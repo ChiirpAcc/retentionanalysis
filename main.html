@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHIIRP Deal Database Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fafaf9;--sf:#fff;--sf2:#f4f3f0;--bd:#e5e2db;--bdl:#eeedea;--t:#1c1917;--t2:#57534e;--t3:#a8a29e;--ac:#0f766e;--acb:#f0fdfa;--r:#b91c1c;--rb:#fef2f2;--a:#92400e;--ab:#fffbeb;--p:#6d28d9;--pb:#f5f3ff;--g:#166534;--gb:#f0fdf4;--b:#1e40af;--bb:#eff6ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.hd{padding:24px 40px;border-bottom:1px solid var(--bd);background:var(--sf);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.ht{font-size:18px;font-weight:700;letter-spacing:-.3px}.hs{font-size:12px;color:var(--t3);margin-top:2px}
+.hb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);background:var(--sf2);padding:5px 12px;border-radius:6px}
+.nv{display:flex;gap:4px;padding:10px 40px;border-bottom:1px solid var(--bdl);background:var(--sf);overflow-x:auto}
+.nb{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--t3);padding:6px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:.15s}
+.nb:hover{color:var(--t2);background:var(--sf2)}.nb.on{color:var(--ac);background:var(--acb)}
+.mn{max-width:1200px;margin:0 auto;padding:28px 40px}
+.sc{display:none}.sc.on{display:block}
+.st{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+.sd{font-size:13px;color:var(--t2);max-width:700px;line-height:1.7;margin-bottom:20px}
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.k{background:var(--sf);border:1px solid var(--bdl);border-radius:10px;padding:14px 16px}
+.kl{font-size:11px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.kv{font-size:24px;font-weight:700;line-height:1.1}.ks{font-size:11px;color:var(--t3);margin-top:3px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.cd{background:var(--sf);border:1px solid var(--bdl);border-radius:10px;padding:18px}
+.ct{font-size:14px;font-weight:600;margin-bottom:2px}.cs{font-size:11px;color:var(--t3);margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--bd)}
+td{padding:9px 10px;border-bottom:1px solid var(--bdl)}tr:last-child td{border-bottom:none}
+.bg{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600}
+.bg-g{background:var(--gb);color:var(--g)}.bg-r{background:var(--rb);color:var(--r)}.bg-a{background:var(--ab);color:var(--a)}.bg-b{background:var(--bb);color:var(--b)}
+.ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:14px}
+.i{background:var(--sf);border:1px solid var(--bdl);border-radius:8px;padding:12px 14px}
+.i.good{border-left:3px solid var(--g)}.i.bad{border-left:3px solid var(--r)}.i.warn{border-left:3px solid var(--a)}.i.ntrl{border-left:3px solid var(--p)}
+.it{font-size:12px;font-weight:700;margin-bottom:3px}.ib{font-size:12px;color:var(--t2);line-height:1.65}.ib strong{color:var(--t);font-weight:600}
+.co{background:var(--acb);border:1px solid #d1fae5;border-radius:10px;padding:16px 18px;margin-bottom:18px}
+.cot{font-size:14px;font-weight:700;color:var(--ac);margin-bottom:5px}.cob{font-size:13px;color:var(--t2);line-height:1.7}.cob strong{color:var(--t)}
+.br{display:flex;align-items:center;gap:10px;margin-bottom:7px}.bl{width:110px;font-size:12px;flex-shrink:0}.bk{flex:1;height:7px;background:var(--sf2);border-radius:4px;overflow:hidden}.bf{height:100%;border-radius:4px}.bv{width:80px;text-align:right;font-size:12px;color:var(--t2);font-weight:500}
+@media(max-width:900px){.mn{padding:16px}.hd,.nv{padding-left:16px;padding-right:16px}.g2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hd"><div><div class="ht">CHIIRP Deal Database Analysis</div><div class="hs">1,410 customers · 12-month window · cohort-controlled</div></div><div class="hb">April 2026</div></div>
+<nav class="nv">
+<button class="nb on" onclick="go('ov')">Overview</button>
+<button class="nb" onclick="go('ch')">Cohort & churn</button>
+<button class="nb" onclick="go('ob')">Onboarding effect</button>
+<button class="nb" onclick="go('fm')">Free months</button>
+<button class="nb" onclick="go('ow')">Deal owners</button>
+<button class="nb" onclick="go('ls')">Lead sources</button>
+<button class="nb" onclick="go('mr')">MRR & revenue</button>
+</nav>
+<div class="mn">
+
+<!-- OVERVIEW -->
+<div class="sc on" id="ov">
+<div class="st">Portfolio overview</div>
+<div class="sd">High-level health metrics. Active = last paid month is April 2026 or later.</div>
+<div class="kg">
+<div class="k"><div class="kl">Total customers</div><div class="kv">1,410</div></div>
+<div class="k"><div class="kl">Active</div><div class="kv" style="color:var(--g)">933</div><div class="ks">66.2%</div></div>
+<div class="k"><div class="kl">Churned</div><div class="kv" style="color:var(--r)">477</div><div class="ks">33.8%</div></div>
+<div class="k"><div class="kl">Current MRR</div><div class="kv" style="color:var(--ac)">$685,548</div></div>
+<div class="k"><div class="kl">Avg MRR / customer</div><div class="kv">$735</div><div class="ks">active accounts</div></div>
+<div class="k"><div class="kl">Median tenure</div><div class="kv">13 mo</div><div class="ks">mean 17.5 mo</div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ct">New customers per month</div><div class="cs">Jan 2024 – Mar 2026</div><canvas id="c1" height="200"></canvas></div>
+<div class="cd"><div class="ct">Active vs churned by cohort year</div><div class="cs">Stacked count</div><canvas id="c2" height="200"></canvas></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ct">Monthly churn events</div><div class="cs">Apr 2025 – Mar 2026</div><canvas id="c3" height="180"></canvas></div>
+<div class="cd"><div class="ct">MRR by amount tier</div><div class="cs">Active customers</div><canvas id="c4" height="180"></canvas></div>
+</div>
+<div class="ig">
+<div class="i good"><div class="it">Strong MRR base</div><div class="ib">$685K MRR from 933 active. The $700–$1K tier contributes <strong>$260K</strong> (38% of total) from 295 customers.</div></div>
+<div class="i bad"><div class="it">Churn accelerating</div><div class="ib">Events rose from ~21/month in Jun–Jul 2025 to <strong>35–40/month</strong> by early 2026. February 2026 peaked at 40.</div></div>
+<div class="i warn"><div class="it">Onboarding drop-off</div><div class="ib">Late 2024: ~100% of deals had onboarding at ~$750. By Mar 2026: <strong>24% adoption</strong> at avg $187.</div></div>
+<div class="i ntrl"><div class="it">2025 volume surge</div><div class="ib">595 new customers in 2025 vs 378 in 2024. Sep 2025 alone had <strong>90 new deals</strong>.</div></div>
+</div>
+</div>
+
+<!-- COHORT -->
+<div class="sc" id="ch">
+<div class="st">Cohort & churn analysis</div>
+<div class="sd">Raw churn rates are misleading across years — older cohorts have had more time to churn. Tenure rate normalizes this.</div>
+<div class="co"><div class="cot">Why tenure rate matters</div><div class="cob">A Q1 2024 customer has had 27 months to churn. A Q1 2026 customer has had 3. <strong>Tenure rate</strong> = months paid ÷ max months since signup. A score of 0.85 means a customer paid for 85% of their possible lifetime. This metric is comparable across cohorts.</div></div>
+<div class="kg">
+<div class="k"><div class="kl">2022 churn</div><div class="kv">22%</div><div class="ks">27 of 122</div></div>
+<div class="k"><div class="kl">2023 churn</div><div class="kv" style="color:var(--g)">17%</div><div class="ks">25 of 146</div></div>
+<div class="k"><div class="kl">2024 churn</div><div class="kv" style="color:var(--r)">41%</div><div class="ks">153 of 378</div></div>
+<div class="k"><div class="kl">2025 churn</div><div class="kv" style="color:var(--r)">40%</div><div class="ks">236 of 595</div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ct">Tenure rate by cohort quarter</div><div class="cs">1.0 = perfect retention since signup. Comparable across quarters.</div><canvas id="c5" height="220"></canvas></div>
+<div class="cd"><div class="ct">Raw churn rate by year</div><div class="cs">Misleading across years (shown for reference)</div><canvas id="c6" height="220"></canvas></div>
+</div>
+<div class="cd" style="margin-bottom:14px"><div class="ct">Churn rate by MRR tier</div><div class="cs">Raw rates</div><div style="padding-top:10px">
+<div class="br"><div class="bl">&lt;$300/mo</div><div class="bk"><div class="bf" style="width:26%;background:var(--g)"></div></div><div class="bv">26% · 186</div></div>
+<div class="br"><div class="bl">$300–500</div><div class="bk"><div class="bf" style="width:42%;background:var(--r)"></div></div><div class="bv">42% · 238</div></div>
+<div class="br"><div class="bl">$500–700</div><div class="bk"><div class="bf" style="width:37%;background:var(--a)"></div></div><div class="bv">37% · 389</div></div>
+<div class="br"><div class="bl">$700–1K</div><div class="bk"><div class="bf" style="width:32%;background:var(--a)"></div></div><div class="bv">32% · 437</div></div>
+<div class="br"><div class="bl">$1K+</div><div class="bk"><div class="bf" style="width:26%;background:var(--g)"></div></div><div class="bv">26% · 149</div></div>
+</div></div>
+<div class="ig">
+<div class="i good"><div class="it">2022–2023 cohorts are sticky</div><div class="ib">Tenure rates of <strong>0.95–0.99</strong>. These customers stayed nearly all the time they could have.</div></div>
+<div class="i bad"><div class="it">2024Q3–2025Q2 is the trouble band</div><div class="ib">Tenure rates drop to <strong>0.78–0.85</strong>. Peak onboarding fees AND peak volume — exact period that needs investigation.</div></div>
+<div class="i warn"><div class="it">High MRR retains better</div><div class="ib">$1K+ and &lt;$300 tiers both at 26% churn. Low-end is old DIY; high-end reflects commitment.</div></div>
+</div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="sc" id="ob">
+<div class="st">Onboarding effect on retention</div>
+<div class="sd">Cohort-controlled regression with quarter fixed effects (N=1,266, R²=0.086).</div>
+<div class="co"><div class="cot">Regression result — cohort-controlled</div><div class="cob">Per $100 onboarding → <strong>−0.4% of max tenure ≈ −$44 LTV</strong>. Before cohort controls this appeared to be −$92 — more than half was time bias from old $0 accounts having longer tenure. The remaining effect is small and inconsistent quarter to quarter.</div></div>
+<div class="kg">
+<div class="k"><div class="kl">Before controls</div><div class="kv" style="color:var(--r)">−$92</div><div class="ks">LTV per $100 ob</div></div>
+<div class="k"><div class="kl">After controls</div><div class="kv" style="color:var(--a)">−$44</div><div class="ks">LTV per $100 ob</div></div>
+<div class="k"><div class="kl">$0 tenure rate</div><div class="kv" style="color:var(--g)">93%</div><div class="ks">n=632</div></div>
+<div class="k"><div class="kl">$750+ tenure rate</div><div class="kv" style="color:var(--a)">83%</div><div class="ks">n=451</div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ct">Within-quarter: $0 vs paid onboarding</div><div class="cs">Same cohort quarter — apples to apples</div><canvas id="c7" height="240"></canvas></div>
+<div class="cd"><div class="ct">Onboarding adoption over time</div><div class="cs">% of new deals + avg fee</div><canvas id="c8" height="240"></canvas></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ct">Active rate by tier (2024–2025)</div><div class="cs">Raw, not tenure-rate</div><canvas id="c9" height="200"></canvas></div>
+<div class="cd"><div class="ct">Est. LTV by tier (2024–2025)</div><div class="cs">Amount × tenure months</div><canvas id="c10" height="200"></canvas></div>
+</div>
+<div class="ig">
+<div class="i warn"><div class="it">Small negative remains after controls</div><div class="ib">Paid tiers at 83–86% vs $0 at 93%. But >50% of the original gap was time bias. Remaining −$44 is weak.</div></div>
+<div class="i good"><div class="it">Q3 2025 flips positive</div><div class="ib">Paid outperformed $0 by <strong>+4.6pp</strong>. Only quarter where paid wins — suggests the effect isn't structural.</div></div>
+<div class="i bad"><div class="it">$1–499 partial tier is worst</div><div class="ib">50% active rate — worse than $0 and worse than $750+. Incomplete onboarding may be worse than none.</div></div>
+<div class="i ntrl"><div class="it">Bottom line</div><div class="ib">No strong evidence onboarding fees hurt or help. The effect is small (−$44) and inconsistent. What matters is whether onboarding is <strong>delivered effectively</strong>, not what was charged.</div></div>
+</div>
+</div>
+
+<!-- FREE MONTHS -->
+<div class="sc" id="fm">
+<div class="st">Free months & discount effect</div>
+<div class="sd">Cohort-controlled analysis of free months given at signup.</div>
+<div class="co"><div class="cot">Regression result — cohort-controlled</div><div class="cob">Per free month → <strong>−0.02% of max tenure ≈ −$2 LTV</strong>. Effectively zero. Before controls this appeared to be −$100/month — that finding was <strong>almost entirely time bias</strong>. Older no-discount accounts simply had more time to accumulate tenure.</div></div>
+<div class="kg">
+<div class="k"><div class="kl">Before controls</div><div class="kv" style="color:var(--r)">−$100</div><div class="ks">LTV per free month</div></div>
+<div class="k"><div class="kl">After controls</div><div class="kv" style="color:var(--g)">~$0</div><div class="ks">LTV per free month</div></div>
+<div class="k"><div class="kl">W/ free months</div><div class="kv">186</div><div class="ks">13.2% of base</div></div>
+<div class="k"><div class="kl">Quarters helped</div><div class="kv">2 of 6</div><div class="ks">Q4'24, Q3'25</div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ct">Within-quarter: 0 vs any free months</div><div class="cs">Tenure rate — same cohort, comparable</div><canvas id="c11" height="240"></canvas></div>
+<div class="cd"><div class="ct">Raw churn by free months (reference)</div><div class="cs">Not cohort-controlled — included for context</div><canvas id="c12" height="240"></canvas></div>
+</div>
+<div class="ig">
+<div class="i good"><div class="it">Free months aren't the retention killer we thought</div><div class="ib">Regression coefficient is essentially <strong>zero</strong> after cohort control. The within-quarter direction flips half the time. No consistent negative signal.</div></div>
+<div class="i warn"><div class="it">Q1–Q2 2025 were weak</div><div class="ib">Those quarters show −6pp and −10pp. Free months may have attracted weaker deals then, but it's not structural.</div></div>
+<div class="i warn"><div class="it">Discounted deals churn more (raw)</div><div class="ib">48% vs 32%. But most discounted deals are newer cohorts — time bias again.</div></div>
+<div class="i ntrl"><div class="it">$0 Stripe invoices not captured</div><div class="ib">Free months don't generate charges, understating tenure for couponed accounts. Fixing the SQL would likely make free months look even more neutral.</div></div>
+</div>
+</div>
+
+<!-- OWNERS -->
+<div class="sc" id="ow">
+<div class="st">Deal owner performance</div>
+<div class="sd">All owners with 10+ deals. Raw churn (not cohort-controlled) — owners have mixed-vintage books.</div>
+<div class="cd" style="margin-bottom:14px"><div class="ct">Deal owner scorecard</div><div class="cs">Sorted by churn (best first)</div>
+<table><thead><tr><th>Owner</th><th>Deals</th><th>Active</th><th>Churn</th><th>Avg MRR</th><th>Tenure</th><th>% OB</th><th>Active MRR</th></tr></thead><tbody>
+<tr><td>Blake Fenn</td><td>36</td><td>30</td><td><span class="bg bg-g">17%</span></td><td>$1,198</td><td>5.8</td><td>39%</td><td>$37,356</td></tr>
+<tr><td>Kai Kaimikaua</td><td>29</td><td>23</td><td><span class="bg bg-g">21%</span></td><td>$723</td><td>32.1</td><td>0%</td><td>$15,675</td></tr>
+<tr><td>Ky Decker</td><td>51</td><td>39</td><td><span class="bg bg-g">24%</span></td><td>$1,241</td><td>5.8</td><td>25%</td><td>$50,195</td></tr>
+<tr><td>Justin Judd</td><td>38</td><td>26</td><td><span class="bg bg-a">32%</span></td><td>$937</td><td>16.3</td><td>92%</td><td>$23,328</td></tr>
+<tr><td>Korth Rushdi</td><td>32</td><td>20</td><td><span class="bg bg-a">38%</span></td><td>$769</td><td>7.1</td><td>69%</td><td>$16,244</td></tr>
+<tr><td>Colton Lingmann</td><td>190</td><td>116</td><td><span class="bg bg-a">39%</span></td><td>$724</td><td>7.0</td><td>58%</td><td>$86,809</td></tr>
+<tr><td>Chelsea Allred</td><td>223</td><td>136</td><td><span class="bg bg-a">39%</span></td><td>$808</td><td>17.0</td><td>83%</td><td>$119,450</td></tr>
+<tr><td>Ryan Peterson</td><td>15</td><td>9</td><td><span class="bg bg-r">40%</span></td><td>$800</td><td>11.7</td><td>100%</td><td>$6,949</td></tr>
+<tr><td>Parker Joos</td><td>451</td><td>262</td><td><span class="bg bg-r">42%</span></td><td>$806</td><td>11.0</td><td>82%</td><td>$213,105</td></tr>
+</tbody></table></div>
+<div class="g2">
+<div class="cd"><div class="ct">Deals by owner</div><div class="cs">All time</div><canvas id="c13" height="260"></canvas></div>
+<div class="cd"><div class="ct">Churn by owner</div><div class="cs">Lower is better</div><canvas id="c14" height="260"></canvas></div>
+</div>
+<div class="ig">
+<div class="i good"><div class="it">Blake Fenn & Ky Decker lead</div><div class="ib">17% and 24% churn at higher MRR ($1,198 / $1,241). Fewer deals, better quality.</div></div>
+<div class="i warn"><div class="it">Parker Joos: volume vs quality</div><div class="ib">451 deals (32% of DB) at 42% churn. $213K active MRR — top contributor but high churn creates volatility.</div></div>
+</div>
+</div>
+
+<!-- LEAD SOURCE -->
+<div class="sc" id="ls">
+<div class="st">Lead source performance</div>
+<div class="sd">Only 266 of 1,410 (19%) have a source. Directional only.</div>
+<div class="cd" style="margin-bottom:14px"><div class="ct">Lead source scorecard</div><div class="cs">Sources with 3+ deals</div>
+<table><thead><tr><th>Source</th><th>Deals</th><th>Active rate</th><th>Avg MRR</th><th>Tenure</th><th>Avg OB</th></tr></thead><tbody>
+<tr><td>Home Service Freedom</td><td>87</td><td><span class="bg bg-g">70%</span></td><td>$837</td><td>10.4</td><td>$666</td></tr>
+<tr><td>Webinar - Can't Stop Growth</td><td>64</td><td><span class="bg bg-a">53%</span></td><td>$835</td><td>11.6</td><td>$699</td></tr>
+<tr><td>Hero Marketing Agency</td><td>15</td><td><span class="bg bg-g">80%</span></td><td>$806</td><td>7.7</td><td>$317</td></tr>
+<tr><td>Website</td><td>13</td><td><span class="bg bg-g">77%</span></td><td>$1,254</td><td>3.4</td><td>$462</td></tr>
+<tr><td>LB Roofing Process</td><td>8</td><td><span class="bg bg-r">25%</span></td><td>$924</td><td>2.9</td><td>$313</td></tr>
+<tr><td>BDR Spark Conference</td><td>6</td><td><span class="bg bg-g">100%</span></td><td>$1,667</td><td>6.3</td><td>$42</td></tr>
+<tr><td>EGIA Epic</td><td>4</td><td><span class="bg bg-g">100%</span></td><td>$1,813</td><td>2.0</td><td>$0</td></tr>
+<tr><td>Certain Path</td><td>4</td><td><span class="bg bg-g">75%</span></td><td>$2,000</td><td>2.3</td><td>$500</td></tr>
+</tbody></table></div>
+<div class="ig">
+<div class="i good"><div class="it">Home Service Freedom is the best at scale</div><div class="ib">87 deals, 70% active, $837 avg MRR. Top priority to protect and grow.</div></div>
+<div class="i good"><div class="it">Conference leads = high MRR</div><div class="ib">EGIA ($1,813), BDR Spark ($1,667), Certain Path ($2,000). Small counts but consistently high-value.</div></div>
+<div class="i bad"><div class="it">LB Roofing underperformed</div><div class="ib"><strong>25% active rate</strong>, 2.9 mo tenure. Poor qualification or product fit.</div></div>
+<div class="i warn"><div class="it">81% missing lead source</div><div class="ib">Enforce capture at deal creation to improve marketing ROI attribution.</div></div>
+</div>
+</div>
+
+<!-- MRR -->
+<div class="sc" id="mr">
+<div class="st">MRR & revenue</div>
+<div class="sd">Current recurring revenue and package performance.</div>
+<div class="kg">
+<div class="k"><div class="kl">Total MRR</div><div class="kv" style="color:var(--ac)">$685,548</div></div>
+<div class="k"><div class="kl">$700–1K tier</div><div class="kv">$260K</div><div class="ks">38% of MRR</div></div>
+<div class="k"><div class="kl">$1K+ tier</div><div class="kv">$181K</div><div class="ks">26% of MRR</div></div>
+<div class="k"><div class="kl">Growth avg LTV</div><div class="kv" style="color:var(--g)">$16,789</div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ct">MRR by amount tier</div><div class="cs">Active customers</div><canvas id="c15" height="200"></canvas></div>
+<div class="cd"><div class="ct">Avg LTV by package</div><div class="cs">Contract value after coupon</div><canvas id="c16" height="200"></canvas></div>
+</div>
+<div class="cd" style="margin-bottom:14px"><div class="ct">Package performance</div>
+<table><thead><tr><th>Package</th><th>Count</th><th>Churn</th><th>Tenure</th><th>Avg LTV</th></tr></thead><tbody>
+<tr><td>DIY</td><td>290</td><td><span class="bg bg-g">11%</span></td><td>34.6 mo</td><td>$5,186</td></tr>
+<tr><td>Growth</td><td>88</td><td><span class="bg bg-g">15%</span></td><td>4.4 mo</td><td>$16,789</td></tr>
+<tr><td>Gold</td><td>166</td><td><span class="bg bg-a">30%</span></td><td>6.1 mo</td><td>$9,004</td></tr>
+<tr><td>Enterprise</td><td>106</td><td><span class="bg bg-a">40%</span></td><td>16.5 mo</td><td>$13,848</td></tr>
+<tr><td>Partner</td><td>549</td><td><span class="bg bg-r">50%</span></td><td>13.4 mo</td><td>$8,120</td></tr>
+<tr><td>Freedom</td><td>57</td><td><span class="bg bg-r">60%</span></td><td>12.9 mo</td><td>$3,673</td></tr>
+</tbody></table></div>
+<div class="ig">
+<div class="i good"><div class="it">Growth is the winner</div><div class="ib">$16,789 avg LTV, 15% churn. Short tenure (4.4 mo) just reflects how new they are.</div></div>
+<div class="i good"><div class="it">DIY is the retention champion</div><div class="ib">11% churn, <strong>34.6 month avg tenure</strong>. Lower MRR but extremely sticky.</div></div>
+<div class="i bad"><div class="it">Partner is the liability</div><div class="ib">549 customers (largest) at <strong>50% churn</strong>. Understanding this is critical.</div></div>
+</div>
+</div>
+
+</div>
+<script>
+Chart.defaults.color='#a8a29e';Chart.defaults.borderColor='#e5e2db';Chart.defaults.font.family="'DM Sans',sans-serif";Chart.defaults.font.size=11;
+var G='#166534',R='#b91c1c',A='#92400e',P='#6d28d9',T='#0f766e';
+function go(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.remove('on')});document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on')});document.getElementById(id).classList.add('on');event.target.classList.add('on');window.scrollTo(0,0)}
+var gc='#f0efec';
+var mo=["'24-Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","'25-Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","'26-Jan","Feb","Mar"];
+var nd=[9,23,17,25,39,27,34,41,43,38,46,36,28,38,54,51,51,52,50,53,90,63,28,37,56,46,41];
+new Chart(document.getElementById('c1'),{type:'bar',data:{labels:mo,datasets:[{data:nd,backgroundColor:nd.map(function(v){return v>=70?T:v>=40?P:'#d6d3d1'}),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{maxRotation:60,font:{size:9}}},y:{grid:{color:gc}}}}});
+new Chart(document.getElementById('c2'),{type:'bar',data:{labels:['2022','2023','2024','2025','2026'],datasets:[{label:'Active',data:[95,121,225,359,120],backgroundColor:G,borderRadius:3},{label:'Churned',data:[27,25,153,236,27],backgroundColor:R,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a8a29e'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:gc}}}}});
+new Chart(document.getElementById('c3'),{type:'line',data:{labels:["Apr'25",'May','Jun','Jul','Aug','Sep','Oct','Nov','Dec',"Jan'26",'Feb','Mar'],datasets:[{data:[6,5,21,21,23,26,36,37,28,35,40,33],borderColor:R,backgroundColor:'rgba(185,28,28,0.06)',fill:true,tension:0.4,pointBackgroundColor:R,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},beginAtZero:true}}}});
+new Chart(document.getElementById('c4'),{type:'doughnut',data:{labels:['<$300 ($22K)','$300-500 ($61K)','$500-700 ($162K)','$700-1K ($260K)','$1K+ ($181K)'],datasets:[{data:[21734,61129,161854,260186,180644],backgroundColor:['#d6d3d1',P,T,G,A],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right',labels:{color:'#78716c',font:{size:10},padding:10}}}}});
+var cq=['22Q1','22Q2','22Q3','22Q4','23Q1','23Q2','23Q3','23Q4','24Q1','24Q2','24Q3','24Q4','25Q1','25Q2','25Q3','25Q4','26Q1'];
+var cr=[97,98,99,95,97,98,99,97,94,95,82,85,82,78,80,84,87];
+new Chart(document.getElementById('c5'),{type:'bar',data:{labels:cq,datasets:[{data:cr,backgroundColor:cr.map(function(v){return v>=95?G:v>=85?'#15803d':v>=80?A:R}),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'%'}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:gc},min:70,max:100,ticks:{callback:function(v){return v+'%'}}}}}});
+new Chart(document.getElementById('c6'),{type:'bar',data:{labels:['2022','2023','2024','2025','2026*'],datasets:[{data:[22.1,17.1,40.5,39.7,18.4],backgroundColor:[G,G,R,R,A],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'%'}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},max:50}}}});
+var wq=['24Q1','24Q2','24Q3','24Q4','25Q1','25Q2','25Q3','25Q4'];
+var n0=[96,97,86,89,95,82,77,85];var pd=[86,92,82,85,81,78,81,83];
+new Chart(document.getElementById('c7'),{type:'bar',data:{labels:wq,datasets:[{label:'$0 onboarding',data:n0,backgroundColor:T,borderRadius:3},{label:'Paid onboarding',data:pd,backgroundColor:pd.map(function(v,i){return v>=n0[i]?G:A}),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#78716c'}},tooltip:{callbacks:{label:function(c){var i=c.dataIndex;var d=pd[i]-n0[i];return c.dataset.label+': '+c.raw+'% ('+(d>=0?'+':'')+d+'pp)'}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},min:70,max:100,ticks:{callback:function(v){return v+'%'}}}}}});
+var tm=["Jan'24",'Apr','Jul','Oct',"Jan'25",'Apr','Jul','Oct',"Jan'26",'Mar'];
+var tp=[0,24,85,97,93,96,86,44,46,24];var tf=[0,160,699,762,750,691,568,235,296,187];
+new Chart(document.getElementById('c8'),{type:'line',data:{labels:tm,datasets:[{label:'% w/ onboarding',data:tp,borderColor:T,backgroundColor:'rgba(15,118,110,0.06)',fill:true,tension:0.4,pointBackgroundColor:T,pointRadius:3,yAxisID:'y'},{label:'Avg fee ($)',data:tf,borderColor:A,backgroundColor:'transparent',borderDash:[5,4],tension:0.4,pointBackgroundColor:A,pointRadius:3,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#78716c'}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},max:110},y2:{ticks:{callback:function(v){return '$'+v}},position:'right',grid:{display:false}}}}});
+new Chart(document.getElementById('c9'),{type:'bar',data:{labels:['$0','$1-499','$500-749','$750+'],datasets:[{data:[73,50,57,55],backgroundColor:[G,R,A,A],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% active'}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},max:85}}}});
+new Chart(document.getElementById('c10'),{type:'bar',data:{labels:['$0','$1-499','$500-749','$750+'],datasets:[{data:[11614,4461,7499,11192],backgroundColor:[T,R,A,T],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+c.raw.toLocaleString()}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
+var fq=['24Q3','24Q4','25Q1','25Q2','25Q3','25Q4'];
+var nf=[82,83,84,80,80,85];var hf=[82,89,78,70,82,73];
+new Chart(document.getElementById('c11'),{type:'bar',data:{labels:fq,datasets:[{label:'0 free months',data:nf,backgroundColor:P,borderRadius:3},{label:'Any free months',data:hf,backgroundColor:hf.map(function(v,i){return v>=nf[i]?G:A}),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#78716c'}},tooltip:{callbacks:{label:function(c){var i=c.dataIndex;var d=hf[i]-nf[i];return c.dataset.label+': '+c.raw+'% ('+(d>=0?'+':'')+d+'pp)'}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},min:60,max:100,ticks:{callback:function(v){return v+'%'}}}}}});
+new Chart(document.getElementById('c12'),{type:'bar',data:{labels:['0 mo (1224)','1 mo (18)','2 mo (10)','3 mo (146)','4 mo (4)','6 mo (6)'],datasets:[{data:[32,39,40,46,75,67],backgroundColor:[G,A,A,A,R,R],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'% churn'}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},max:85}}}});
+var ow=['Parker Joos','Chelsea Allred','Colton Lingmann','Ky Decker','Justin Judd','Blake Fenn','Korth Rushdi','Kai Kaimikaua'];
+new Chart(document.getElementById('c13'),{type:'bar',data:{labels:ow,datasets:[{data:[451,223,190,51,38,36,32,29],backgroundColor:P,borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+new Chart(document.getElementById('c14'),{type:'bar',data:{labels:ow,datasets:[{data:[42,39,39,24,32,17,38,21],backgroundColor:[R,A,A,G,A,G,A,G],borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+'%'}}}},scales:{x:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},max:50},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+new Chart(document.getElementById('c15'),{type:'bar',data:{labels:['<$300','$300-500','$500-700','$700-1K','$1K+'],datasets:[{label:'Customers',data:[137,137,245,295,110],backgroundColor:P,borderRadius:3},{label:'MRR ($K)',data:[22,61,162,260,181],backgroundColor:T,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#78716c'}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}}}}});
+new Chart(document.getElementById('c16'),{type:'bar',data:{labels:['DIY','Growth','Gold','Enterprise','Partner','Freedom'],datasets:[{data:[5186,16789,9004,13848,8120,3673],backgroundColor:[T,G,A,P,A,R],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return '$'+c.raw.toLocaleString()}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
+</script>
+</body></html>
