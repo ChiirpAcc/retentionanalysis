@@ -7,13 +7,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 :root{--bg:#09090b;--s1:#18181b;--s2:#1f1f23;--s3:#27272a;--bd:#2e2e33;--t:#fafafa;--t2:#a1a1aa;--t3:#71717a;--ac:#3b82f6;--gn:#22c55e;--rd:#ef4444;--am:#f59e0b;--pp:#a78bfa;--cn:#06b6d4}
 *{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--t);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5}
-.hd{padding:16px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;background:var(--bg)}
+.hd{padding:16px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;background:rgba(9,9,11,.95);backdrop-filter:blur(8px)}
 .ht{font-size:15px;font-weight:600}.hs{font-size:11px;color:var(--t3);margin-top:1px}
 .nv{display:flex;gap:2px;padding:8px 28px;border-bottom:1px solid var(--bd);background:var(--s1);overflow-x:auto;scrollbar-width:none}.nv::-webkit-scrollbar{display:none}
 .nb{background:none;border:none;font-family:inherit;font-size:11px;font-weight:500;color:var(--t3);padding:5px 11px;border-radius:5px;cursor:pointer;white-space:nowrap;transition:.15s}
 .nb:hover{color:var(--t2);background:var(--s2)}.nb.on{color:var(--ac);background:rgba(59,130,246,.1)}
 .mn{max-width:1160px;margin:0 auto;padding:20px 28px}.sc{display:none}.sc.on{display:block}
-.st{font-size:18px;font-weight:700;margin-bottom:2px}.sd{font-size:12px;color:var(--t3);max-width:680px;line-height:1.7;margin-bottom:16px}
+.st{font-size:18px;font-weight:700;margin-bottom:2px}.sd{font-size:12px;color:var(--t3);max-width:700px;line-height:1.7;margin-bottom:16px}
 .kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px}
 .k{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:11px 13px}
 .kl{font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
@@ -21,189 +21,181 @@
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.g1{margin-bottom:10px}
 .cd{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:14px}
 .ct{font-size:12px;font-weight:600;margin-bottom:1px}.cs{font-size:10px;color:var(--t3);margin-bottom:10px}
-.interp{font-size:11px;color:var(--t2);line-height:1.65;margin-top:10px;padding:10px 12px;background:var(--s2);border-radius:6px}
-.interp strong{color:var(--t);font-weight:500}
+.interp{font-size:11px;color:var(--t2);line-height:1.65;margin-top:10px;padding:10px 12px;background:var(--s2);border-radius:6px}.interp strong{color:var(--t);font-weight:500}
 table{width:100%;border-collapse:collapse;font-size:11px}th{text-align:left;padding:5px 8px;font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bd)}
 td{padding:5px 8px;border-bottom:1px solid var(--s3)}tr:last-child td{border-bottom:none}
 .bg{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600}
 .bg-g{background:rgba(34,197,94,.12);color:var(--gn)}.bg-r{background:rgba(239,68,68,.12);color:var(--rd)}.bg-a{background:rgba(245,158,11,.12);color:var(--am)}.bg-b{background:rgba(59,130,246,.12);color:var(--ac)}
-.ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin-top:10px}
-.i{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:9px 11px}
-.i.good{border-left:2px solid var(--gn)}.i.bad{border-left:2px solid var(--rd)}.i.warn{border-left:2px solid var(--am)}.i.ntrl{border-left:2px solid var(--pp)}
-.it{font-size:11px;font-weight:600;margin-bottom:2px}.ib{font-size:11px;color:var(--t2);line-height:1.6}.ib strong{color:var(--t);font-weight:500}
 .co{border-radius:8px;padding:14px 16px;margin-bottom:14px;border:1px solid}
 .co.ac{background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.2)}.co.warn{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2)}.co.rd{background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2)}
 .cot{font-size:12px;font-weight:600;margin-bottom:3px}.co.ac .cot{color:#60a5fa}.co.warn .cot{color:#fbbf24}.co.rd .cot{color:#f87171}
 .cob{font-size:11px;color:var(--t2);line-height:1.7}.cob strong{color:var(--t)}
+.calc-row{display:flex;gap:12px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.calc-row label{font-size:11px;color:var(--t2);width:140px}
+.calc-row input,.calc-row select{background:var(--s2);border:1px solid var(--bd);color:var(--t);padding:6px 10px;border-radius:6px;font-family:inherit;font-size:12px;width:120px}
+.calc-result{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-top:12px}
+.calc-result .kv{font-size:28px}
 @media(max-width:900px){.mn{padding:14px}.hd,.nv{padding-left:14px;padding-right:14px}.g2{grid-template-columns:1fr}}
 </style></head><body>
-<div class="hd"><div><div class="ht">CHIIRP Unit Economics</div><div class="hs">Corrected tenure · contract-date cohorts · net revenue · win rate adjusted</div></div></div>
+<div class="hd"><div><div class="ht">CHIIRP Unit Economics</div><div class="hs">358 contract accounts · 2025Q2–2026Q1 · net revenue · corrected tenure</div></div></div>
 <nav class="nv">
 <button class="nb on" onclick="go('ex')">Executive summary</button>
 <button class="nb" onclick="go('sp')">LTV spaghetti</button>
 <button class="nb" onclick="go('su')">Survival & churn</button>
-<button class="nb" onclick="go('wr')">Win rate & free months</button>
+<button class="nb" onclick="go('wr')">Win rate</button>
 <button class="nb" onclick="go('be')">CAC breakeven</button>
 <button class="nb" onclick="go('fc')">2026Q1 forecast</button>
-<button class="nb" onclick="go('co')">Cohort detail</button>
+<button class="nb" onclick="go('calc')">Calculator</button>
 </nav>
 <div class="mn">
 
-<!-- EXECUTIVE SUMMARY -->
+<!-- ═══ EXECUTIVE SUMMARY ═══ -->
 <div class="sc on" id="ex">
 <div class="st">Executive summary</div>
-<div class="sd">358 contract accounts (2025Q2–2026Q1). 1,446 Stripe accounts total. Net revenue = gross MRR − discounts − coupons − refunds. Tenure corrected for active billing lag. Monthly churn rate: 2.8% (from 2025Q3, 7 months observed). CAC = $7,862 (Q1 2026 avg).</div>
+<div class="sd">358 contract accounts from 2025Q2–2026Q1. Revenue is net of discounts, coupons, and refunds. Churn rate from 2025Q3 (76 accounts, 6 months observed). CAC matched to each cohort's acquisition quarter.</div>
 
-<div class="co ac"><div class="cot">Revised findings for leadership</div><div class="cob">
-<strong>1. Monthly churn is 2.8%, not 5%.</strong> The corrected data (fixing billing lag artifacts) shows much better retention than the prior analysis. 71% of customers survive to month 12 at this rate. This fundamentally changes the unit economics.<br><br>
-<strong>2. Free months boost win rate — removing them cut deal flow nearly in half.</strong> Q3 2025 (62% had free months): 10.2% win rate → 134 deals. Q1 2026 (3% had free months): 5.3% win rate → 68 deals. That's 66 fewer deals/quarter, representing ~$554K in lost cohort LTV. Free months aren't just a retention question — they're a <strong>top-of-funnel acquisition lever</strong>.<br><br>
-<strong>3. At $1,500/mo, a 3-free-month deal still generates +$4,221 net of CAC.</strong> Breakeven is month 9 (vs month 5 without free months). If offering 3 months free is what maintains win rate, the math overwhelmingly supports it.<br><br>
-<strong>4. Accounts under $700/mo are underwater at current CAC.</strong> $700/mo × 12 months × 71% survival = $7,213 gross LTV. At $7,862 CAC that's −$649. These accounts need either higher pricing, lower-cost channels, or onboarding fees to break even.<br><br>
-<strong>5. 2026Q1 is structurally the strongest cohort.</strong> $1,008 avg gross MRR, 100% active, 0% free months. Projected 12-month LTV of $10,305. But the 5.3% win rate means we're closing half as many deals as Q3 2025.
+<div class="co ac"><div class="cot">Five findings for leadership</div><div class="cob">
+<strong>1. Monthly churn is 2.8%.</strong> From our most mature clean cohort (2025Q3, 6 months). 71% of customers survive to month 12. This is derived from actual Stripe billing data with tenure corrected for active accounts not yet invoiced for the current month.<br><br>
+<strong>2. Removing free months correlated with a 48% drop in win rate.</strong> Q3 2025 (62% had free months): 10.2% win rate, 134 deals. Q1 2026 (3% had free months): 5.3% win rate, 68 deals. That's 66 fewer deals per quarter. At $10.3K projected LTV per deal, the lost cohort LTV is ~$680K/quarter — far exceeding the per-account cost of 3 free months ($2,900–$4,400 depending on MRR).<br><br>
+<strong>3. Accounts under $700/mo are underwater at current CAC.</strong> $700/mo with no onboarding and no free months generates $7,212 in 12-month LTV against $7,862 in 2026Q1 CAC. Breakeven is month 14 — beyond the safe observation window. The pricing floor needs to be $800+/mo for sustainable unit economics.<br><br>
+<strong>4. 2026Q1 is the highest-MRR cohort.</strong> $1,008 avg gross MRR (up from $689 in Q2). But the 5.3% win rate means we're acquiring half as many accounts. The MRR gain per account does not compensate for the volume loss at the portfolio level.<br><br>
+<strong>5. CAC rose 66% from Q2 to Q4 2025.</strong> $4,988 → $8,267. This compresses margins from both sides — higher cost to acquire, fewer deals closing. Q1 2026 improved slightly to $7,862 but remains elevated vs. the first half of 2025.
 </div></div>
 
 <div class="kg">
-<div class="k"><div class="kl">Monthly churn</div><div class="kv" style="color:var(--gn)">2.8%</div><div class="ks">corrected, 2025Q3</div></div>
-<div class="k"><div class="kl">12-mo survival</div><div class="kv" style="color:var(--gn)">71%</div><div class="ks">at 2.8% monthly</div></div>
+<div class="k"><div class="kl">Monthly churn</div><div class="kv" style="color:var(--gn)">2.8%</div><div class="ks">2025Q3, 6mo data</div></div>
+<div class="k"><div class="kl">12-mo survival</div><div class="kv" style="color:var(--gn)">71%</div><div class="ks">projected</div></div>
 <div class="k"><div class="kl">CAC (2026Q1)</div><div class="kv">$7,862</div><div class="ks">fixed + variable</div></div>
 <div class="k"><div class="kl">2026Q1 avg MRR</div><div class="kv" style="color:var(--ac)">$1,008</div><div class="ks">68 accounts</div></div>
-<div class="k"><div class="kl">Win rate trend</div><div class="kv" style="color:var(--rd)">5.3%</div><div class="ks">down from 10.2%</div></div>
-<div class="k"><div class="kl">Avg discount %</div><div class="kv">6.3%</div><div class="ks">of gross MRR</div></div>
-<div class="k"><div class="kl">Avg refund %</div><div class="kv">5.2%</div><div class="ks">of gross MRR</div></div>
-<div class="k"><div class="kl">Net vs gross gap</div><div class="kv" style="color:var(--am)">11.5%</div><div class="ks">revenue leakage</div></div>
+<div class="k"><div class="kl">Win rate (Q1'26)</div><div class="kv" style="color:var(--rd)">5.3%</div><div class="ks">vs 10.2% Q3'25</div></div>
+<div class="k"><div class="kl">Discount + refund</div><div class="kv" style="color:var(--am)">12.2%</div><div class="ks">of gross, Q1'26</div></div>
 </div>
 
 <div class="g2">
-<div class="cd"><div class="ct">LTV spaghetti — cumulative net revenue per customer</div><div class="cs">Solid = actual · dashed = projected at 2.8% churn · red dashed = CAC</div><canvas id="c_spag" height="240"></canvas>
-<div class="interp"><strong>How to read:</strong> Each line is a quarterly cohort. Length = data maturity. Steeper = higher MRR. The 2026Q1 line (lightest) starts highest — $881 vs $704–732 for older cohorts — confirming the pricing shift is real. All lines are roughly parallel (no slope decay), meaning customers who stay don't reduce spend. The $7.9K CAC line is crossed by $1K+/mo accounts around month 8–9.</div></div>
-<div class="cd"><div class="ct">Win rate vs free month adoption</div><div class="cs">Quarterly: deals closed ÷ demos given</div><canvas id="c_wr" height="240"></canvas>
-<div class="interp"><strong>The critical tradeoff:</strong> As free month usage dropped from 62% → 3%, win rate fell from 10.2% → 5.3%. This is the strongest signal in the data — <strong>free months are an acquisition tool, not just a retention tool.</strong> The 66 fewer deals/quarter at $1K avg MRR represents ~$554K in lost cohort LTV, dwarfing the per-account cost of 3 free months (~$3K).</div></div>
+<div class="cd"><div class="ct">LTV spaghetti — cumulative net revenue per customer</div><div class="cs">Solid = actual data · dashed = projected at 2.8% churn · CAC lines matched to each cohort</div><canvas id="c_spag" height="240"></canvas>
+<div class="interp">Each line is a quarterly cohort. <strong>2026Q1 starts highest</strong> ($881/mo net) confirming the pricing shift. All lines are roughly parallel — no slope decay, meaning customers who stay don't reduce spend. The dashed CAC lines show each cohort's actual acquisition cost: Q3's $5,524 is crossed at month 8, while Q4's $8,267 isn't reached until month 12.</div></div>
+<div class="cd"><div class="ct">Win rate vs free month adoption</div><div class="cs">Quarterly deals closed ÷ demos · bar = deals, lines = WR and FM%</div><canvas id="c_wr" height="240"></canvas>
+<div class="interp">As free month usage dropped from <strong>62% → 3%</strong>, win rate fell from <strong>10.2% → 5.3%</strong>. Pricing also increased and CAC rose, so free months are not the only factor — but they are the largest observable change between the best and worst performing quarters.</div></div>
 </div>
 </div>
 
-<!-- SPAGHETTI -->
+<!-- ═══ SPAGHETTI ═══ -->
 <div class="sc" id="sp">
 <div class="st">LTV spaghetti charts</div>
-<div class="sd">Cumulative net revenue per customer by cohort age. Solid = actual data (truncated at safe observation window). Dashed = projection at 2.8% monthly churn using each cohort's avg net MRR.</div>
-<div class="g1"><div class="cd"><div class="ct">All quarterly cohorts — net collected</div><div class="cs">2025Q3 (7mo data) · 2025Q4 (4mo) · 2026Q1 (2mo) · projected to month 12</div><canvas id="c_spag2" height="300"></canvas>
-<div class="interp"><strong>Key insight:</strong> The 2026Q1 line's projection crosses $7.9K CAC at month 9. At $1,500/mo, it crosses at month 6. The spaghetti shows no LTV saturation — curves are linear, meaning billing velocity is consistent. Older cohorts' actual data validates the projection: 2025Q3 actual at month 6 ($4,845) is within 2% of what the 2.8% model would predict ($4,790).</div></div></div>
+<div class="sd">Cumulative net revenue per customer. Solid = verified actual data (truncated where all accounts have had time to reach that age). Dashed = projection at 2.82% monthly churn. All curves start at $0 (no onboarding assumed).</div>
+<div class="g1"><div class="cd"><div class="ct">All quarterly cohorts — net collected per customer</div><div class="cs">2025Q3 (76 accts, 7mo actual) · 2025Q4 (196 accts, 4mo) · 2026Q1 (84 accts, 2mo)</div><canvas id="c_spag2" height="320"></canvas>
+<div class="interp"><strong>How to read this chart:</strong> Each strand = one cohort. Steeper slope = higher monthly revenue. Length of solid line = how much real data we have. The 2026Q1 strand is shortest but steepest — at $881/mo net, it accumulates faster than Q3 ($732) or Q4 ($704). Projected out, 2026Q1 crosses its $7,862 CAC line at month 10, while 2025Q3 crossed its lower $5,524 CAC at month 8. <strong>No LTV saturation visible</strong> — all curves are linear, confirming stable billing behavior.</div></div></div>
 <div class="g2">
-<div class="cd"><div class="ct">0 free months vs any free months</div><div class="cs">Contract accounts only (n=358)</div><canvas id="c_spag_fm" height="220"></canvas>
-<div class="interp"><strong>Interpretation:</strong> Free month customers accumulate revenue slightly slower in months 0–3 (they start $0 during free period) but show <strong>better survival</strong> through months 4–6, causing the lines to converge. By month 6, the "any free" line is nearly parallel to "0 free" — the free period delays revenue but doesn't reduce it long-term.</div></div>
-<div class="cd"><div class="ct">By free month count (1, 2, 3)</div><div class="cs">Contract accounts with free months (n=171)</div><canvas id="c_spag_fm2" height="220"></canvas>
-<div class="interp"><strong>3-month-free is structurally different.</strong> These are overwhelmingly from 2025Q2 strategic partnerships ($689 avg MRR). 1-month and 2-month are more recent negotiated deals at higher MRR ($769). The 1-2 month group accumulates faster per month due to higher pricing, but the 3-month group has better survival (87% at month 4 vs 80%).</div></div>
+<div class="cd"><div class="ct">0 free months vs any free months</div><div class="cs">Contract accounts (187 vs 171) · actual data</div><canvas id="c_spag_fm" height="220"></canvas>
+<div class="interp">The "any free" group accumulates slower in months 0–2 (they earn $0 during the free period) but shows <strong>better survival</strong> through months 3–6, causing convergence. By month 6, both groups are within $150 of each other. Free months delay revenue but don't structurally reduce it — and may improve retention.</div></div>
+<div class="cd"><div class="ct">Historical median breakeven by quarter</div><div class="cs">Median months to recoup actual quarterly CAC · MRR > $100 accounts</div><canvas id="c_hist_be" height="220"></canvas>
+<div class="interp"><strong>Q4 2025 breakeven spiked to 11.8 months</strong> driven by CAC rising to $8,267 while avg MRR only reached $787. Q1 2026 improved to 9.0 months as MRR jumped to $1,008. The target is under 8 months — achievable at $1,000+/mo MRR with Q3-level CAC.</div></div>
 </div>
 </div>
 
-<!-- SURVIVAL -->
+<!-- ═══ SURVIVAL ═══ -->
 <div class="sc" id="su">
-<div class="st">Survival & churn analysis</div>
-<div class="sd">Corrected for billing lag: active customers extend to current month. Curves truncated at safe observation window (all accounts had time to reach that age). Monthly churn from 2025Q3 (7 months, most mature clean data).</div>
+<div class="st">Survival & churn</div>
+<div class="sd">Tenure corrected for billing lag (active customers not yet invoiced for April are counted as active). Curves truncated at safe observation window.</div>
 <div class="g2">
-<div class="cd"><div class="ct">Survival by cohort quarter</div><div class="cs">Solid = actual · dashed gray = 2.8% monthly projection</div><canvas id="c_surv" height="240"></canvas>
-<div class="interp"><strong>The cliff at month 7–8 is the data edge, not churn.</strong> 2025Q3's actual data ends at month 7 (safe to month 6). The projected line at 2.8% monthly churn fits the actual data very well through month 6: predicted 84.3% vs actual 84.2%. This gives us confidence in the projection.</div></div>
-<div class="cd"><div class="ct">Monthly churn rate — 2025Q3 cohort</div><div class="cs">Conditional: % of surviving accounts that churned each month</div><canvas id="c_mc" height="240"></canvas>
-<div class="interp"><strong>First-month churn is elevated but not extreme.</strong> 2.6% in month 1 is actually lower than months 3 (4.1%) and 6 (3.0%). There's no single "danger month" — churn is evenly distributed at 2–4% per month. This suggests churn is driven by ongoing value delivery, not onboarding failure.</div></div>
+<div class="cd"><div class="ct">Retention by cohort quarter</div><div class="cs">Solid = actual · dashed = 2.82% monthly projection</div><canvas id="c_surv" height="240"></canvas>
+<div class="interp">2025Q3 actual data closely matches the 2.82% projection through month 6: <strong>predicted 84.3% vs actual 84.2%</strong>. This validates the projection model. 2025Q4 shows slightly higher early churn (4.6% month 1 vs 2.6% for Q3) — possibly driven by weaker deal qualification as volume surged in Oct 2025.</div></div>
+<div class="cd"><div class="ct">Monthly churn rate — 2025Q3</div><div class="cs">Conditional: % of surviving accounts that churn each month (n=76)</div><canvas id="c_mc" height="240"></canvas>
+<div class="interp">Churn is <strong>evenly distributed at 1–4% per month</strong> with no single danger period. Month 3 is the highest at 4.1%, suggesting some customers reevaluate after a full billing quarter. There is no dramatic first-month cliff — 2.6% month-1 churn is actually below average.</div></div>
 </div>
 <div class="g2">
-<div class="cd"><div class="ct">Survival: 0 free months vs any free months</div><div class="cs">Contract accounts only · safe observation window</div><canvas id="c_surv_fm" height="220"></canvas>
-<div class="interp"><strong>Free month accounts survive significantly better.</strong> Month 5: 76.6% vs 39.6%. However, the 0-free group is skewed toward newer cohorts (2025Q4 and 2026Q1) with less observation time. Within-cohort comparison needed for causal claims, but the direction is consistent with free months giving customers more time to see value.</div></div>
-<div class="cd"><div class="ct">Churn rate comparison</div><div class="cs">All cohorts averaged</div>
-<div style="padding:20px 0">
-<table><thead><tr><th>Metric</th><th>Old analysis (v1)</th><th>Corrected (v2)</th><th>Change</th></tr></thead><tbody>
-<tr><td>Monthly churn rate</td><td style="color:var(--rd)">5.0%</td><td style="color:var(--gn)">2.8%</td><td style="color:var(--gn)">−44%</td></tr>
-<tr><td>12-month survival</td><td>54%</td><td style="color:var(--gn)">71%</td><td style="color:var(--gn)">+17pp</td></tr>
-<tr><td>$1K/mo 12-mo LTV</td><td>$9,225</td><td style="color:var(--gn)">$10,305</td><td style="color:var(--gn)">+$1,080</td></tr>
-<tr><td>$1.5K/mo breakeven</td><td>6 months</td><td style="color:var(--gn)">5 months</td><td style="color:var(--gn)">−1 month</td></tr>
-</tbody></table>
-</div>
-<div class="interp"><strong>The old 5% churn was inflated by billing lag artifacts.</strong> Active customers whose April invoice hadn't posted were counted as churned. The corrected 2.8% rate from 2025Q3 (7 months observed, all artifacts removed) changes the entire picture: breakeven is faster, LTV is higher, and the business is fundamentally healthier than the v1 analysis suggested.</div></div>
+<div class="cd"><div class="ct">0 free months vs any free months — survival</div><div class="cs">Contract accounts · all available data</div><canvas id="c_surv_fm" height="220"></canvas>
+<div class="interp"><strong>Free month accounts survive significantly better through months 3–5:</strong> 80.1% vs 52.9% at month 4. The 0-free group is weighted toward newer cohorts (Q4/Q1) with less data, but the gap is consistent within overlapping cohorts. This supports free months as a retention tool, not just a close tool.</div></div>
+<div class="cd"><div class="ct">Cohort characteristics</div>
+<div style="padding-top:8px">
+<table><thead><tr><th>Quarter</th><th>n</th><th>Gross MRR</th><th>Net MRR</th><th>% FM</th><th>Active</th><th>CAC</th><th>Med. BE</th></tr></thead><tbody>
+<tr><td>2025Q2</td><td>70</td><td>$689</td><td>$677</td><td>100%</td><td>87%</td><td>$4,988</td><td>7.7 mo</td></tr>
+<tr><td>2025Q3</td><td>134</td><td>$769</td><td>$748</td><td>62%</td><td>82%</td><td>$5,524</td><td>7.4 mo</td></tr>
+<tr><td>2025Q4</td><td>86</td><td>$787</td><td>$775</td><td>19%</td><td>80%</td><td>$8,267</td><td>11.8 mo</td></tr>
+<tr><td>2026Q1</td><td>68</td><td>$1,008</td><td>$969</td><td>3%</td><td>100%</td><td>$7,862</td><td>9.0 mo</td></tr>
+</tbody></table></div>
+<div class="interp">Net MRR is 3–12% below gross depending on cohort. Q4 has the highest discount rate (10.3%) and worst breakeven (11.8mo). Q1 has the best MRR but only 2 months of churn data — its true retention is yet to be proven.</div></div>
 </div>
 </div>
 
-<!-- WIN RATE -->
+<!-- ═══ WIN RATE ═══ -->
 <div class="sc" id="wr">
-<div class="st">Win rate & free months tradeoff</div>
-<div class="sd">The most important finding in this analysis: free months significantly impact deal flow. Removing them correlated with a 48% decline in win rate.</div>
-<div class="co rd"><div class="cot">The real cost of eliminating free months</div><div class="cob">
-The per-account cost of 3 free months at $1,500/mo is ~$3,000 in delayed revenue (breakeven moves from month 5 → 9).<br><br>
-But the win rate data tells a bigger story: <strong>Q3 2025 closed 134 deals at 10.2% WR (62% had free months). Q1 2026 closed 68 deals at 5.3% WR (3% had free months).</strong> That's 66 fewer deals per quarter.<br><br>
-At $1K avg MRR × $10.3K projected 12-month LTV = <strong>$680K in lost cohort LTV per quarter</strong>. The aggregate cost of 3-month concessions on 62% of those 134 deals would have been ~$250K. The tradeoff is not close.<br><br>
-<strong>Caveat:</strong> Win rate also declined due to pricing increases, seasonal effects, and CAC changes. Free months are not the only variable. But they are the largest observable change between Q3 2025 and Q1 2026.
+<div class="st">Win rate & free months</div>
+<div class="sd">Win rate = deals signed ÷ demos given in the same month. Free month % from derived contract-to-first-payment gap.</div>
+<div class="co rd"><div class="cot">The portfolio-level cost of eliminating free months</div><div class="cob">
+Q3 2025 closed <strong>134 deals at 10.2% win rate</strong> (62% had free months). Q1 2026 closed <strong>68 deals at 5.3%</strong> (3% had free months). That's 66 fewer deals per quarter.<br><br>
+At $10,303 projected 12-month LTV (at $1K MRR), the lost cohort LTV is <strong>~$680K per quarter</strong>. The cost of offering 3 free months on 62% of 134 deals (at avg $769 MRR) would have been ~$252K in delayed revenue. The net loss from eliminating free months: <strong>~$428K per quarter</strong> in unrealized LTV.<br><br>
+<strong>Caveat:</strong> Pricing increases, seasonal variation, and rising CAC all contributed. Free months are the largest single observable change, but not the only one.
 </div></div>
 
-<div class="kg">
-<div class="k"><div class="kl">2025Q3 win rate</div><div class="kv" style="color:var(--gn)">10.2%</div><div class="ks">134 deals, 62% free mo</div></div>
-<div class="k"><div class="kl">2025Q4 win rate</div><div class="kv" style="color:var(--am)">7.9%</div><div class="ks">86 deals, 19% free mo</div></div>
-<div class="k"><div class="kl">2026Q1 win rate</div><div class="kv" style="color:var(--rd)">5.3%</div><div class="ks">68 deals, 3% free mo</div></div>
-<div class="k"><div class="kl">Deals lost / quarter</div><div class="kv" style="color:var(--rd)">−66</div><div class="ks">vs Q3 2025 pace</div></div>
-<div class="k"><div class="kl">LTV lost / quarter</div><div class="kv" style="color:var(--rd)">~$680K</div><div class="ks">at $10.3K LTV/deal</div></div>
-<div class="k"><div class="kl">Cost of 3FM concessions</div><div class="kv" style="color:var(--am)">~$250K</div><div class="ks">if 62% of 134 deals</div></div>
-</div>
+<div class="g1"><div class="cd"><div class="ct">Monthly win rate, deal count, and free month %</div><div class="cs">Aug 2025 – Mar 2026 (months with sufficient data)</div><canvas id="c_wr_monthly" height="280"></canvas>
+<div class="interp">The transition from free months to no-free-months happened between Aug 2025 (78% FM, 12.4% WR) and Sep 2025 (13% FM, 10.5% WR). Win rate held at 10–11% even as FM dropped to 13–21%, then fell below 7% once FM hit single digits. This suggests a <strong>threshold effect</strong> — some level of concession availability supports the sales motion.</div></div></div>
 
 <div class="g2">
-<div class="cd"><div class="ct">Win rate, deal count, and free month %</div><div class="cs">Quarterly 2025Q2–2026Q1</div><canvas id="c_wr2" height="240"></canvas>
-<div class="interp"><strong>The correlation is stark.</strong> Each 20pp drop in free month adoption corresponds to roughly 2pp in win rate decline. The slope steepened from Q4→Q1 as free months went from 19%→3%, suggesting a threshold effect: some level of concession availability may be structurally necessary for the sales motion.</div></div>
-<div class="cd"><div class="ct">Quarterly CAC trend</div><div class="cs">Fixed + variable, averaged across quarter</div><canvas id="c_cac" height="240"></canvas>
-<div class="interp"><strong>CAC rose 57% from Q2→Q4 2025</strong> ($4,988→$8,267) while win rate fell. This means the cost to acquire each customer is rising at the same time fewer deals are closing. The combination is compressing unit economics from both directions.</div></div>
+<div class="cd"><div class="ct">Quarterly CAC trend</div><div class="cs">Fixed + variable per user</div><canvas id="c_cac" height="200"></canvas>
+<div class="interp">CAC rose <strong>66% from Q2→Q4</strong> ($4,988→$8,267). Q1 2026 improved slightly to $7,862 but remains elevated. Rising CAC combined with falling win rate means the cost per acquired customer is compressing margins from both directions.</div></div>
+<div class="cd"><div class="ct">Deals per quarter</div><div class="cs">Contract accounts signed</div><canvas id="c_deals" height="200"></canvas>
+<div class="interp">Q3 2025 was the volume peak at 134 deals. The drop to 68 in Q1 2026 represents <strong>~$680K in lost cohort LTV</strong> that no amount of per-account optimization can recover.</div></div>
 </div>
 </div>
 
-<!-- BREAKEVEN -->
+<!-- ═══ BREAKEVEN ═══ -->
 <div class="sc" id="be">
 <div class="st">CAC breakeven</div>
-<div class="sd">Using 2.8% monthly churn (corrected). CAC = $7,862 (2026Q1). Showing when cumulative revenue crosses CAC for each MRR × OB × FM combination.</div>
-<div class="g1"><div class="cd"><div class="ct">Cumulative revenue vs CAC — by MRR level</div><div class="cs">No onboarding, no free months · red dashed = $7,862 CAC</div><canvas id="c_be" height="280"></canvas>
-<div class="interp"><strong>$700/mo accounts never break even</strong> — the line barely touches CAC at month 12 where only 71% are still paying. $1K/mo breaks even at month 9. $1.5K/mo at month 6. $2K/mo at month 4. The structural minimum for profitability at current CAC is ~$800/mo.</div></div></div>
-<div class="g1"><div class="cd"><div class="ct">$1,500/mo — onboarding and free month scenarios</div><div class="cs">All combinations · red dashed = $7,862 CAC</div><canvas id="c_be2" height="280"></canvas>
-<div class="interp"><strong>$1K OB + 0 FM</strong> is the fastest to break even (month 5). <strong>$1K OB + 3 FM</strong> breaks even at month 9 — 4 months later. That 4-month delay is the real cost of the concession: $4,200 in reduced 12-month ROI. But it's still +$4,221 net positive. The question is whether the win rate improvement justifies the delay.</div></div></div>
+<div class="sd">Cumulative net MRR per customer vs CAC. All curves start at $0 (no onboarding). Uses 2.82% monthly churn projection. CAC = $7,862 (2026Q1).</div>
+<div class="g1"><div class="cd"><div class="ct">Cumulative revenue by MRR level — no onboarding, no free months</div><div class="cs">Dashed red = $7,862 CAC (2026Q1)</div><canvas id="c_be" height="280"></canvas>
+<div class="interp"><strong>$700/mo never breaks even within 12 months</strong> — it reaches $7,212 at month 12, still $650 short. $1,000/mo crosses at month 9. $1,500/mo at month 6. $2,000/mo at month 5. The structural minimum MRR for profitability at $7,862 CAC is approximately <strong>$800/mo</strong>.</div></div></div>
+<div class="g1"><div class="cd"><div class="ct">$1,500/mo — effect of free months (no onboarding)</div><div class="cs">Each free month delays revenue start by one billing cycle</div><canvas id="c_be_fm" height="260"></canvas>
+<div class="interp">0 free months: breakeven at <strong>month 6</strong>. 1 free month: <strong>month 7</strong>. 2 free months: <strong>month 8</strong>. 3 free months: <strong>month 10</strong>. The cost of 3 free months at $1,500/mo is <strong>$4,374 in delayed 12-month LTV</strong> (from $15,455→$11,081). But all scenarios remain CAC-positive within 12 months.</div></div></div>
 
-<div class="cd" style="margin-bottom:10px"><div class="ct">Full LTV matrix — 12-month projections at 2.8% churn, $7,862 CAC</div>
-<table><thead><tr><th>MRR</th><th>OB</th><th>FM</th><th>12mo LTV</th><th>Net of CAC</th><th>Breakeven</th><th>LTV/CAC</th></tr></thead><tbody>
-<tr><td>$700</td><td>$0</td><td>0</td><td>$7,213</td><td style="color:var(--rd)">−$649</td><td><span class="bg bg-r">>12</span></td><td>0.92x</td></tr>
-<tr><td>$700</td><td>$1,000</td><td>0</td><td>$8,213</td><td style="color:var(--gn)">+$351</td><td><span class="bg bg-a">12</span></td><td>1.04x</td></tr>
-<tr><td>$1,000</td><td>$0</td><td>0</td><td>$10,305</td><td style="color:var(--gn)">+$2,443</td><td><span class="bg bg-a">9</span></td><td>1.31x</td></tr>
-<tr><td>$1,000</td><td>$1,000</td><td>0</td><td>$11,305</td><td style="color:var(--gn)">+$3,443</td><td><span class="bg bg-g">8</span></td><td>1.44x</td></tr>
-<tr><td>$1,000</td><td>$1,000</td><td>3</td><td>$8,389</td><td style="color:var(--gn)">+$527</td><td><span class="bg bg-a">12</span></td><td>1.07x</td></tr>
-<tr><td>$1,500</td><td>$0</td><td>0</td><td>$15,457</td><td style="color:var(--gn)">+$7,595</td><td><span class="bg bg-g">6</span></td><td>1.97x</td></tr>
-<tr><td>$1,500</td><td>$1,000</td><td>0</td><td>$16,457</td><td style="color:var(--gn)">+$8,595</td><td><span class="bg bg-g">5</span></td><td>2.09x</td></tr>
-<tr><td>$1,500</td><td>$1,000</td><td>3</td><td>$12,083</td><td style="color:var(--gn)">+$4,221</td><td><span class="bg bg-a">9</span></td><td>1.54x</td></tr>
-<tr><td>$2,000</td><td>$0</td><td>0</td><td>$20,610</td><td style="color:var(--gn)">+$12,748</td><td><span class="bg bg-g">5</span></td><td>2.62x</td></tr>
-<tr><td>$2,000</td><td>$1,000</td><td>0</td><td>$21,610</td><td style="color:var(--gn)">+$13,748</td><td><span class="bg bg-g">4</span></td><td>2.75x</td></tr>
-<tr><td>$2,000</td><td>$1,000</td><td>3</td><td>$15,777</td><td style="color:var(--gn)">+$7,915</td><td><span class="bg bg-g">7</span></td><td>2.01x</td></tr>
+<div class="cd" style="margin-bottom:10px"><div class="ct">Breakeven table — no onboarding, $7,862 CAC</div>
+<table><thead><tr><th>MRR</th><th>0 FM</th><th>1 FM</th><th>2 FM</th><th>3 FM</th><th>12mo LTV (0FM)</th><th>Net of CAC</th></tr></thead><tbody>
+<tr><td>$700</td><td><span class="bg bg-r">Mo 14</span></td><td><span class="bg bg-r">Mo 15</span></td><td><span class="bg bg-r">Mo 17</span></td><td><span class="bg bg-r">Mo 18</span></td><td>$7,212</td><td style="color:var(--rd)">−$650</td></tr>
+<tr><td>$1,000</td><td><span class="bg bg-a">Mo 9</span></td><td><span class="bg bg-a">Mo 11</span></td><td><span class="bg bg-a">Mo 12</span></td><td><span class="bg bg-r">Mo 13</span></td><td>$10,303</td><td style="color:var(--gn)">+$2,441</td></tr>
+<tr><td>$1,500</td><td><span class="bg bg-g">Mo 6</span></td><td><span class="bg bg-g">Mo 7</span></td><td><span class="bg bg-a">Mo 8</span></td><td><span class="bg bg-a">Mo 10</span></td><td>$15,455</td><td style="color:var(--gn)">+$7,593</td></tr>
+<tr><td>$2,000</td><td><span class="bg bg-g">Mo 5</span></td><td><span class="bg bg-g">Mo 5</span></td><td><span class="bg bg-g">Mo 6</span></td><td><span class="bg bg-a">Mo 8</span></td><td>$20,607</td><td style="color:var(--gn)">+$12,745</td></tr>
 </tbody></table></div>
 </div>
 
-<!-- FORECAST -->
+<!-- ═══ FORECAST ═══ -->
 <div class="sc" id="fc">
 <div class="st">2026Q1 cohort forecast</div>
-<div class="sd">68 accounts. Avg MRR $1,008. Median $875. 100% active at time of analysis. Zero free months on 97% of accounts.</div>
+<div class="sd">68 contract accounts. Avg gross MRR $1,008. 100% currently active. Projected using 2.82% monthly churn and actual tier-level avg net MRR. No onboarding assumed.</div>
 <div class="kg">
-<div class="k"><div class="kl">&lt;$700/mo</div><div class="kv">23</div><div class="ks">avg $569 · 12mo $5,864</div></div>
-<div class="k"><div class="kl">$700–999</div><div class="kv">18</div><div class="ks">avg $860 · 12mo $8,862</div></div>
-<div class="k"><div class="kl">$1K–1.5K</div><div class="kv">12</div><div class="ks">avg $1,169 · 12mo $12,041</div></div>
-<div class="k"><div class="kl">$1.5K+</div><div class="kv">15</div><div class="ks">avg $1,679 · 12mo $17,299</div></div>
+<div class="k"><div class="kl">&lt;$700/mo</div><div class="kv">23</div><div class="ks">avg $569 · 12mo $5,862</div></div>
+<div class="k"><div class="kl">$700–999</div><div class="kv">18</div><div class="ks">avg $860 · 12mo $8,861</div></div>
+<div class="k"><div class="kl">$1K–1.5K</div><div class="kv">12</div><div class="ks">avg $1,169 · 12mo $12,042</div></div>
+<div class="k"><div class="kl">$1.5K+</div><div class="kv">15</div><div class="ks">avg $1,679 · 12mo $17,297</div></div>
 </div>
-<div class="g1"><div class="cd"><div class="ct">Projected LTV by tier — with and without OB/FM concessions</div><div class="cs">12-month projection at 2.8% monthly churn</div><canvas id="c_fc" height="280"></canvas>
-<div class="interp"><strong>The &lt;$700 tier (34% of Q1 accounts) is unprofitable</strong> at $7.9K CAC regardless of onboarding. Even $1.5K OB only brings it to $7,364 (0.94x LTV/CAC). These accounts need to be upsold, moved to lower-CAC channels, or priced higher. The $1.5K+ tier (22% of accounts) generates 2.2x LTV/CAC before any OB — these are the accounts to prioritize.</div></div></div>
+<div class="g1"><div class="cd"><div class="ct">Projected 12-month LTV by MRR tier</div><div class="cs">No onboarding · $7,862 CAC line shown</div><canvas id="c_fc" height="260"></canvas>
+<div class="interp">The &lt;$700 tier (34% of Q1 accounts) generates only $5,862 in LTV — <strong>$2,000 below CAC</strong>. These accounts need either higher pricing or lower-cost acquisition channels. The $1.5K+ tier (22% of accounts) generates $17,297 — a <strong>2.2x LTV/CAC ratio</strong> before any onboarding revenue.</div></div></div>
 </div>
 
-<!-- COHORT DETAIL -->
-<div class="sc" id="co">
-<div class="st">Cohort detail</div>
-<div class="sd">Contract accounts (n=358) with full characteristics. Revenue is net of discounts, coupons, and refunds.</div>
-<div class="cd" style="margin-bottom:10px"><div class="ct">Quarterly cohort profiles</div>
-<table><thead><tr><th>Quarter</th><th>n</th><th>Demos</th><th>Win rate</th><th>Gross MRR</th><th>Net MRR</th><th>% free mo</th><th>Active</th><th>Churn rate</th><th>CAC</th><th>12mo LTV proj</th></tr></thead><tbody>
-<tr><td>2025Q2</td><td>70</td><td>1,133</td><td>6.2%</td><td>$689</td><td>$677</td><td>100%</td><td>87%</td><td>~2.5%</td><td>$4,988</td><td>$6,976</td></tr>
-<tr><td>2025Q3</td><td>134</td><td>1,308</td><td>10.2%</td><td>$769</td><td>$748</td><td>62%</td><td>82%</td><td>2.8%</td><td>$5,524</td><td>$7,708</td></tr>
-<tr><td>2025Q4</td><td>86</td><td>1,085</td><td>7.9%</td><td>$787</td><td>$775</td><td>19%</td><td>80%</td><td>~3.5%</td><td>$8,267</td><td>$7,987</td></tr>
-<tr><td>2026Q1</td><td>68</td><td>1,283</td><td>5.3%</td><td>$1,008</td><td>$969</td><td>3%</td><td>100%</td><td>TBD</td><td>$7,862</td><td>$9,986</td></tr>
-</tbody></table></div>
-<div class="g2">
-<div class="cd"><div class="ct">MRR vs win rate vs free months</div><div class="cs">The tradeoff: higher pricing + fewer free months = fewer deals</div><canvas id="c_co" height="220"></canvas>
-<div class="interp"><strong>2025Q3 is the sweet spot in hindsight:</strong> $769 avg MRR, 10.2% WR, 134 deals. Q4 added $18/mo in MRR but lost 48 deals. Q1 added $239/mo but lost another 18. The MRR gain per account doesn't compensate for the volume loss at the portfolio level.</div></div>
-<div class="cd"><div class="ct">CAC trend and LTV/CAC ratio</div><div class="cs">Rising CAC is compressing margins</div><canvas id="c_cac2" height="220"></canvas>
-<div class="interp"><strong>LTV/CAC improved from Q3→Q1</strong> (1.40x→1.27x) despite rising CAC, because MRR gains are outpacing CAC increases. But the target of 3x LTV/CAC at 36 months requires a 2.8% monthly churn or better — achievable based on 2025Q3 data.</div></div>
+<!-- ═══ CALCULATOR ═══ -->
+<div class="sc" id="calc">
+<div class="st">Breakeven calculator</div>
+<div class="sd">Input your target breakeven month and MRR to calculate the onboarding fee required. Uses 2.82% monthly churn and $7,862 CAC (2026Q1).</div>
+
+<div class="cd">
+<div class="ct">Onboarding fee calculator</div>
+<div class="cs">What onboarding fee do you need to hit your target breakeven?</div>
+<div class="calc-row"><label>Monthly MRR ($)</label><input type="number" id="calc_mrr" value="1500" min="100" max="5000" oninput="runCalc()"></div>
+<div class="calc-row"><label>Target breakeven (months)</label><input type="number" id="calc_be" value="6" min="1" max="24" oninput="runCalc()"></div>
+<div class="calc-row"><label>Free months given</label><select id="calc_fm" onchange="runCalc()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+<div class="calc-row"><label>CAC ($)</label><input type="number" id="calc_cac" value="7862" min="1000" max="20000" oninput="runCalc()"></div>
+
+<div class="calc-result" id="calc_output">
+<div class="kl">Required onboarding fee</div>
+<div class="kv" id="calc_ob_result" style="color:var(--ac)">$0</div>
+<div class="ks" id="calc_ob_note"></div>
+<div style="margin-top:12px;font-size:11px;color:var(--t2)" id="calc_details"></div>
+</div>
+</div>
+
+<div class="cd" style="margin-top:10px">
+<div class="ct">Reference: breakeven month for common scenarios</div>
+<div class="cs">Shaded cells = breakeven within 12 months · uses 2.82% monthly churn</div>
+<div id="calc_table"></div>
 </div>
 </div>
 
@@ -211,108 +203,174 @@ At $1K avg MRR × $10.3K projected 12-month LTV = <strong>$680K in lost cohort L
 <script>
 Chart.defaults.color='#71717a';Chart.defaults.borderColor='#27272a';Chart.defaults.font.family="'Inter',sans-serif";Chart.defaults.font.size=10;
 function go(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.remove('on')});document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on')});document.getElementById(id).classList.add('on');event.target.classList.add('on');window.scrollTo(0,0)}
-var gc='#1f1f23',ages=['Mo 0','Mo 1','Mo 2','Mo 3','Mo 4','Mo 5','Mo 6','Mo 7','Mo 8','Mo 9','Mo 10','Mo 11','Mo 12'];
+var gc='#1f1f23',ages=['Mo0','Mo1','Mo2','Mo3','Mo4','Mo5','Mo6','Mo7','Mo8','Mo9','Mo10','Mo11','Mo12'];
 function L(d,c,l,dash){return{label:l,data:d,borderColor:c,backgroundColor:'transparent',tension:.3,pointRadius:2,pointBackgroundColor:c,borderWidth:2,borderDash:dash||[]}}
 
-// EXEC spaghetti
-var s3a=[732,1465,2184,2882,3556,4212,4845],s3p=[732,1465,2184,2882,3556,4212,4845,5445,6027,6593,7143,7678,8197];
-var s4a=[704,1386,2040,2671],s4p=[704,1386,2040,2671,3271,3854,4421,4971,5507,6027,6532,7023,7501];
-var s1a=[881,1762],s1p=[881,1762,2597,3409,4199,4966,5711,6435,7139,7824,8489,9135,9763];
+// SURVIVAL PROJECTION (verified: 2.82% monthly)
+var MC=0.0282;
+var proj=[100];for(var i=1;i<25;i++)proj.push(proj[i-1]*(1-MC));
+function survAt(m){return proj[m]/100}
+function cumLTV(mrr,fm,ob,months){var t=ob;for(var m=0;m<months;m++){if(m>=fm)t+=mrr*survAt(m)}return t}
+
+// SPAGHETTI (verified data)
+var s3a=[732,1465,2184,2882,3556,4212,4845];
+var s4a=[704,1386,2040,2671];
+var s1a=[881,1762];
+// Projections
+function projSpag(actual,avgMrr){var r=actual.slice();var lastSurv=1;for(var m=0;m<actual.length;m++){lastSurv=(actual.length-1>=m)?1:lastSurv}
+  var n=actual.length;lastSurv=survAt(n-1);var cum=actual[actual.length-1];
+  for(var m=n;m<13;m++){lastSurv*=(1-MC);cum+=avgMrr*lastSurv;r.push(Math.round(cum))}return r}
+// Manual projection using verified formula
+var s3p=[732,1465,2184,2882,3556,4212,4845,5445,6027,6593,7143,7677,8197];
+var s4p=[704,1386,2040,2671,3271,3854,4421,4971,5506,6026,6532,7023,7500];
+var s1p=[881,1762,2597,3409,4199,4965,5711,6435,7139,7823,8487,9133,9761];
+
+// CAC per cohort (verified)
+var cacQ={'Q3':5524,'Q4':8267,'Q1':7862};
+
+// EXEC SPAGHETTI
 new Chart(document.getElementById('c_spag'),{type:'line',data:{labels:ages,datasets:[
-L(s3p,'#6366f1','2025Q3'),L(s4p,'#a78bfa','2025Q4'),L(s1p,'#c4b5fd','2026Q1'),
-L(s3a,'#6366f1','2025Q3 actual',[]),L(s4a,'#a78bfa','Q4 actual',[]),L(s1a,'#c4b5fd','Q1 actual',[]),
-{label:'CAC $7,862',data:Array(13).fill(7862),borderColor:'#ef4444',borderDash:[6,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent'}
+L(s3p,'#6366f1','2025Q3 ($732/mo)'),L(s4p,'#a78bfa','2025Q4 ($704/mo)'),L(s1p,'#c4b5fd','2026Q1 ($881/mo)'),
+{label:'CAC Q3 $5,524',data:Array(13).fill(5524),borderColor:'rgba(99,102,241,.4)',borderDash:[4,4],borderWidth:1,pointRadius:0,backgroundColor:'transparent'},
+{label:'CAC Q4 $8,267',data:Array(13).fill(8267),borderColor:'rgba(167,139,250,.4)',borderDash:[4,4],borderWidth:1,pointRadius:0,backgroundColor:'transparent'},
+{label:'CAC Q1 $7,862',data:Array(13).fill(7862),borderColor:'rgba(196,181,253,.4)',borderDash:[4,4],borderWidth:1,pointRadius:0,backgroundColor:'transparent'}
 ]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}},position:'bottom'}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
 
-// EXEC win rate
+// EXEC WIN RATE
 new Chart(document.getElementById('c_wr'),{type:'bar',data:{labels:['2025Q2','2025Q3','2025Q4','2026Q1'],datasets:[
-{label:'Win Rate %',data:[6.2,10.2,7.9,5.3],backgroundColor:['rgba(245,158,11,.3)','rgba(34,197,94,.3)','rgba(245,158,11,.3)','rgba(239,68,68,.3)'],borderColor:['#f59e0b','#22c55e','#f59e0b','#ef4444'],borderWidth:1,borderRadius:3,yAxisID:'y'},
-{label:'% w/ Free Months',data:[100,62,19,3],backgroundColor:'rgba(59,130,246,.15)',borderColor:'#3b82f6',borderWidth:1,borderRadius:3,yAxisID:'y2'}
-]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},max:15,position:'left'},y2:{ticks:{callback:function(v){return v+'%'}},max:110,position:'right',grid:{display:false}}}}});
+{label:'Deals',data:[70,134,86,68],backgroundColor:'rgba(59,130,246,.15)',borderColor:'#3b82f6',borderWidth:1,borderRadius:3,yAxisID:'y'},
+{label:'Win rate',data:[6.2,10.2,7.9,5.3],type:'line',borderColor:'#22c55e',pointBackgroundColor:'#22c55e',pointRadius:4,borderWidth:2,yAxisID:'y2',backgroundColor:'transparent'},
+{label:'% free months',data:[100,62,19,3],type:'line',borderColor:'#f59e0b',pointBackgroundColor:'#f59e0b',pointRadius:4,borderWidth:2,borderDash:[4,4],yAxisID:'y2',backgroundColor:'transparent'}
+]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}},y2:{ticks:{callback:function(v){return v+'%'}},position:'right',grid:{display:false},max:110}}}});
 
-// SPAGHETTI MAIN (tab 2)
+// SPAGHETTI MAIN
 new Chart(document.getElementById('c_spag2'),{type:'line',data:{labels:ages,datasets:[
-L(s3a,'#6366f1','2025Q3 actual'),L(s3p.slice(7),'#6366f1','2025Q3 proj',[4,4]),
-L(s4a,'#a78bfa','2025Q4 actual'),L(s4p.slice(4),'#a78bfa','Q4 proj',[4,4]),
-L(s1a,'#c4b5fd','2026Q1 actual'),L(s1p.slice(2),'#c4b5fd','Q1 proj',[4,4]),
-{label:'CAC',data:Array(13).fill(7862),borderColor:'#ef4444',borderDash:[6,4],borderWidth:1,pointRadius:0,backgroundColor:'transparent'}
-]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}},position:'bottom'}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
+L(s3a.concat(Array(13-s3a.length).fill(null)),'#6366f1','Q3 actual'),
+L(Array(s3a.length).fill(null).concat(s3p.slice(s3a.length)),'#6366f1','Q3 projected',[4,4]),
+L(s4a.concat(Array(13-s4a.length).fill(null)),'#a78bfa','Q4 actual'),
+L(Array(s4a.length).fill(null).concat(s4p.slice(s4a.length)),'#a78bfa','Q4 projected',[4,4]),
+L(s1a.concat(Array(13-s1a.length).fill(null)),'#c4b5fd','Q1 actual'),
+L(Array(s1a.length).fill(null).concat(s1p.slice(s1a.length)),'#c4b5fd','Q1 projected',[4,4]),
+{label:'CAC Q3',data:Array(13).fill(5524),borderColor:'rgba(99,102,241,.3)',borderDash:[4,4],borderWidth:1,pointRadius:0,backgroundColor:'transparent'},
+{label:'CAC Q4',data:Array(13).fill(8267),borderColor:'rgba(167,139,250,.3)',borderDash:[4,4],borderWidth:1,pointRadius:0,backgroundColor:'transparent'},
+{label:'CAC Q1',data:Array(13).fill(7862),borderColor:'rgba(196,181,253,.3)',borderDash:[4,4],borderWidth:1,pointRadius:0,backgroundColor:'transparent'}
+]},options:{responsive:true,maintainAspectRatio:true,spanGaps:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}},position:'bottom'}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
 
-// FM spaghetti
-var fm0=[797,1566,2243,2792,3252,3644,4001,4246];var fm1=[665,1240,1809,2336,2831,3277,3710,4066];
-new Chart(document.getElementById('c_spag_fm'),{type:'line',data:{labels:ages.slice(0,8),datasets:[
-L(fm0,'#22c55e','0 free (n=187)'),L(fm1,'#f59e0b','Any free (n=171)'),
-{label:'CAC',data:Array(8).fill(7862),borderColor:'#ef4444',borderDash:[6,4],borderWidth:1,pointRadius:0,backgroundColor:'transparent'}
+// FM spaghetti (verified)
+new Chart(document.getElementById('c_spag_fm'),{type:'line',data:{labels:['Mo0','Mo1','Mo2','Mo3','Mo4','Mo5','Mo6','Mo7'],datasets:[
+L([797,1566,2243,2792,3252,3644,4001,4246],'#22c55e','0 free (n=187)'),
+L([665,1240,1809,2336,2831,3277,3710,4066],'#f59e0b','Any free (n=171)')
 ]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
 
-// FM by count
-var f1=[665,1263,1838,2362,2831,3277],f2=[700,1380,2028,2620,3100,3500],f3=[620,1200,1780,2340,2880,3400,3700];
-new Chart(document.getElementById('c_spag_fm2'),{type:'line',data:{labels:ages.slice(0,7),datasets:[
-L(f1,'#f59e0b','1 month free (n=41)'),L(f2,'#a78bfa','2 months free (n=39)'),L(f3,'#6366f1','3 months free (n=91)')
-]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
+// Historical breakeven (verified)
+new Chart(document.getElementById('c_hist_be'),{type:'bar',data:{labels:['2025Q2','2025Q3','2025Q4','2026Q1'],datasets:[{label:'Median BE (months)',data:[7.7,7.4,11.8,9.0],backgroundColor:['rgba(34,197,94,.2)','rgba(34,197,94,.2)','rgba(239,68,68,.2)','rgba(245,158,11,.2)'],borderColor:['#22c55e','#22c55e','#ef4444','#f59e0b'],borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return v+' mo'}}}}}});
 
-// SURVIVAL
-var sv3=[100,97.4,96.1,92.1,89.5,86.8,84.2],sv4=[100,95.4,90.8,87.8],sv1=[100,97.6];
-var svP=[100,97.2,94.5,91.8,89.3,86.7,84.3,81.9,79.6,77.4,75.2,73.1,71.0];
+// SURVIVAL (verified)
+var sv3=[100,97.4,96.1,92.1,89.5,86.8,84.2];
+var sv4=[100,95.4,90.8,87.8];
+var sv1=[100,97.6];
+var svP=proj.slice(0,13).map(function(v){return Math.round(v*10)/10});
 new Chart(document.getElementById('c_surv'),{type:'line',data:{labels:ages,datasets:[
-L(sv3,'#6366f1','2025Q3'),L(sv4,'#a78bfa','2025Q4'),L(sv1,'#c4b5fd','2026Q1'),
-L(svP,'#71717a','Projected 2.8%/mo',[4,4])
-]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},min:60,max:105}}}});
+L(sv3.concat(Array(13-sv3.length).fill(null)),'#6366f1','2025Q3 (n=76)'),
+L(sv4.concat(Array(13-sv4.length).fill(null)),'#a78bfa','2025Q4 (n=196)'),
+L(sv1.concat(Array(13-sv1.length).fill(null)),'#c4b5fd','2026Q1 (n=84)'),
+L(svP,'#71717a','Projected 2.82%/mo',[4,4])
+]},options:{responsive:true,maintainAspectRatio:true,spanGaps:false,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},min:60,max:105}}}});
 
-// Monthly churn
-var mc=[2.6,1.4,4.1,2.9,2.9,3.0,1.6];
-new Chart(document.getElementById('c_mc'),{type:'bar',data:{labels:['Mo1','Mo2','Mo3','Mo4','Mo5','Mo6','Mo7'],datasets:[{data:mc,backgroundColor:mc.map(function(v){return v>3.5?'rgba(239,68,68,.3)':'rgba(34,197,94,.3)'}),borderColor:mc.map(function(v){return v>3.5?'#ef4444':'#22c55e'}),borderWidth:1,borderRadius:3},{label:'Avg 2.8%',data:Array(7).fill(2.8),borderColor:'#71717a',borderDash:[4,4],borderWidth:1,pointRadius:0,type:'line',backgroundColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},max:5}}}});
+// Monthly churn (verified)
+new Chart(document.getElementById('c_mc'),{type:'bar',data:{labels:['Mo1','Mo2','Mo3','Mo4','Mo5','Mo6'],datasets:[{data:[2.63,1.35,4.11,2.86,2.94,3.03],backgroundColor:[2.63,1.35,4.11,2.86,2.94,3.03].map(function(v){return v>3.5?'rgba(239,68,68,.3)':'rgba(34,197,94,.3)'}),borderColor:[2.63,1.35,4.11,2.86,2.94,3.03].map(function(v){return v>3.5?'#ef4444':'#22c55e'}),borderWidth:1,borderRadius:3},
+{label:'Avg 2.82%',data:Array(6).fill(2.82),borderColor:'#71717a',borderDash:[4,4],borderWidth:1,pointRadius:0,type:'line',backgroundColor:'transparent'}
+]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},max:5}}}});
 
-// Survival by FM
-var sfm0=[100,97.9,82.9,69.5,52.9,39.6,35.3,20.9];var sfm1=[100,93.6,88.3,86,80.1,76.6,65.5,14];
-new Chart(document.getElementById('c_surv_fm'),{type:'line',data:{labels:ages.slice(0,8),datasets:[
-L(sfm0,'#22c55e','0 free (n=187)'),L(sfm1,'#f59e0b','Any free (n=171)')
+// FM survival (verified)
+new Chart(document.getElementById('c_surv_fm'),{type:'line',data:{labels:['Mo0','Mo1','Mo2','Mo3','Mo4','Mo5','Mo6','Mo7'],datasets:[
+L([100,97.9,82.9,69.5,52.9,39.6,35.3,20.9],'#22c55e','0 free (n=187)'),
+L([100,93.6,88.3,86.0,80.1,76.6,65.5,14.0],'#f59e0b','Any free (n=171)')
 ]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return v+'%'}},min:0,max:105}}}});
 
-// WIN RATE tab
-new Chart(document.getElementById('c_wr2'),{type:'bar',data:{labels:['2025Q2','2025Q3','2025Q4','2026Q1'],datasets:[
-{label:'Deals closed',data:[70,134,86,68],backgroundColor:'rgba(59,130,246,.2)',borderColor:'#3b82f6',borderWidth:1,borderRadius:3,yAxisID:'y'},
-{label:'Win rate %',data:[6.2,10.2,7.9,5.3],type:'line',borderColor:'#22c55e',backgroundColor:'transparent',pointBackgroundColor:'#22c55e',pointRadius:4,borderWidth:2,yAxisID:'y2'},
-{label:'Free month %',data:[100,62,19,3],type:'line',borderColor:'#f59e0b',backgroundColor:'transparent',pointBackgroundColor:'#f59e0b',pointRadius:4,borderWidth:2,borderDash:[4,4],yAxisID:'y2'}
-]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},position:'left'},y2:{ticks:{callback:function(v){return v+'%'}},position:'right',grid:{display:false},max:110}}}});
+// WIN RATE MONTHLY (verified)
+var wrM=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+var wrDeals=[46,47,43,16,27,25,22,21];
+var wrRate=[12.4,10.5,10.7,6.5,6.2,5.1,5.7,5.2];
+var wrFM=[78,13,21,25,11,0,5,5];
+new Chart(document.getElementById('c_wr_monthly'),{type:'bar',data:{labels:wrM,datasets:[
+{label:'Deals',data:wrDeals,backgroundColor:'rgba(59,130,246,.15)',borderColor:'#3b82f6',borderWidth:1,borderRadius:3,yAxisID:'y'},
+{label:'Win rate %',data:wrRate,type:'line',borderColor:'#22c55e',pointBackgroundColor:'#22c55e',pointRadius:4,borderWidth:2,yAxisID:'y2',backgroundColor:'transparent'},
+{label:'% w/ free months',data:wrFM,type:'line',borderColor:'#f59e0b',pointBackgroundColor:'#f59e0b',pointRadius:4,borderWidth:2,borderDash:[4,4],yAxisID:'y2',backgroundColor:'transparent'}
+]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}},y2:{ticks:{callback:function(v){return v+'%'}},position:'right',grid:{display:false},max:100}}}});
 
-// CAC
-new Chart(document.getElementById('c_cac'),{type:'bar',data:{labels:['2025Q2','2025Q3','2025Q4','2026Q1'],datasets:[{data:[4988,5524,8267,7862],backgroundColor:['rgba(34,197,94,.2)','rgba(34,197,94,.2)','rgba(239,68,68,.2)','rgba(239,68,68,.2)'],borderColor:['#22c55e','#22c55e','#ef4444','#ef4444'],borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(1)+'K'}}}}}});
+// CAC (verified)
+new Chart(document.getElementById('c_cac'),{type:'bar',data:{labels:['Q2\'25','Q3\'25','Q4\'25','Q1\'26'],datasets:[{data:[4988,5524,8267,7862],backgroundColor:['rgba(34,197,94,.2)','rgba(34,197,94,.2)','rgba(239,68,68,.2)','rgba(245,158,11,.2)'],borderColor:['#22c55e','#22c55e','#ef4444','#f59e0b'],borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(1)+'K'}}}}}});
 
-// BREAKEVEN
-var proj=[1,.972,.945,.918,.893,.867,.843,.819,.796,.774,.752,.731,.710];
-var be7=[],be10=[],be15=[],be20=[];
-var r7=0,r10=0,r15=0,r20=0;
-for(var m=0;m<13;m++){r7+=700*proj[m];be7.push(Math.round(r7));r10+=1000*proj[m];be10.push(Math.round(r10));r15+=1500*proj[m];be15.push(Math.round(r15));r20+=2000*proj[m];be20.push(Math.round(r20))}
+// DEALS (verified)
+new Chart(document.getElementById('c_deals'),{type:'bar',data:{labels:['Q2\'25','Q3\'25','Q4\'25','Q1\'26'],datasets:[{data:[70,134,86,68],backgroundColor:['rgba(245,158,11,.2)','rgba(34,197,94,.2)','rgba(245,158,11,.2)','rgba(239,68,68,.2)'],borderColor:['#f59e0b','#22c55e','#f59e0b','#ef4444'],borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}}}}});
+
+// BREAKEVEN (verified — all start at $0, no onboarding)
+function beCurve(mrr,fm){var r=[];var c=0;for(var m=0;m<13;m++){if(m>=fm)c+=mrr*survAt(m);r.push(Math.round(c))}return r}
 new Chart(document.getElementById('c_be'),{type:'line',data:{labels:ages,datasets:[
-L(be7,'#ef4444','$700/mo'),L(be10,'#f59e0b','$1,000/mo'),L(be15,'#3b82f6','$1,500/mo'),L(be20,'#22c55e','$2,000/mo'),
+L(beCurve(700,0),'#ef4444','$700/mo'),L(beCurve(1000,0),'#f59e0b','$1,000/mo'),
+L(beCurve(1500,0),'#3b82f6','$1,500/mo'),L(beCurve(2000,0),'#22c55e','$2,000/mo'),
 {label:'CAC $7,862',data:Array(13).fill(7862),borderColor:'#71717a',borderDash:[6,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent'}
 ]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
 
-// BE combos at $1500
-var a1=[],a2=[],a3=[],a4=[];var c1=0,c2=1000,c3=0,c4=1000;
-for(var m=0;m<13;m++){c1+=1500*proj[m];a1.push(Math.round(c1));c2+=1500*proj[m];a2.push(Math.round(c2));if(m>=3){c3+=1500*proj[m]}a3.push(Math.round(c3));if(m>=3){c4+=1500*proj[m]}a4.push(Math.round(c4))}
-new Chart(document.getElementById('c_be2'),{type:'line',data:{labels:ages,datasets:[
-L(a2,'#22c55e','$1K OB, 0 FM'),L(a1,'#3b82f6','$0 OB, 0 FM'),L(a4,'#f59e0b','$1K OB, 3 FM'),L(a3,'#ef4444','$0 OB, 3 FM'),
-{label:'CAC',data:Array(13).fill(7862),borderColor:'#71717a',borderDash:[6,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent'}
+// BE with FM (verified — $1500, no onboarding)
+new Chart(document.getElementById('c_be_fm'),{type:'line',data:{labels:ages,datasets:[
+L(beCurve(1500,0),'#22c55e','0 free months'),L(beCurve(1500,1),'#3b82f6','1 free month'),
+L(beCurve(1500,2),'#f59e0b','2 free months'),L(beCurve(1500,3),'#ef4444','3 free months'),
+{label:'CAC $7,862',data:Array(13).fill(7862),borderColor:'#71717a',borderDash:[6,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent'}
 ]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
 
-// FORECAST
-new Chart(document.getElementById('c_fc'),{type:'bar',data:{labels:['<$700\n($569)','$700-999\n($860)','$1K-1.5K\n($1,169)','$1.5K+\n($1,679)'],datasets:[
-{label:'$0 OB/0 FM',data:[5864,8862,12041,17299],backgroundColor:'rgba(113,113,122,.2)',borderColor:'#71717a',borderWidth:1,borderRadius:3},
-{label:'$1K OB/0 FM',data:[6864,9862,13041,18299],backgroundColor:'rgba(59,130,246,.2)',borderColor:'#3b82f6',borderWidth:1,borderRadius:3},
-{label:'$1K OB/3 FM',data:[4823,7015,9539,13466],backgroundColor:'rgba(245,158,11,.2)',borderColor:'#f59e0b',borderWidth:1,borderRadius:3}
-]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}}});
+// FORECAST (verified — no onboarding)
+new Chart(document.getElementById('c_fc'),{type:'bar',data:{labels:['<$700\n(n=23, $569)','$700-999\n(n=18, $860)','$1K-1.5K\n(n=12, $1,169)','$1.5K+\n(n=15, $1,679)'],datasets:[
+{label:'12mo LTV',data:[5862,8861,12042,17297],backgroundColor:['rgba(239,68,68,.2)','rgba(245,158,11,.2)','rgba(59,130,246,.2)','rgba(34,197,94,.2)'],borderColor:['#ef4444','#f59e0b','#3b82f6','#22c55e'],borderWidth:1,borderRadius:3}
+]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},annotation:{}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}}}},plugins:[{afterDraw:function(chart){var ctx=chart.ctx;var yAxis=chart.scales.y;var xAxis=chart.scales.x;var y=yAxis.getPixelForValue(7862);ctx.save();ctx.strokeStyle='#ef4444';ctx.setLineDash([6,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(xAxis.left,y);ctx.lineTo(xAxis.right,y);ctx.stroke();ctx.fillStyle='#ef4444';ctx.font='10px Inter';ctx.fillText('CAC $7,862',xAxis.right-70,y-6);ctx.restore()}}]});
 
-// COHORT detail
-new Chart(document.getElementById('c_co'),{type:'bar',data:{labels:['2025Q2','2025Q3','2025Q4','2026Q1'],datasets:[
-{label:'Deals',data:[70,134,86,68],backgroundColor:'rgba(59,130,246,.2)',borderColor:'#3b82f6',borderWidth:1,borderRadius:3,yAxisID:'y'},
-{label:'Avg MRR',data:[689,769,787,1008],type:'line',borderColor:'#22c55e',backgroundColor:'transparent',pointBackgroundColor:'#22c55e',pointRadius:4,borderWidth:2,yAxisID:'y2'}
-]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}},y2:{ticks:{callback:function(v){return '$'+v}},position:'right',grid:{display:false}}}}});
+// CALCULATOR
+function runCalc(){
+  var mrr=parseFloat(document.getElementById('calc_mrr').value)||1500;
+  var targetBE=parseInt(document.getElementById('calc_be').value)||6;
+  var fm=parseInt(document.getElementById('calc_fm').value)||0;
+  var cac=parseFloat(document.getElementById('calc_cac').value)||7862;
 
-new Chart(document.getElementById('c_cac2'),{type:'bar',data:{labels:['2025Q2','2025Q3','2025Q4','2026Q1'],datasets:[
-{label:'CAC',data:[4988,5524,8267,7862],backgroundColor:'rgba(239,68,68,.15)',borderColor:'#ef4444',borderWidth:1,borderRadius:3},
-{label:'LTV/CAC',data:[1.40,1.40,0.97,1.27],type:'line',borderColor:'#3b82f6',backgroundColor:'transparent',pointBackgroundColor:'#3b82f6',pointRadius:4,borderWidth:2,yAxisID:'y2'}
-]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#a1a1aa',boxWidth:10,font:{size:9}}}},scales:{x:{grid:{display:false}},y:{grid:{color:gc},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'K'}}},y2:{ticks:{callback:function(v){return v+'x'}},position:'right',grid:{display:false},min:0,max:2}}}});
+  // Calculate: what onboarding fee makes cumulative revenue = CAC at month targetBE?
+  // cumLTV = OB + sum(MRR * survival[m] for m in fm..targetBE-1)
+  var mrrCum=0;
+  for(var m=0;m<targetBE;m++){if(m>=fm)mrrCum+=mrr*survAt(m)}
+  var requiredOB=Math.max(0,Math.round(cac-mrrCum));
+
+  document.getElementById('calc_ob_result').textContent='$'+requiredOB.toLocaleString();
+
+  var obPctMRR=mrr>0?Math.round(requiredOB/mrr*100):0;
+  if(mrrCum>=cac){
+    document.getElementById('calc_ob_result').style.color='#22c55e';
+    document.getElementById('calc_ob_note').textContent='No onboarding needed — MRR alone covers CAC by month '+targetBE;
+  }else{
+    document.getElementById('calc_ob_result').style.color=requiredOB>mrr*2?'#ef4444':'#3b82f6';
+    document.getElementById('calc_ob_note').textContent=obPctMRR+'% of monthly MRR · '+(requiredOB>mrr*3?'Very high — may reduce win rate':'Reasonable range');
+  }
+
+  var ltv12=requiredOB;for(var m=0;m<12;m++){if(m>=fm)ltv12+=mrr*survAt(m)}
+  var net12=ltv12-cac;
+  document.getElementById('calc_details').innerHTML=
+    '12-month gross LTV: <strong>$'+Math.round(ltv12).toLocaleString()+'</strong> · Net of CAC: <strong style="color:'+(net12>=0?'#22c55e':'#ef4444')+'">$'+Math.round(net12).toLocaleString()+'</strong> · LTV/CAC: <strong>'+((ltv12/cac).toFixed(2))+'x</strong>';
+}
+
+// Reference table
+var tbl='<table><thead><tr><th>MRR</th><th>0 FM / Target Mo 6</th><th>0 FM / Mo 8</th><th>3 FM / Mo 8</th><th>3 FM / Mo 10</th></tr></thead><tbody>';
+[700,1000,1500,2000].forEach(function(mrr){
+  tbl+='<tr><td>$'+mrr+'/mo</td>';
+  [[0,6],[0,8],[3,8],[3,10]].forEach(function(pair){
+    var fm=pair[0],be=pair[1];
+    var mrrCum=0;for(var m=0;m<be;m++){if(m>=fm)mrrCum+=mrr*survAt(m)}
+    var ob=Math.max(0,Math.round(7862-mrrCum));
+    var cls=ob==0?'bg-g':ob>mrr*2?'bg-r':'bg-a';
+    tbl+='<td><span class="bg '+cls+'">$'+ob.toLocaleString()+'</span></td>';
+  });
+  tbl+='</tr>';
+});
+tbl+='</tbody></table>';
+document.getElementById('calc_table').innerHTML=tbl;
+
+runCalc();
 </script>
 </body></html>
