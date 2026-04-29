@@ -125,6 +125,7 @@ h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
 .grid1{display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:18px;margin-bottom:18px}
 
 .card{
   background:var(--surface);
@@ -348,7 +349,7 @@ td{
 }
 
 @media (max-width:1100px){
-  .calcGrid,.grid2,.grid3,.results{grid-template-columns:1fr}
+  .calcGrid,.grid2,.grid3,.grid4,.results{grid-template-columns:1fr}
   .kpis{grid-template-columns:1fr 1fr}
   .result.full{grid-column:auto}
 }
@@ -364,37 +365,36 @@ td{
   <div class="header">
     <div>
       <h1>CHIIRP — Deal Structure Calculator</h1>
-      <p>Held demos → expected wins → churn → revenue → CAC breakeven</p>
+      <p>100 held demos → modeled win rate → expected wins → churn → revenue → CAC breakeven</p>
     </div>
     <div class="badges">
-      <span class="badge">Default held demos 100</span>
-      <span class="badge">Default win rate 25.9%</span>
+      <span class="badge">Static held demos: 100</span>
+      <span class="badge">Win rate = modeled</span>
       <span class="badge">Default MRR $2,250</span>
       <span class="badge">Default onboarding 100%</span>
       <span class="badge">Default free month 1</span>
-      <span class="badge alert">CAC is a threshold</span>
+      <span class="badge alert">Win rate model is directional</span>
     </div>
   </div>
 
   <div class="tabs">
     <div class="tab active" data-tab="summary">Executive summary</div>
     <div class="tab" data-tab="calculator">Calculator</div>
-    <div class="tab" data-tab="cohort">Held-demo walk-forward</div>
+    <div class="tab" data-tab="cohort">100-demo walk-forward</div>
     <div class="tab" data-tab="curves">Outcome curves</div>
     <div class="tab" data-tab="sensitivity">Sensitivity / nonlinear</div>
     <div class="tab" data-tab="method">Method</div>
   </div>
 
-  <!-- SUMMARY -->
   <section class="section active" id="tab-summary">
     <div class="sectionHead">
       <h2>Executive summary</h2>
-      <p>The calculator starts at held demos, applies win rate, then projects the won accounts through churn and revenue recovery.</p>
+      <p>This version fixes the funnel logic: win rate is predicted from deal structure, not manually entered.</p>
     </div>
 
     <div class="kpis">
-      <div class="kpi"><div class="kpiLabel">Funnel start</div><div class="kpiValue">100</div><div class="kpiSub">Held demos default</div></div>
-      <div class="kpi"><div class="kpiLabel">Win-rate default</div><div class="kpiValue">25.9%</div><div class="kpiSub">Expected wins from held demos</div></div>
+      <div class="kpi"><div class="kpiLabel">Funnel start</div><div class="kpiValue">100</div><div class="kpiSub">Held demos, fixed</div></div>
+      <div class="kpi"><div class="kpiLabel">Win rate</div><div class="kpiValue">Model</div><div class="kpiSub">Based on deal terms</div></div>
       <div class="kpi"><div class="kpiLabel">Recommended OB</div><div class="kpiValue">1× MRR</div><div class="kpiSub">Upfront onboarding</div></div>
       <div class="kpi"><div class="kpiLabel">Recommended FM</div><div class="kpiValue">1 mo</div><div class="kpiSub">Free month at start</div></div>
       <div class="kpi"><div class="kpiLabel">Leakage default</div><div class="kpiValue">10%</div><div class="kpiSub">Refund/discount haircut</div></div>
@@ -403,59 +403,42 @@ td{
 
     <div class="grid2">
       <div class="card">
-        <div class="cardTitle">What changed in this version</div>
+        <div class="cardTitle">Correct calculation flow</div>
         <div class="definition">
-          The calculator now moves one step higher in the funnel. It no longer starts with “100 customers.” It starts with held demos, applies a win rate, and only the expected won accounts generate onboarding cash, MRR, churn, and CAC recovery.
+          The calculator uses a fixed 100 held demos, predicts win rate from onboarding %, free months, MRR, leakage, and the selected month index, then converts that into expected won accounts. Only won accounts generate onboarding revenue, MRR, churn, and CAC recovery.
         </div>
         <div class="note">
-          <b>Example:</b> 100 held demos × 25.9% win rate = 25.9 expected won accounts. Those 25.9 accounts create onboarding revenue immediately, recurring revenue after the free-month period, and churn-adjusted cash over time.
+          <b>Example logic:</b> 100 held demos × modeled win rate = expected wins. Those wins create onboarding cash immediately, then recurring revenue after free months, reduced over time by churn and leakage.
         </div>
       </div>
 
       <div class="card">
-        <div class="cardTitle">How to interpret the output</div>
+        <div class="cardTitle">What executives should look at</div>
         <div class="definition">
-          The key readout is no longer just single-account LTV. The more executive-friendly readout is cohort economics:
-          <br>• how many wins 100 held demos generate
-          <br>• how many of those customers churn each month
-          <br>• how much revenue is collected each month
-          <br>• when the full cohort crosses total CAC
+          The main outputs are:
+          <br>• modeled win rate from 100 held demos
+          <br>• expected won accounts
+          <br>• expected customer churn by month
+          <br>• cumulative cohort revenue
+          <br>• CAC breakeven month
+          <br>• how each deal variable changes win rate and churn
         </div>
         <div class="warn">
-          <b>Important:</b> CAC is not used to predict churn or win rate. CAC is only the threshold the expected revenue curve must cross.
+          <b>Win-rate caveat:</b> the win-rate model is based on 12 monthly 2025 observations. Use it directionally, not as a precise causal forecast.
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CALCULATOR -->
   <section class="section" id="tab-calculator">
     <div class="sectionHead">
-      <h2>Deal calculator</h2>
-      <p>Use this section to test one proposed sales motion: held demos, win rate, pricing, onboarding, free months, leakage, and CAC.</p>
+      <h2>Calculator</h2>
+      <p>Enter the proposed deal structure. Held demos stay fixed at 100. Win rate is predicted by the model.</p>
     </div>
 
     <div class="calcGrid">
       <div class="card inputs">
-        <div class="cardTitle">Inputs</div>
-
-        <div class="field">
-          <label>Held demos</label>
-          <div class="sliderRow">
-            <input id="heldDemos" type="range" min="10" max="500" step="10" value="100">
-            <span class="sliderValue" id="heldDemosLabel">100</span>
-          </div>
-          <div class="hint">Number of real/sellable demos held. Default = 100 so the output reads like a funnel walk-forward.</div>
-        </div>
-
-        <div class="field">
-          <label>Win rate from held demos</label>
-          <div class="sliderRow">
-            <input id="winRate" type="range" min="1" max="60" step="0.5" value="25.9">
-            <span class="sliderValue" id="winRateLabel">25.9%</span>
-          </div>
-          <div class="hint">Percent of held demos that become customers. This controls how many accounts enter the revenue/churn projection.</div>
-        </div>
+        <div class="cardTitle">Deal inputs</div>
 
         <div class="field">
           <label>Contract MRR</label>
@@ -463,7 +446,7 @@ td{
             <input id="mrr" type="range" min="1000" max="5000" step="50" value="2250">
             <span class="sliderValue" id="mrrLabel">$2,250</span>
           </div>
-          <div class="hint">Use current pricing assumptions. This is the recurring price after free months.</div>
+          <div class="hint">Use current pricing assumptions. This is the monthly recurring price after free months.</div>
         </div>
 
         <div class="field">
@@ -481,13 +464,13 @@ td{
             <input id="fm" type="range" min="0" max="6" step="1" value="1">
             <span class="sliderValue" id="fmLabel">1</span>
           </div>
-          <div class="hint">MRR begins in month <span id="mrrStartHint">2</span>. Free months delay recurring cash.</div>
+          <div class="hint">MRR begins in month <span id="mrrStartHint">2</span>. Free months also feed the win-rate model.</div>
         </div>
 
         <div class="field">
           <label>CAC per won customer</label>
           <input id="cac" type="number" min="0" step="100" value="6605">
-          <div class="hint">Total cohort CAC = expected wins × CAC per won customer.</div>
+          <div class="hint">Total cohort CAC = expected wins × CAC per won customer. CAC does not predict win rate or churn.</div>
         </div>
 
         <div class="field">
@@ -496,7 +479,7 @@ td{
             <input id="leak" type="range" min="0" max="30" step="1" value="10">
             <span class="sliderValue" id="leakLabel">10%</span>
           </div>
-          <div class="hint">Use 10% as a practical current default. This reduces collected MRR after churn and free months.</div>
+          <div class="hint">This reduces collected MRR and also feeds the churn model.</div>
         </div>
 
         <div class="field">
@@ -507,13 +490,35 @@ td{
           </div>
           <div class="hint">Used for cohort cash, LTV:CAC, and breakeven calculations.</div>
         </div>
+
+        <div class="field">
+          <label>Month index for win-rate model</label>
+          <div class="sliderRow">
+            <input id="monthIndex" type="range" min="0" max="11" step="1" value="0">
+            <span class="sliderValue" id="monthIndexLabel">0</span>
+          </div>
+          <div class="hint">0 = January baseline in the 2025 monthly model. Increasing this applies the 2025 time trend.</div>
+        </div>
       </div>
 
       <div class="results">
         <div class="result">
-          <div class="resultLabel">Expected won accounts</div>
+          <div class="resultLabel">Held demos</div>
+          <div class="resultValue">100</div>
+          <div class="resultSub">Static funnel starting point</div>
+        </div>
+
+        <div class="result">
+          <div class="resultLabel">Modeled win rate</div>
+          <div class="resultValue" id="modeledWinRateOut">—</div>
+          <div class="resultSub">Predicted from deal terms</div>
+          <div class="bar"><div class="fill" id="winRateFill"></div></div>
+        </div>
+
+        <div class="result">
+          <div class="resultLabel">Expected wins</div>
           <div class="resultValue" id="winsOut">—</div>
-          <div class="resultSub">Held demos × win rate</div>
+          <div class="resultSub">100 held demos × modeled win rate</div>
         </div>
 
         <div class="result">
@@ -526,6 +531,12 @@ td{
           <div class="resultLabel">Cohort CAC threshold</div>
           <div class="resultValue" id="cohortCacOut">—</div>
           <div class="resultSub">Expected wins × CAC</div>
+        </div>
+
+        <div class="result">
+          <div class="resultLabel">Cohort breakeven</div>
+          <div class="resultValue" id="breakevenOut">—</div>
+          <div class="resultSub">First month cohort cash ≥ cohort CAC</div>
         </div>
 
         <div class="result">
@@ -543,12 +554,6 @@ td{
         </div>
 
         <div class="result">
-          <div class="resultLabel">Cohort breakeven</div>
-          <div class="resultValue" id="breakevenOut">—</div>
-          <div class="resultSub">First month cohort cash ≥ cohort CAC</div>
-        </div>
-
-        <div class="result">
           <div class="resultLabel">Cohort cash at horizon</div>
           <div class="resultValue" id="cashOut">—</div>
           <div class="resultSub">Expected cumulative cohort cash</div>
@@ -561,9 +566,15 @@ td{
         </div>
 
         <div class="result">
-          <div class="resultLabel">Month-1 customer churn</div>
-          <div class="resultValue" id="m1ChurnOut">—</div>
-          <div class="resultSub">Expected won customers lost after month 1</div>
+          <div class="resultLabel">Win impact: +10pp onboarding</div>
+          <div class="resultValue" id="marginalObWinOut">—</div>
+          <div class="resultSub">Marginal effect at current onboarding</div>
+        </div>
+
+        <div class="result">
+          <div class="resultLabel">Win impact: +1 free month</div>
+          <div class="resultValue" id="marginalFmWinOut">—</div>
+          <div class="resultSub">Marginal effect at current free-month level</div>
         </div>
 
         <div class="result full">
@@ -584,7 +595,7 @@ td{
               <tr>
                 <td>MRR billing starts</td>
                 <td class="mono" id="mrrStartRow">—</td>
-                <td>First month recurring revenue begins after the free-month period.</td>
+                <td>First recurring revenue month after free months.</td>
               </tr>
               <tr>
                 <td>Month-1 recurring revenue</td>
@@ -594,7 +605,7 @@ td{
               <tr>
                 <td>Revenue lost to churn by horizon</td>
                 <td class="mono" id="revenueLostRow">—</td>
-                <td>Difference between no-churn revenue and churn-adjusted revenue.</td>
+                <td>Difference between no-churn and churn-adjusted cohort revenue.</td>
               </tr>
               <tr>
                 <td>Net after CAC</td>
@@ -608,11 +619,10 @@ td{
     </div>
   </section>
 
-  <!-- COHORT WALK FORWARD -->
   <section class="section" id="tab-cohort">
     <div class="sectionHead">
-      <h2>Held-demo funnel walk-forward</h2>
-      <p>This starts with held demos, applies win rate, then walks won accounts through churn, MRR collection, and CAC recovery.</p>
+      <h2>100 held-demo walk-forward</h2>
+      <p>This starts with 100 held demos, applies modeled win rate, then walks won accounts through churn, MRR collection, and CAC recovery.</p>
     </div>
 
     <div class="grid3">
@@ -620,8 +630,8 @@ td{
         <div class="cardTitle">Funnel snapshot</div>
         <table>
           <tbody>
-            <tr><td>Held demos</td><td class="mono" id="cohortHeldDemos">—</td></tr>
-            <tr><td>Win rate</td><td class="mono" id="cohortWinRate">—</td></tr>
+            <tr><td>Held demos</td><td class="mono">100</td></tr>
+            <tr><td>Modeled win rate</td><td class="mono" id="cohortWinRate">—</td></tr>
             <tr><td>Expected won accounts</td><td class="mono" id="cohortExpectedWins">—</td></tr>
             <tr><td>Lost opportunities</td><td class="mono" id="cohortLostOpps">—</td></tr>
             <tr><td>Month-1 churned customers</td><td class="mono" id="cohortM1Churn">—</td></tr>
@@ -659,17 +669,17 @@ td{
 
     <div class="grid2">
       <div class="card">
-        <div class="cardTitle">Held demos → wins → surviving customers</div>
+        <div class="cardTitle">100 held demos → modeled wins → surviving customers</div>
         <div class="definition">
-          The funnel starts with held demos, converts a portion into won customers using the selected win rate, then applies monthly churn to the won customer base. Bars show accounts churned each month; the line shows remaining active customers.
+          Bars show expected customers churned each month. The line shows remaining active customers from the expected won account base.
         </div>
         <div class="chartBox"><canvas id="cohortChurnChart"></canvas></div>
       </div>
 
       <div class="card">
-        <div class="cardTitle">Revenue from won customers after win-rate conversion</div>
+        <div class="cardTitle">Revenue from modeled won customers</div>
         <div class="definition">
-          Revenue only comes from won accounts. Month 0 includes onboarding revenue from expected wins. MRR starts after the free-month period and is reduced over time by churn and billing leakage. The dashed line is cohort CAC.
+          Revenue only comes from expected wins. Month 0 includes onboarding revenue. MRR starts after free months and is reduced by churn and leakage.
         </div>
         <div class="chartBox"><canvas id="cohortRevenueChart"></canvas></div>
       </div>
@@ -695,62 +705,70 @@ td{
     </div>
   </section>
 
-  <!-- OUTCOME CURVES -->
   <section class="section" id="tab-curves">
     <div class="sectionHead">
       <h2>Outcome curves</h2>
-      <p>These charts show churn probability, monthly revenue, cumulative revenue, and revenue lost to churn.</p>
+      <p>These charts show modeled win rate, churn probability, monthly revenue, cumulative revenue, and revenue lost to churn.</p>
     </div>
 
     <div class="grid2">
+      <div class="card">
+        <div class="cardTitle">Modeled win rate by onboarding level</div>
+        <div class="definition">
+          Keeps MRR, free months, leakage, and month index fixed while changing onboarding %. Shows modeled win rate and expected wins from 100 held demos.
+        </div>
+        <div class="chartBox short"><canvas id="winRateByOnboardingChart"></canvas></div>
+      </div>
+
       <div class="card">
         <div class="cardTitle">Cumulative churn probability by month</div>
         <div class="definition">
-          This curve shows the cumulative chance that a won customer has churned by each month. It is applied only after the held demos are converted into expected wins.
+          This curve shows the cumulative chance that a won customer has churned by each month.
         </div>
         <div class="chartBox short"><canvas id="singleChurnChart"></canvas></div>
-      </div>
-
-      <div class="card">
-        <div class="cardTitle">Expected monthly revenue per won account</div>
-        <div class="definition">
-          Revenue is zero during free months, then MRR begins and gradually falls as churn reduces the active customer base. Leakage reduces collected revenue in each paid month.
-        </div>
-        <div class="chartBox short"><canvas id="singleMonthlyRevenueChart"></canvas></div>
       </div>
     </div>
 
     <div class="grid2">
       <div class="card">
-        <div class="cardTitle">Cohort cumulative cash vs CAC</div>
+        <div class="cardTitle">Expected monthly revenue per won account</div>
         <div class="definition">
-          This is the most important financial chart. It shows expected cumulative cash from the won customer cohort against total cohort CAC.
+          Revenue is zero during free months, then MRR begins and gradually falls as churn reduces the active customer base.
         </div>
-        <div class="chartBox"><canvas id="singleCumulativeChart"></canvas></div>
+        <div class="chartBox short"><canvas id="singleMonthlyRevenueChart"></canvas></div>
       </div>
 
       <div class="card">
+        <div class="cardTitle">Cohort cumulative cash vs CAC</div>
+        <div class="definition">
+          The main financial chart. Shows expected cumulative cash from modeled wins against total cohort CAC.
+        </div>
+        <div class="chartBox short"><canvas id="singleCumulativeChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid1">
+      <div class="card">
         <div class="cardTitle">Revenue lost to churn over time</div>
         <div class="definition">
-          This compares a no-churn scenario to the churn-adjusted scenario. The gap is the cumulative revenue cost of churn.
+          Compares a no-churn scenario to the churn-adjusted scenario. The gap is cumulative revenue cost of churn.
         </div>
         <div class="chartBox"><canvas id="lostRevenueChart"></canvas></div>
       </div>
     </div>
   </section>
 
-  <!-- SENSITIVITY -->
   <section class="section" id="tab-sensitivity">
     <div class="sectionHead">
       <h2>Sensitivity and nonlinear effects</h2>
-      <p>See the modeled nonlinear minimums and how win rate changes cohort economics.</p>
+      <p>Shows modeled nonlinear minimums and marginal effects for win rate, churn, and revenue.</p>
     </div>
 
     <div class="grid3">
       <div class="card">
         <div class="cardTitle">Churn-minimizing onboarding</div>
         <div class="definition">
-          Modeled onboarding level, holding other settings fixed, that minimizes the churn equation within the allowed range.
+          Modeled onboarding level that minimizes the churn equation within the allowed range.
         </div>
         <div class="resultValue" id="optObOut">—</div>
         <div class="resultSub" id="optObSub">—</div>
@@ -768,7 +786,7 @@ td{
       <div class="card">
         <div class="cardTitle">Best cash at horizon</div>
         <div class="definition">
-          Scans onboarding levels and shows the onboarding % that maximizes expected cumulative cohort cash at the chosen horizon.
+          Scans onboarding levels and shows the onboarding % that maximizes expected cohort cash.
         </div>
         <div class="resultValue" id="optCashOut">—</div>
         <div class="resultSub" id="optCashSub">—</div>
@@ -785,21 +803,35 @@ td{
       </div>
 
       <div class="card">
-        <div class="cardTitle">Free months effect on churn and cohort cash</div>
+        <div class="cardTitle">Free months effect on churn, win rate, and cohort cash</div>
         <div class="definition">
-          Left axis = predicted 12-month churn. Right axis = expected cohort cash at the chosen horizon.
+          Shows how free months affect modeled churn, modeled win rate, and expected cohort cash.
         </div>
         <div class="chartBox tall"><canvas id="fmSensitivityChart"></canvas></div>
       </div>
     </div>
 
-    <div class="grid1">
+    <div class="grid2">
       <div class="card">
-        <div class="cardTitle">Win-rate sensitivity: held demos → revenue and CAC recovery</div>
-        <div class="definition">
-          This isolates the effect of win rate. MRR, onboarding, free months, churn, leakage, CAC, and held demos stay fixed. The x-axis changes the win rate from held demos. Higher win rate creates more won customers, which increases both cohort revenue and total cohort CAC if CAC is measured per won customer.
+        <div class="cardTitle">Modeled win-rate effect table</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Current value</th>
+              <th>Marginal effect</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody id="winRateEffectRows"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="cardTitle">Model caution</div>
+        <div class="warn">
+          The win-rate equation is based on 12 months of 2025 data. It is useful for directional scenario testing, but it should not be used as proof that onboarding or free months causally change win rate.
         </div>
-        <div class="chartBox tall"><canvas id="winRateSensitivityChart"></canvas></div>
       </div>
     </div>
 
@@ -811,7 +843,7 @@ td{
             <tr>
               <th>Scenario</th>
               <th>Held demos</th>
-              <th>Win rate</th>
+              <th>Modeled win rate</th>
               <th>Expected wins</th>
               <th>Onboarding</th>
               <th>Free months</th>
@@ -828,7 +860,6 @@ td{
     </div>
   </section>
 
-  <!-- METHOD -->
   <section class="section" id="tab-method">
     <div class="sectionHead">
       <h2>Method and assumptions</h2>
@@ -839,7 +870,7 @@ td{
       <div class="card">
         <div class="cardTitle">Funnel math</div>
         <div class="definition">
-          The calculator starts with held demos and turns them into expected won customers before applying churn and revenue.
+          The calculator starts with 100 held demos and uses the modeled win rate to calculate expected won customers before applying churn and revenue.
         </div>
         <table>
           <thead>
@@ -849,8 +880,10 @@ td{
             </tr>
           </thead>
           <tbody>
-            <tr><td>Expected wins</td><td class="mono">held_demos × win_rate</td></tr>
-            <tr><td>Lost opportunities</td><td class="mono">held_demos - expected_wins</td></tr>
+            <tr><td>Held demos</td><td class="mono">100 fixed</td></tr>
+            <tr><td>Modeled win rate</td><td class="mono">Win C model output</td></tr>
+            <tr><td>Expected wins</td><td class="mono">100 × modeled_win_rate</td></tr>
+            <tr><td>Lost opportunities</td><td class="mono">100 - expected_wins</td></tr>
             <tr><td>Total cohort CAC</td><td class="mono">expected_wins × CAC_per_won_customer</td></tr>
             <tr><td>Month 0 onboarding cash</td><td class="mono">expected_wins × MRR × onboarding_pct</td></tr>
             <tr><td>Paid month MRR cash</td><td class="mono">expected_wins × MRR × survival(t) × (1 - leakage)</td></tr>
@@ -859,34 +892,39 @@ td{
       </div>
 
       <div class="card">
-        <div class="cardTitle">Churn and revenue model</div>
-        <div class="definition">
-          The calculator uses the controlled 12-month churn equation, then converts annual churn into a monthly hazard so it can walk revenue forward month by month.
-        </div>
+        <div class="cardTitle">Model coefficients used</div>
         <table>
           <thead>
             <tr>
-              <th>Component</th>
-              <th>Formula</th>
+              <th>Model</th>
+              <th>Term</th>
+              <th>Coefficient</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>12-mo churn</td><td class="mono">controlled model output</td></tr>
-            <tr><td>Monthly churn hazard</td><td class="mono">1 - (1 - annual_churn)^(1/12)</td></tr>
-            <tr><td>Survival at month t</td><td class="mono">(1 - monthly_hazard)^t</td></tr>
-            <tr><td>Breakeven month</td><td class="mono">first month cumulative cash ≥ cohort CAC</td></tr>
-            <tr><td>Revenue lost to churn</td><td class="mono">no-churn revenue - churn-adjusted revenue</td></tr>
+            <tr><td>Win C</td><td>Intercept</td><td class="mono">0.9876</td></tr>
+            <tr><td>Win C</td><td>Onboarding %</td><td class="mono">-0.0769</td></tr>
+            <tr><td>Win C</td><td>Effective free months</td><td class="mono">-0.1024</td></tr>
+            <tr><td>Win C</td><td>Log MRR</td><td class="mono">-0.0707</td></tr>
+            <tr><td>Win C</td><td>Month index</td><td class="mono">-0.0197</td></tr>
+            <tr><td>Churn 12mo</td><td>Intercept</td><td class="mono">0.2771</td></tr>
+            <tr><td>Churn 12mo</td><td>Onboarding %</td><td class="mono">-0.1158</td></tr>
+            <tr><td>Churn 12mo</td><td>Onboarding²</td><td class="mono">0.0523</td></tr>
+            <tr><td>Churn 12mo</td><td>Free months</td><td class="mono">0.0242</td></tr>
+            <tr><td>Churn 12mo</td><td>Free months²</td><td class="mono">-0.0020</td></tr>
+            <tr><td>Churn 12mo</td><td>Log MRR</td><td class="mono">0.0171</td></tr>
+            <tr><td>Churn 12mo</td><td>Leakage</td><td class="mono">0.5729</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <div class="warn">
-      <b>Limitations:</b> this is a decision-support tool built from observational model outputs. It is best for comparing structures under the same MRR, win rate, and CAC assumptions. It should not be treated as a precise causal forecast for a specific customer.
+      <b>Limitations:</b> this is a decision-support tool built from observational model outputs. The churn model is stronger than the win-rate model. The win-rate model has only 12 monthly observations and should be treated as directional.
     </div>
   </section>
 
-  <div class="footer">CHIIRP deal structure calculator · held demos → wins → churn → revenue → CAC recovery</div>
+  <div class="footer">CHIIRP deal structure calculator · 100 held demos → modeled win rate → wins → churn → revenue → CAC recovery</div>
 </div>
 
 <script>
@@ -894,6 +932,8 @@ const $ = id => document.getElementById(id);
 const fmtDollar = v => '$' + Math.round(v).toLocaleString();
 const fmtPct = v => (v * 100).toFixed(1) + '%';
 const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+
+const STATIC_HELD_DEMOS = 100;
 
 const COLORS = {
   blue:'#1a4fd6',
@@ -904,7 +944,7 @@ const COLORS = {
   gray:'#8f8b84'
 };
 
-const MODEL = {
+const CHURN_MODEL = {
   intercept: 0.2771,
   ob: -0.1158,
   ob2: 0.0523,
@@ -914,35 +954,86 @@ const MODEL = {
   leakage: 0.5729
 };
 
+const WIN_RATE_MODEL = {
+  intercept: 0.9876,
+  onboardingPct: -0.0769,
+  onboardingPctSquared: 0.0000,
+  freeMonths: -0.1024,
+  freeMonthsSquared: 0.0000,
+  logMrr: -0.0707,
+  leakage: 0.0000,
+  monthIndex: -0.0197
+};
+
 let charts = {};
 
 function getInputs(){
   return {
-    heldDemos: Number($('heldDemos').value),
-    winRate: Number($('winRate').value) / 100,
+    heldDemos: STATIC_HELD_DEMOS,
     mrr: Number($('mrr').value),
     obPct: Number($('ob').value) / 100,
     freeMonths: Number($('fm').value),
     cac: Math.max(0, Number($('cac').value || 0)),
     leakage: Number($('leak').value) / 100,
-    horizon: Number($('horizon').value)
+    horizon: Number($('horizon').value),
+    monthIndex: Number($('monthIndex').value)
   };
 }
 
 function annualChurn(params){
-  const raw = MODEL.intercept
-    + MODEL.ob * params.obPct
-    + MODEL.ob2 * params.obPct * params.obPct
-    + MODEL.fm * params.freeMonths
-    + MODEL.fm2 * params.freeMonths * params.freeMonths
-    + MODEL.logMrr * Math.log(Math.max(params.mrr,1))
-    + MODEL.leakage * params.leakage;
+  const raw = CHURN_MODEL.intercept
+    + CHURN_MODEL.ob * params.obPct
+    + CHURN_MODEL.ob2 * params.obPct * params.obPct
+    + CHURN_MODEL.fm * params.freeMonths
+    + CHURN_MODEL.fm2 * params.freeMonths * params.freeMonths
+    + CHURN_MODEL.logMrr * Math.log(Math.max(params.mrr, 1))
+    + CHURN_MODEL.leakage * params.leakage;
 
   return clamp(raw, 0.03, 0.90);
 }
 
 function monthlyHazard(p12){
   return 1 - Math.pow(1 - p12, 1 / 12);
+}
+
+function modeledWinRate(params){
+  const raw = WIN_RATE_MODEL.intercept
+    + WIN_RATE_MODEL.onboardingPct * params.obPct
+    + WIN_RATE_MODEL.onboardingPctSquared * params.obPct * params.obPct
+    + WIN_RATE_MODEL.freeMonths * params.freeMonths
+    + WIN_RATE_MODEL.freeMonthsSquared * params.freeMonths * params.freeMonths
+    + WIN_RATE_MODEL.logMrr * Math.log(Math.max(params.mrr, 1))
+    + WIN_RATE_MODEL.leakage * params.leakage
+    + WIN_RATE_MODEL.monthIndex * params.monthIndex;
+
+  return clamp(raw, 0.01, 0.80);
+}
+
+function winRateMarginalEffects(params){
+  const marginalOnboarding =
+    WIN_RATE_MODEL.onboardingPct + 2 * WIN_RATE_MODEL.onboardingPctSquared * params.obPct;
+
+  const marginalFreeMonths =
+    WIN_RATE_MODEL.freeMonths + 2 * WIN_RATE_MODEL.freeMonthsSquared * params.freeMonths;
+
+  const onboardingTurningPoint =
+    WIN_RATE_MODEL.onboardingPctSquared !== 0
+      ? -WIN_RATE_MODEL.onboardingPct / (2 * WIN_RATE_MODEL.onboardingPctSquared)
+      : null;
+
+  const freeMonthTurningPoint =
+    WIN_RATE_MODEL.freeMonthsSquared !== 0
+      ? -WIN_RATE_MODEL.freeMonths / (2 * WIN_RATE_MODEL.freeMonthsSquared)
+      : null;
+
+  return {
+    marginalOnboarding,
+    marginalOnboardingPer10Pct: marginalOnboarding * 0.10,
+    marginalFreeMonths,
+    marginalMrr10Pct: WIN_RATE_MODEL.logMrr * Math.log(1.10),
+    onboardingTurningPoint,
+    freeMonthTurningPoint
+  };
 }
 
 function buildSingleProjection(params){
@@ -1004,8 +1095,9 @@ function buildSingleProjection(params){
 function buildCohortProjection(params){
   const single = buildSingleProjection(params);
 
-  const expectedWins = params.heldDemos * params.winRate;
-  const lostOpportunities = params.heldDemos - expectedWins;
+  const winRate = modeledWinRate(params);
+  const expectedWins = STATIC_HELD_DEMOS * winRate;
+  const lostOpportunities = STATIC_HELD_DEMOS - expectedWins;
   const totalCac = params.cac * expectedWins;
 
   const rows = [];
@@ -1016,7 +1108,8 @@ function buildCohortProjection(params){
 
     rows.push({
       month:r.month,
-      heldDemos:params.heldDemos,
+      heldDemos:STATIC_HELD_DEMOS,
+      winRate,
       expectedWins,
       lostOpportunities,
       churnedCount:churnedThisMonthShare * expectedWins,
@@ -1032,8 +1125,8 @@ function buildCohortProjection(params){
   const breakeven = rows.find(r => r.cumulativeRevenue >= totalCac);
 
   return {
-    heldDemos:params.heldDemos,
-    winRate:params.winRate,
+    heldDemos:STATIC_HELD_DEMOS,
+    winRate,
     expectedWins,
     lostOpportunities,
     totalCac,
@@ -1046,26 +1139,21 @@ function buildCohortProjection(params){
 }
 
 function churnMinOnboarding(){
-  const ob = -MODEL.ob / (2 * MODEL.ob2);
+  const ob = -CHURN_MODEL.ob / (2 * CHURN_MODEL.ob2);
   return clamp(ob, 0, 2);
 }
 
 function churnMinFreeMonths(params){
-  const candidates = [];
-  for(let fm = 0; fm <= 6; fm++){
-    candidates.push(fm);
-  }
-
   let bestFm = 0;
   let bestVal = Infinity;
 
-  candidates.forEach(fm => {
+  for(let fm = 0; fm <= 6; fm++){
     const p = annualChurn({...params, freeMonths:fm});
     if(p < bestVal){
       bestVal = p;
       bestFm = fm;
     }
-  });
+  }
 
   return bestFm;
 }
@@ -1091,6 +1179,12 @@ function fillColorByRisk(p){
   return COLORS.red;
 }
 
+function fillColorByWinRate(p){
+  if(p >= 0.25) return COLORS.green;
+  if(p >= 0.15) return COLORS.amber;
+  return COLORS.red;
+}
+
 function readStatus(breakevenMonth, finalCash, cac){
   if(cac <= 0) return '<span class="pill watch">No CAC set</span>';
   if(breakevenMonth === 0) return '<span class="pill ok">Immediate payback</span>';
@@ -1100,22 +1194,36 @@ function readStatus(breakevenMonth, finalCash, cac){
 }
 
 function updateLabels(p){
-  $('heldDemosLabel').textContent = p.heldDemos.toFixed(0);
-  $('winRateLabel').textContent = (p.winRate * 100).toFixed(1) + '%';
   $('mrrLabel').textContent = fmtDollar(p.mrr);
   $('obLabel').textContent = Math.round(p.obPct * 100) + '%';
   $('fmLabel').textContent = p.freeMonths;
   $('horizonLabel').textContent = p.horizon + ' mo';
   $('leakLabel').textContent = Math.round(p.leakage * 100) + '%';
+  $('monthIndexLabel').textContent = p.monthIndex;
 
   $('obHint').textContent = 'Upfront onboarding cash = ' + fmtDollar(p.mrr * p.obPct) + ' per won account';
   $('mrrStartHint').textContent = p.freeMonths + 1;
 }
 
 function updateCalculatorOutputs(params, single, cohort){
+  const winEffects = winRateMarginalEffects(params);
+
+  $('modeledWinRateOut').textContent = fmtPct(cohort.winRate);
+  $('modeledWinRateOut').style.color = fillColorByWinRate(cohort.winRate);
+  $('winRateFill').style.width = Math.round(cohort.winRate * 100) + '%';
+  $('winRateFill').style.background = fillColorByWinRate(cohort.winRate);
+
   $('winsOut').textContent = cohort.expectedWins.toFixed(1);
   $('lostOppsOut').textContent = cohort.lostOpportunities.toFixed(1);
   $('cohortCacOut').textContent = fmtDollar(cohort.totalCac);
+
+  $('marginalObWinOut').textContent =
+    (winEffects.marginalOnboardingPer10Pct >= 0 ? '+' : '') +
+    (winEffects.marginalOnboardingPer10Pct * 100).toFixed(1) + ' pts';
+
+  $('marginalFmWinOut').textContent =
+    (winEffects.marginalFreeMonths >= 0 ? '+' : '') +
+    (winEffects.marginalFreeMonths * 100).toFixed(1) + ' pts';
 
   $('churn12Out').textContent = fmtPct(single.p12);
   $('churn12Out').style.color = fillColorByRisk(single.p12);
@@ -1134,7 +1242,6 @@ function updateCalculatorOutputs(params, single, cohort){
   $('cashOut').textContent = fmtDollar(cohort.finalCash);
   $('ltvCacOut').textContent = cohort.ltvCac ? cohort.ltvCac.toFixed(2) + '×' : '—';
   $('ltvCacOut').style.color = cohort.ltvCac && cohort.ltvCac >= 1 ? COLORS.green : COLORS.red;
-  $('m1ChurnOut').textContent = cohort.month1ChurnCount.toFixed(1);
 
   $('upfrontCashRow').textContent = fmtDollar(single.upfront * cohort.expectedWins);
   $('mrrStartRow').textContent = 'Month ' + (params.freeMonths + 1);
@@ -1147,7 +1254,6 @@ function updateCalculatorOutputs(params, single, cohort){
   $('netAfterCacRow').textContent = (netAfter >= 0 ? '+' : '') + fmtDollar(netAfter);
   $('netAfterCacRow').style.color = netAfter >= 0 ? COLORS.green : COLORS.red;
 
-  $('cohortHeldDemos').textContent = cohort.heldDemos.toFixed(0);
   $('cohortWinRate').textContent = fmtPct(cohort.winRate);
   $('cohortExpectedWins').textContent = cohort.expectedWins.toFixed(1) + ' accounts';
   $('cohortLostOpps').textContent = cohort.lostOpportunities.toFixed(1) + ' demos';
@@ -1321,6 +1427,7 @@ function updateOutcomeCharts(params, single, cohort){
   const cohortSurvivors = cohort.rows.map(r => +r.survivors.toFixed(2));
   const cohortMonthlyRev = cohort.rows.map(r => Math.round(r.monthlyRevenue));
   const cohortCumulative = cohort.rows.map(r => Math.round(r.cumulativeRevenue));
+  const cohortCacLine2 = cohort.rows.map(_ => cohort.totalCac);
 
   buildOrUpdateChart('cohortChurnChart', {
     data:{
@@ -1386,7 +1493,7 @@ function updateOutcomeCharts(params, single, cohort){
         {
           type:'line',
           label:'Total cohort CAC',
-          data:cohortCacLine,
+          data:cohortCacLine2,
           borderColor:COLORS.red,
           borderDash:[6,4],
           pointRadius:0,
@@ -1407,6 +1514,80 @@ function updateOutcomeCharts(params, single, cohort){
           grid:{drawOnChartArea:false},
           title:{display:true,text:'Cumulative revenue / CAC'},
           ticks:{callback:v=>'$'+Math.round(v).toLocaleString()}
+        }
+      }
+    }
+  });
+
+  updateWinRateByOnboardingChart(params);
+}
+
+function updateWinRateByOnboardingChart(params){
+  const labels = [];
+  const winRates = [];
+  const expectedWins = [];
+  const marginalEffects = [];
+
+  for(let ob = 0; ob <= 200; ob += 5){
+    const p = {...params, obPct:ob / 100};
+    const wr = modeledWinRate(p);
+    const fx = winRateMarginalEffects(p);
+
+    labels.push(ob);
+    winRates.push(+(wr * 100).toFixed(2));
+    expectedWins.push(+(STATIC_HELD_DEMOS * wr).toFixed(1));
+    marginalEffects.push(+(fx.marginalOnboardingPer10Pct * 100).toFixed(2));
+  }
+
+  buildOrUpdateChart('winRateByOnboardingChart', {
+    data:{
+      labels,
+      datasets:[
+        {
+          type:'line',
+          label:'Modeled win rate %',
+          data:winRates,
+          borderColor:COLORS.blue,
+          borderWidth:2.5,
+          pointRadius:0,
+          tension:.25,
+          yAxisID:'y'
+        },
+        {
+          type:'line',
+          label:'Expected wins from 100 held demos',
+          data:expectedWins,
+          borderColor:COLORS.green,
+          borderWidth:2.2,
+          pointRadius:0,
+          tension:.25,
+          yAxisID:'y'
+        },
+        {
+          type:'bar',
+          label:'Marginal effect of +10pp onboarding',
+          data:marginalEffects,
+          backgroundColor:'rgba(146,64,14,.35)',
+          borderColor:COLORS.amber,
+          borderWidth:1,
+          yAxisID:'y1'
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:true, labels:{boxWidth:10,font:{size:11}}}
+      },
+      scales:{
+        x:{title:{display:true,text:'Onboarding % of MRR'}},
+        y:{title:{display:true,text:'Win rate % / expected wins'}, ticks:{callback:v=>v}},
+        y1:{
+          position:'right',
+          grid:{drawOnChartArea:false},
+          title:{display:true,text:'Marginal effect, points'},
+          ticks:{callback:v=>v + ' pts'}
         }
       }
     }
@@ -1450,12 +1631,14 @@ function updateSensitivity(params){
   const fmLabels = [];
   const fmChurn = [];
   const fmCash = [];
+  const fmWin = [];
 
   for(let fm = 0; fm <= 6; fm++){
     const p = {...params, freeMonths:fm};
     fmLabels.push(fm);
     fmChurn.push(+(annualChurn(p) * 100).toFixed(2));
     fmCash.push(Math.round(buildCohortProjection(p).finalCash));
+    fmWin.push(+(modeledWinRate(p) * 100).toFixed(2));
   }
 
   const optOb = churnMinOnboarding();
@@ -1528,12 +1711,21 @@ function updateSensitivity(params){
         },
         {
           type:'line',
-          label:'Cohort cash at horizon',
-          data:fmCash,
-          borderColor:COLORS.blue,
-          borderWidth:2.4,
+          label:'Modeled win rate %',
+          data:fmWin,
+          borderColor:COLORS.green,
+          borderWidth:2.2,
           pointRadius:3,
           tension:.22,
+          yAxisID:'y'
+        },
+        {
+          type:'bar',
+          label:'Cohort cash at horizon',
+          data:fmCash,
+          backgroundColor:'rgba(26,79,214,.45)',
+          borderColor:COLORS.blue,
+          borderWidth:1,
           yAxisID:'y1'
         }
       ]
@@ -1544,7 +1736,7 @@ function updateSensitivity(params){
       plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
       scales:{
         x:{title:{display:true,text:'Free months'}},
-        y:{title:{display:true,text:'12-mo churn %'}, ticks:{callback:v=>v+'%'}},
+        y:{title:{display:true,text:'Rate %'}, ticks:{callback:v=>v+'%'}},
         y1:{
           position:'right',
           grid:{drawOnChartArea:false},
@@ -1555,89 +1747,61 @@ function updateSensitivity(params){
     }
   });
 
-  updateWinRateSensitivity(params);
+  updateWinRateEffectTable(params);
   updateComparisonTable(params);
 }
 
-function updateWinRateSensitivity(params){
-  const labels = [];
-  const wins = [];
-  const cash = [];
-  const totalCac = [];
-  const net = [];
+function updateWinRateEffectTable(params){
+  const fx = winRateMarginalEffects(params);
 
-  for(let wr = 0.05; wr <= 0.60; wr += 0.025){
-    const p = {...params, winRate:wr};
-    const cohort = buildCohortProjection(p);
+  const obTurn =
+    fx.onboardingTurningPoint === null
+      ? 'No squared term'
+      : Math.round(fx.onboardingTurningPoint * 100) + '%';
 
-    labels.push((wr * 100).toFixed(1) + '%');
-    wins.push(+cohort.expectedWins.toFixed(1));
-    cash.push(Math.round(cohort.finalCash));
-    totalCac.push(Math.round(cohort.totalCac));
-    net.push(Math.round(cohort.finalCash - cohort.totalCac));
-  }
+  const fmTurn =
+    fx.freeMonthTurningPoint === null
+      ? 'No squared term'
+      : fx.freeMonthTurningPoint.toFixed(1) + ' months';
 
-  buildOrUpdateChart('winRateSensitivityChart', {
-    data:{
-      labels,
-      datasets:[
-        {
-          type:'bar',
-          label:'Expected won accounts',
-          data:wins,
-          backgroundColor:'rgba(14,116,144,.65)',
-          borderColor:COLORS.teal,
-          borderWidth:1,
-          yAxisID:'y'
-        },
-        {
-          type:'line',
-          label:'Cohort cash at horizon',
-          data:cash,
-          borderColor:COLORS.blue,
-          borderWidth:2.4,
-          pointRadius:0,
-          tension:.25,
-          yAxisID:'y1'
-        },
-        {
-          type:'line',
-          label:'Total cohort CAC',
-          data:totalCac,
-          borderColor:COLORS.red,
-          borderDash:[6,4],
-          borderWidth:1.8,
-          pointRadius:0,
-          yAxisID:'y1'
-        },
-        {
-          type:'line',
-          label:'Net after CAC',
-          data:net,
-          borderColor:COLORS.green,
-          borderWidth:2.2,
-          pointRadius:0,
-          tension:.25,
-          yAxisID:'y1'
-        }
-      ]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
-      scales:{
-        x:{title:{display:true,text:'Win rate from held demos'}},
-        y:{title:{display:true,text:'Expected won accounts'}},
-        y1:{
-          position:'right',
-          grid:{drawOnChartArea:false},
-          title:{display:true,text:'Cohort dollars'},
-          ticks:{callback:v=>'$'+Math.round(v).toLocaleString()}
-        }
-      }
-    }
-  });
+  $('winRateEffectRows').innerHTML = `
+    <tr>
+      <td>Onboarding % of MRR</td>
+      <td class="mono">${Math.round(params.obPct * 100)}%</td>
+      <td class="mono">
+        ${(fx.marginalOnboardingPer10Pct >= 0 ? '+' : '')}${(fx.marginalOnboardingPer10Pct * 100).toFixed(2)} pts per +10pp
+      </td>
+      <td>Estimated win-rate change from increasing onboarding by 10 percentage points at the current level.</td>
+    </tr>
+    <tr>
+      <td>Free months</td>
+      <td class="mono">${params.freeMonths}</td>
+      <td class="mono">
+        ${(fx.marginalFreeMonths >= 0 ? '+' : '')}${(fx.marginalFreeMonths * 100).toFixed(2)} pts per +1 month
+      </td>
+      <td>Estimated win-rate change from adding one more free month.</td>
+    </tr>
+    <tr>
+      <td>MRR</td>
+      <td class="mono">${fmtDollar(params.mrr)}</td>
+      <td class="mono">
+        ${(fx.marginalMrr10Pct >= 0 ? '+' : '')}${(fx.marginalMrr10Pct * 100).toFixed(2)} pts per +10% MRR
+      </td>
+      <td>Estimated win-rate change from a 10% increase in MRR.</td>
+    </tr>
+    <tr>
+      <td>Onboarding win-rate turning point</td>
+      <td class="mono">${obTurn}</td>
+      <td class="mono">Nonlinear</td>
+      <td>The selected win-rate model does not include onboarding squared, so there is no turning point in this version.</td>
+    </tr>
+    <tr>
+      <td>Free-month win-rate turning point</td>
+      <td class="mono">${fmTurn}</td>
+      <td class="mono">Nonlinear</td>
+      <td>The selected win-rate model does not include free-month squared, so there is no turning point in this version.</td>
+    </tr>
+  `;
 }
 
 function updateComparisonTable(params){
@@ -1664,8 +1828,8 @@ function updateComparisonTable(params){
     tbody.innerHTML += `
       <tr>
         <td><b>${s.name}</b></td>
-        <td class="mono">${params.heldDemos.toFixed(0)}</td>
-        <td class="mono">${(params.winRate * 100).toFixed(1)}%</td>
+        <td class="mono">100</td>
+        <td class="mono">${fmtPct(cohort.winRate)}</td>
         <td class="mono">${cohort.expectedWins.toFixed(1)}</td>
         <td class="mono">${Math.round(s.obPct * 100)}%</td>
         <td class="mono">${s.freeMonths}</td>
@@ -1693,14 +1857,13 @@ function updateAll(){
 }
 
 [
-  'heldDemos',
-  'winRate',
   'mrr',
   'ob',
   'fm',
   'cac',
   'leak',
-  'horizon'
+  'horizon',
+  'monthIndex'
 ].forEach(id => {
   $(id).addEventListener('input', updateAll);
   $(id).addEventListener('change', updateAll);
