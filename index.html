@@ -6,6 +6,7 @@
 <title>CHIIRP — Deal Structure Calculator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
 <style>
 :root{
   --ink:#0f0f0e;
@@ -26,6 +27,7 @@
   --radius:12px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
   font-family:'Source Serif 4',Georgia,serif;
   background:var(--paper);
@@ -34,12 +36,13 @@ body{
   line-height:1.6;
 }
 .container{
-  max-width:1360px;
+  max-width:1380px;
   margin:0 auto;
   padding:0 22px 60px;
 }
 h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
 .mono{font-family:'JetBrains Mono',monospace}
+
 .header{
   padding:28px 0 18px;
   border-bottom:1.5px solid var(--ink);
@@ -80,6 +83,7 @@ h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
   border-color:#f2c785;
   color:var(--amber);
 }
+
 .tabs{
   display:flex;
   gap:0;
@@ -103,6 +107,7 @@ h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
   color:var(--ink);
   border-bottom-color:var(--ink);
 }
+
 .section{display:none}
 .section.active{display:block}
 .sectionHead{margin-bottom:18px}
@@ -116,9 +121,11 @@ h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
   font-style:italic;
   margin-top:4px;
 }
+
 .grid1{display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+
 .card{
   background:var(--surface);
   border:1px solid var(--rule);
@@ -156,6 +163,7 @@ h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
   color:var(--amber);
   margin-top:10px;
 }
+
 .kpis{
   display:grid;
   grid-template-columns:repeat(6,1fr);
@@ -190,6 +198,7 @@ h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
   color:var(--muted);
   font-style:italic;
 }
+
 .calcGrid{
   display:grid;
   grid-template-columns:.95fr 1.05fr;
@@ -245,6 +254,7 @@ h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
   color:var(--muted);
   font-style:italic;
 }
+
 .results{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
@@ -289,12 +299,14 @@ h1,h2,h3,h4,.sans{font-family:'Syne',sans-serif}
   width:0%;
   transition:width .25s ease;
 }
+
 .chartBox{
   height:300px;
   position:relative;
 }
-.chartBox.tall{height:350px}
+.chartBox.tall{height:360px}
 .chartBox.short{height:240px}
+
 table{
   width:100%;
   border-collapse:collapse;
@@ -326,6 +338,7 @@ td{
 .ok{background:var(--greenLight); color:var(--green)}
 .watch{background:var(--amberLight); color:var(--amber)}
 .bad{background:var(--redLight); color:var(--red)}
+
 .footer{
   margin-top:28px;
   text-align:center;
@@ -333,6 +346,7 @@ td{
   color:#b2afa7;
   font-style:italic;
 }
+
 @media (max-width:1100px){
   .calcGrid,.grid2,.grid3,.results{grid-template-columns:1fr}
   .kpis{grid-template-columns:1fr 1fr}
@@ -343,26 +357,29 @@ td{
 }
 </style>
 </head>
+
 <body>
 <div class="container">
+
   <div class="header">
     <div>
       <h1>CHIIRP — Deal Structure Calculator</h1>
-      <p>Interpretable decision support for churn, cash timing, and CAC payback · current-price default settings included</p>
+      <p>Held demos → expected wins → churn → revenue → CAC breakeven</p>
     </div>
     <div class="badges">
+      <span class="badge">Default held demos 100</span>
+      <span class="badge">Default win rate 25.9%</span>
       <span class="badge">Default MRR $2,250</span>
       <span class="badge">Default onboarding 100%</span>
       <span class="badge">Default free month 1</span>
-      <span class="badge">Default leakage 10%</span>
-      <span class="badge alert">CAC is a threshold, not a causal predictor</span>
+      <span class="badge alert">CAC is a threshold</span>
     </div>
   </div>
 
   <div class="tabs">
     <div class="tab active" data-tab="summary">Executive summary</div>
     <div class="tab" data-tab="calculator">Calculator</div>
-    <div class="tab" data-tab="cohort">100-account cohort</div>
+    <div class="tab" data-tab="cohort">Held-demo walk-forward</div>
     <div class="tab" data-tab="curves">Outcome curves</div>
     <div class="tab" data-tab="sensitivity">Sensitivity / nonlinear</div>
     <div class="tab" data-tab="method">Method</div>
@@ -372,82 +389,41 @@ td{
   <section class="section active" id="tab-summary">
     <div class="sectionHead">
       <h2>Executive summary</h2>
-      <p>Front-page guidance for what the calculator is saying and how to use it.</p>
+      <p>The calculator starts at held demos, applies win rate, then projects the won accounts through churn and revenue recovery.</p>
     </div>
 
     <div class="kpis">
-      <div class="kpi"><div class="kpiLabel">Recommended default</div><div class="kpiValue">1× MRR</div><div class="kpiSub">Onboarding fee</div></div>
-      <div class="kpi"><div class="kpiLabel">Recommended concession</div><div class="kpiValue">1 mo</div><div class="kpiSub">Free month at start</div></div>
-      <div class="kpi"><div class="kpiLabel">Normal onboarding range</div><div class="kpiValue">75–125%</div><div class="kpiSub">Of monthly MRR</div></div>
-      <div class="kpi"><div class="kpiLabel">Approval zone</div><div class="kpiValue">150%+</div><div class="kpiSub">Use selectively</div></div>
-      <div class="kpi"><div class="kpiLabel">Leakage planning default</div><div class="kpiValue">10%</div><div class="kpiSub">Refund/discount haircut</div></div>
-      <div class="kpi"><div class="kpiLabel">Breakeven lens</div><div class="kpiValue">CAC line</div><div class="kpiSub">Crossing month matters</div></div>
+      <div class="kpi"><div class="kpiLabel">Funnel start</div><div class="kpiValue">100</div><div class="kpiSub">Held demos default</div></div>
+      <div class="kpi"><div class="kpiLabel">Win-rate default</div><div class="kpiValue">25.9%</div><div class="kpiSub">Expected wins from held demos</div></div>
+      <div class="kpi"><div class="kpiLabel">Recommended OB</div><div class="kpiValue">1× MRR</div><div class="kpiSub">Upfront onboarding</div></div>
+      <div class="kpi"><div class="kpiLabel">Recommended FM</div><div class="kpiValue">1 mo</div><div class="kpiSub">Free month at start</div></div>
+      <div class="kpi"><div class="kpiLabel">Leakage default</div><div class="kpiValue">10%</div><div class="kpiSub">Refund/discount haircut</div></div>
+      <div class="kpi"><div class="kpiLabel">Breakeven</div><div class="kpiValue">CAC</div><div class="kpiSub">Cash curve crossing</div></div>
     </div>
 
     <div class="grid2">
       <div class="card">
-        <div class="cardTitle">What this calculator is for</div>
+        <div class="cardTitle">What changed in this version</div>
         <div class="definition">
-          This page turns the effects analysis into a practical planning tool. It estimates a 12-month churn probability from the controlled churn model, converts that to a monthly churn rate, and then uses the timing of onboarding cash and recurring MRR to show when expected cumulative revenue crosses CAC.
+          The calculator now moves one step higher in the funnel. It no longer starts with “100 customers.” It starts with held demos, applies a win rate, and only the expected won accounts generate onboarding cash, MRR, churn, and CAC recovery.
         </div>
         <div class="note">
-          <b>Interpretation rule:</b> use this to compare deal structures under the same MRR and CAC assumptions. It is most useful for “what happens if we charge 100% onboarding vs 50% onboarding?” or “what happens if we keep onboarding and give one free month?”
+          <b>Example:</b> 100 held demos × 25.9% win rate = 25.9 expected won accounts. Those 25.9 accounts create onboarding revenue immediately, recurring revenue after the free-month period, and churn-adjusted cash over time.
         </div>
       </div>
+
       <div class="card">
-        <div class="cardTitle">Executive read</div>
+        <div class="cardTitle">How to interpret the output</div>
         <div class="definition">
-          For current pricing, the preferred default remains <b>1 free month + onboarding equal to roughly one month of MRR</b>. The calculator makes that interpretable by showing:
-          <br>• the predicted month-by-month churn path
-          <br>• the expected survivors out of 100 accounts
-          <br>• the revenue hit from churn each month
-          <br>• the cumulative revenue build against CAC
+          The key readout is no longer just single-account LTV. The more executive-friendly readout is cohort economics:
+          <br>• how many wins 100 held demos generate
+          <br>• how many of those customers churn each month
+          <br>• how much revenue is collected each month
+          <br>• when the full cohort crosses total CAC
         </div>
         <div class="warn">
-          <b>Important caveat:</b> CAC is not modeled as a customer behavior driver here. It is simply the dollar amount the expected cash curve must recover.
+          <b>Important:</b> CAC is not used to predict churn or win rate. CAC is only the threshold the expected revenue curve must cross.
         </div>
-      </div>
-    </div>
-
-    <div class="grid1">
-      <div class="card">
-        <div class="cardTitle">How to use this page</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Question</th>
-              <th>Where to look</th>
-              <th>What to compare</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>How risky is this deal structure?</td>
-              <td>Calculator + Outcome curves</td>
-              <td>12-mo churn %, monthly hazard, and survivor curve</td>
-            </tr>
-            <tr>
-              <td>When do we get our CAC back?</td>
-              <td>Calculator + Cumulative cash graph</td>
-              <td>Breakeven month and cash-vs-CAC crossing</td>
-            </tr>
-            <tr>
-              <td>What happens to a cohort, not just one account?</td>
-              <td>100-account cohort</td>
-              <td>Churn counts, survivors, revenue in each month, cumulative cohort payback</td>
-            </tr>
-            <tr>
-              <td>What onboarding level minimizes churn?</td>
-              <td>Sensitivity / nonlinear</td>
-              <td>Modeled churn-minimizing onboarding % and how it changes the curves</td>
-            </tr>
-            <tr>
-              <td>What does a free month cost us?</td>
-              <td>Sensitivity / nonlinear + comparison table</td>
-              <td>Breakeven shift, monthly cash delay, and cumulative cash effect</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
   </section>
@@ -456,7 +432,7 @@ td{
   <section class="section" id="tab-calculator">
     <div class="sectionHead">
       <h2>Deal calculator</h2>
-      <p>Enter the proposed deal structure. Outputs update instantly and are expressed for both a single account and an average cohort.</p>
+      <p>Use this section to test one proposed sales motion: held demos, win rate, pricing, onboarding, free months, leakage, and CAC.</p>
     </div>
 
     <div class="calcGrid">
@@ -464,12 +440,30 @@ td{
         <div class="cardTitle">Inputs</div>
 
         <div class="field">
+          <label>Held demos</label>
+          <div class="sliderRow">
+            <input id="heldDemos" type="range" min="10" max="500" step="10" value="100">
+            <span class="sliderValue" id="heldDemosLabel">100</span>
+          </div>
+          <div class="hint">Number of real/sellable demos held. Default = 100 so the output reads like a funnel walk-forward.</div>
+        </div>
+
+        <div class="field">
+          <label>Win rate from held demos</label>
+          <div class="sliderRow">
+            <input id="winRate" type="range" min="1" max="60" step="0.5" value="25.9">
+            <span class="sliderValue" id="winRateLabel">25.9%</span>
+          </div>
+          <div class="hint">Percent of held demos that become customers. This controls how many accounts enter the revenue/churn projection.</div>
+        </div>
+
+        <div class="field">
           <label>Contract MRR</label>
           <div class="sliderRow">
             <input id="mrr" type="range" min="1000" max="5000" step="50" value="2250">
             <span class="sliderValue" id="mrrLabel">$2,250</span>
           </div>
-          <div class="hint">Use current pricing assumptions. This should reflect the monthly price once billing begins.</div>
+          <div class="hint">Use current pricing assumptions. This is the recurring price after free months.</div>
         </div>
 
         <div class="field">
@@ -478,7 +472,7 @@ td{
             <input id="ob" type="range" min="0" max="200" step="5" value="100">
             <span class="sliderValue" id="obLabel">100%</span>
           </div>
-          <div class="hint" id="obHint">Upfront onboarding cash = $2,250</div>
+          <div class="hint" id="obHint">Upfront onboarding cash = $2,250 per won account</div>
         </div>
 
         <div class="field">
@@ -487,13 +481,13 @@ td{
             <input id="fm" type="range" min="0" max="6" step="1" value="1">
             <span class="sliderValue" id="fmLabel">1</span>
           </div>
-          <div class="hint">MRR begins in month <span id="mrrStartHint">2</span>. Free months delay cash but can protect sales motion.</div>
+          <div class="hint">MRR begins in month <span id="mrrStartHint">2</span>. Free months delay recurring cash.</div>
         </div>
 
         <div class="field">
-          <label>Planning CAC threshold</label>
+          <label>CAC per won customer</label>
           <input id="cac" type="number" min="0" step="100" value="6605">
-          <div class="hint">This is not part of the churn model. It only sets the breakeven line.</div>
+          <div class="hint">Total cohort CAC = expected wins × CAC per won customer.</div>
         </div>
 
         <div class="field">
@@ -502,7 +496,7 @@ td{
             <input id="leak" type="range" min="0" max="30" step="1" value="10">
             <span class="sliderValue" id="leakLabel">10%</span>
           </div>
-          <div class="hint">Use 10% as the practical current default. This reduces expected MRR collected after churn and free months are applied.</div>
+          <div class="hint">Use 10% as a practical current default. This reduces collected MRR after churn and free months.</div>
         </div>
 
         <div class="field">
@@ -511,19 +505,33 @@ td{
             <input id="horizon" type="range" min="12" max="48" step="6" value="24">
             <span class="sliderValue" id="horizonLabel">24 mo</span>
           </div>
-          <div class="hint">Used for expected cash, cumulative cash, and LTV:CAC at the selected time horizon.</div>
-        </div>
-
-        <div class="note">
-          <b>What this means in practice:</b> if month-1 churn is 4%, then an average cohort of 100 accounts loses about 4 accounts after month 1. The cohort and outcome tabs show exactly how that reduces revenue in that month and cumulatively over time.
+          <div class="hint">Used for cohort cash, LTV:CAC, and breakeven calculations.</div>
         </div>
       </div>
 
       <div class="results">
         <div class="result">
+          <div class="resultLabel">Expected won accounts</div>
+          <div class="resultValue" id="winsOut">—</div>
+          <div class="resultSub">Held demos × win rate</div>
+        </div>
+
+        <div class="result">
+          <div class="resultLabel">Lost opportunities</div>
+          <div class="resultValue" id="lostOppsOut">—</div>
+          <div class="resultSub">Held demos not converted</div>
+        </div>
+
+        <div class="result">
+          <div class="resultLabel">Cohort CAC threshold</div>
+          <div class="resultValue" id="cohortCacOut">—</div>
+          <div class="resultSub">Expected wins × CAC</div>
+        </div>
+
+        <div class="result">
           <div class="resultLabel">12-month churn probability</div>
           <div class="resultValue" id="churn12Out">—</div>
-          <div class="resultSub">Controlled model output</div>
+          <div class="resultSub">Controlled churn model</div>
           <div class="bar"><div class="fill" id="churnFill"></div></div>
         </div>
 
@@ -535,63 +543,63 @@ td{
         </div>
 
         <div class="result">
-          <div class="resultLabel">Single-account breakeven</div>
+          <div class="resultLabel">Cohort breakeven</div>
           <div class="resultValue" id="breakevenOut">—</div>
-          <div class="resultSub">First month expected cumulative cash ≥ CAC</div>
+          <div class="resultSub">First month cohort cash ≥ cohort CAC</div>
         </div>
 
         <div class="result">
-          <div class="resultLabel">Cash at horizon</div>
+          <div class="resultLabel">Cohort cash at horizon</div>
           <div class="resultValue" id="cashOut">—</div>
-          <div class="resultSub">Expected cumulative cash by selected horizon</div>
+          <div class="resultSub">Expected cumulative cohort cash</div>
         </div>
 
         <div class="result">
-          <div class="resultLabel">LTV:CAC at horizon</div>
+          <div class="resultLabel">Cohort LTV:CAC</div>
           <div class="resultValue" id="ltvCacOut">—</div>
-          <div class="resultSub">Single-account expected cash ÷ CAC</div>
+          <div class="resultSub">Cohort cash ÷ cohort CAC</div>
         </div>
 
         <div class="result">
-          <div class="resultLabel">Month-1 expected churn</div>
+          <div class="resultLabel">Month-1 customer churn</div>
           <div class="resultValue" id="m1ChurnOut">—</div>
-          <div class="resultSub">Average % of accounts lost after month 1</div>
+          <div class="resultSub">Expected won customers lost after month 1</div>
         </div>
 
         <div class="result full">
           <table>
             <thead>
               <tr>
-                <th>Interpretive metric</th>
+                <th>Metric</th>
                 <th>Value</th>
-                <th>What it means</th>
+                <th>Interpretation</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Upfront onboarding cash</td>
                 <td class="mono" id="upfrontCashRow">—</td>
-                <td>Immediate cash at month 0 from onboarding fee.</td>
+                <td>Month 0 cash collected from expected won accounts.</td>
               </tr>
               <tr>
                 <td>MRR billing starts</td>
                 <td class="mono" id="mrrStartRow">—</td>
-                <td>The first month recurring revenue begins after the free-month period.</td>
+                <td>First month recurring revenue begins after the free-month period.</td>
               </tr>
               <tr>
-                <td>Month-1 revenue from 100 accounts</td>
+                <td>Month-1 recurring revenue</td>
                 <td class="mono" id="cohortM1RevenueRow">—</td>
-                <td>Total expected collected revenue in month 1 for an average 100-account cohort.</td>
-              </tr>
-              <tr>
-                <td>Cohort breakeven month (100 accounts)</td>
-                <td class="mono" id="cohortBreakevenRow">—</td>
-                <td>First month cumulative expected cohort cash crosses total cohort CAC.</td>
+                <td>Expected recurring revenue in month 1 from won accounts.</td>
               </tr>
               <tr>
                 <td>Revenue lost to churn by horizon</td>
                 <td class="mono" id="revenueLostRow">—</td>
-                <td>Difference between no-churn collected revenue and churn-adjusted collected revenue.</td>
+                <td>Difference between no-churn revenue and churn-adjusted revenue.</td>
+              </tr>
+              <tr>
+                <td>Net after CAC</td>
+                <td class="mono" id="netAfterCacRow">—</td>
+                <td>Cohort cash at horizon minus total cohort CAC.</td>
               </tr>
             </tbody>
           </table>
@@ -600,26 +608,28 @@ td{
     </div>
   </section>
 
-  <!-- 100 ACCOUNT COHORT -->
+  <!-- COHORT WALK FORWARD -->
   <section class="section" id="tab-cohort">
     <div class="sectionHead">
-      <h2>Average 100-account cohort</h2>
-      <p>This section makes the economics tangible. Instead of a single “average account,” it shows what happens to 100 comparable accounts under the same parameters.</p>
+      <h2>Held-demo funnel walk-forward</h2>
+      <p>This starts with held demos, applies win rate, then walks won accounts through churn, MRR collection, and CAC recovery.</p>
     </div>
 
     <div class="grid3">
       <div class="card">
-        <div class="cardTitle">Cohort snapshot</div>
+        <div class="cardTitle">Funnel snapshot</div>
         <table>
           <tbody>
-            <tr><td>Starting accounts</td><td class="mono" id="cohortStart">100</td></tr>
-            <tr><td>Expected churn in month 1</td><td class="mono" id="cohortM1Churn">—</td></tr>
-            <tr><td>Expected survivors after month 1</td><td class="mono" id="cohortM1Survive">—</td></tr>
-            <tr><td>Expected survivors after month 12</td><td class="mono" id="cohortM12Survive">—</td></tr>
-            <tr><td>Expected survivors at horizon</td><td class="mono" id="cohortEndSurvive">—</td></tr>
+            <tr><td>Held demos</td><td class="mono" id="cohortHeldDemos">—</td></tr>
+            <tr><td>Win rate</td><td class="mono" id="cohortWinRate">—</td></tr>
+            <tr><td>Expected won accounts</td><td class="mono" id="cohortExpectedWins">—</td></tr>
+            <tr><td>Lost opportunities</td><td class="mono" id="cohortLostOpps">—</td></tr>
+            <tr><td>Month-1 churned customers</td><td class="mono" id="cohortM1Churn">—</td></tr>
+            <tr><td>Survivors after 12 months</td><td class="mono" id="cohortM12Survive">—</td></tr>
           </tbody>
         </table>
       </div>
+
       <div class="card">
         <div class="cardTitle">Revenue timing</div>
         <table>
@@ -632,14 +642,15 @@ td{
           </tbody>
         </table>
       </div>
+
       <div class="card">
         <div class="cardTitle">CAC perspective</div>
         <table>
           <tbody>
-            <tr><td>Total CAC for 100 accounts</td><td class="mono" id="cohortTotalCac">—</td></tr>
+            <tr><td>CAC per won customer</td><td class="mono" id="cohortCacPerCustomer">—</td></tr>
+            <tr><td>Total cohort CAC</td><td class="mono" id="cohortTotalCac">—</td></tr>
             <tr><td>Cohort breakeven month</td><td class="mono" id="cohortBreakEven">—</td></tr>
             <tr><td>LTV:CAC at horizon</td><td class="mono" id="cohortLtvCac">—</td></tr>
-            <tr><td>Net after CAC</td><td class="mono" id="cohortNetAfter">—</td></tr>
             <tr><td>Status</td><td id="cohortStatus">—</td></tr>
           </tbody>
         </table>
@@ -648,16 +659,17 @@ td{
 
     <div class="grid2">
       <div class="card">
-        <div class="cardTitle">Expected churn counts and survivors</div>
+        <div class="cardTitle">Held demos → wins → surviving customers</div>
         <div class="definition">
-          Bars show the average number of accounts lost each month out of 100. The line shows expected survivors remaining. This makes “4% churn in month 1” tangible.
+          The funnel starts with held demos, converts a portion into won customers using the selected win rate, then applies monthly churn to the won customer base. Bars show accounts churned each month; the line shows remaining active customers.
         </div>
         <div class="chartBox"><canvas id="cohortChurnChart"></canvas></div>
       </div>
+
       <div class="card">
-        <div class="cardTitle">Cohort monthly revenue and cumulative revenue</div>
+        <div class="cardTitle">Revenue from won customers after win-rate conversion</div>
         <div class="definition">
-          Bars show collected revenue in each month for the 100-account cohort. The line shows cumulative cohort revenue. The dashed line is total cohort CAC.
+          Revenue only comes from won accounts. Month 0 includes onboarding revenue from expected wins. MRR starts after the free-month period and is reduced over time by churn and billing leakage. The dashed line is cohort CAC.
         </div>
         <div class="chartBox"><canvas id="cohortRevenueChart"></canvas></div>
       </div>
@@ -670,7 +682,7 @@ td{
           <thead>
             <tr>
               <th>Month</th>
-              <th>Accounts churned</th>
+              <th>Customers churned</th>
               <th>Survivors</th>
               <th>Monthly revenue</th>
               <th>Cumulative revenue</th>
@@ -687,21 +699,22 @@ td{
   <section class="section" id="tab-curves">
     <div class="sectionHead">
       <h2>Outcome curves</h2>
-      <p>These are the main decision-support visuals. Together they show churn, revenue timing, and payback.</p>
+      <p>These charts show churn probability, monthly revenue, cumulative revenue, and revenue lost to churn.</p>
     </div>
 
     <div class="grid2">
       <div class="card">
         <div class="cardTitle">Cumulative churn probability by month</div>
         <div class="definition">
-          This curve shows the cumulative chance that an average account has churned by each month. The final point at month 12 matches the 12-month churn probability estimate.
+          This curve shows the cumulative chance that a won customer has churned by each month. It is applied only after the held demos are converted into expected wins.
         </div>
         <div class="chartBox short"><canvas id="singleChurnChart"></canvas></div>
       </div>
+
       <div class="card">
-        <div class="cardTitle">Single-account expected monthly revenue</div>
+        <div class="cardTitle">Expected monthly revenue per won account</div>
         <div class="definition">
-          Revenue is zero during free months, then MRR begins and gradually falls as churn reduces the survivor pool. Leakage reduces collected revenue in each paid month.
+          Revenue is zero during free months, then MRR begins and gradually falls as churn reduces the active customer base. Leakage reduces collected revenue in each paid month.
         </div>
         <div class="chartBox short"><canvas id="singleMonthlyRevenueChart"></canvas></div>
       </div>
@@ -709,12 +722,13 @@ td{
 
     <div class="grid2">
       <div class="card">
-        <div class="cardTitle">Single-account cumulative cash vs CAC</div>
+        <div class="cardTitle">Cohort cumulative cash vs CAC</div>
         <div class="definition">
-          Onboarding cash lands at month 0. Cumulative expected cash rises over time as paid MRR is collected. Breakeven is the first month the blue line crosses the red CAC line.
+          This is the most important financial chart. It shows expected cumulative cash from the won customer cohort against total cohort CAC.
         </div>
         <div class="chartBox"><canvas id="singleCumulativeChart"></canvas></div>
       </div>
+
       <div class="card">
         <div class="cardTitle">Revenue lost to churn over time</div>
         <div class="definition">
@@ -729,30 +743,32 @@ td{
   <section class="section" id="tab-sensitivity">
     <div class="sectionHead">
       <h2>Sensitivity and nonlinear effects</h2>
-      <p>This section answers the “where is the minimum?” question for the nonlinear variables and shows how the outputs move when you change them.</p>
+      <p>See the modeled nonlinear minimums and how win rate changes cohort economics.</p>
     </div>
 
     <div class="grid3">
       <div class="card">
         <div class="cardTitle">Churn-minimizing onboarding</div>
         <div class="definition">
-          This is the modeled onboarding level, holding other settings fixed, that minimizes the churn equation within the allowed range.
+          Modeled onboarding level, holding other settings fixed, that minimizes the churn equation within the allowed range.
         </div>
         <div class="resultValue" id="optObOut">—</div>
         <div class="resultSub" id="optObSub">—</div>
       </div>
+
       <div class="card">
         <div class="cardTitle">Churn-minimizing free months</div>
         <div class="definition">
-          This is the modeled free-month value that minimizes churn within the allowed 0–6 month range. Practical sales policy may still choose 1 month.
+          Modeled free-month value that minimizes churn within the 0–6 month range.
         </div>
         <div class="resultValue" id="optFmOut">—</div>
         <div class="resultSub" id="optFmSub">—</div>
       </div>
+
       <div class="card">
-        <div class="cardTitle">Best expected cash in range</div>
+        <div class="cardTitle">Best cash at horizon</div>
         <div class="definition">
-          This scans the selected onboarding range and shows the onboarding level that maximizes expected cumulative cash at the chosen horizon.
+          Scans onboarding levels and shows the onboarding % that maximizes expected cumulative cohort cash at the chosen horizon.
         </div>
         <div class="resultValue" id="optCashOut">—</div>
         <div class="resultSub" id="optCashSub">—</div>
@@ -761,18 +777,29 @@ td{
 
     <div class="grid2">
       <div class="card">
-        <div class="cardTitle">Onboarding % effect on churn and cash</div>
+        <div class="cardTitle">Onboarding % effect on churn and cohort cash</div>
         <div class="definition">
-          Left axis = predicted 12-month churn. Right axis = expected cumulative cash at the chosen horizon. The dotted marker shows the churn-minimizing onboarding point.
+          Left axis = predicted 12-month churn. Right axis = expected cohort cash at the chosen horizon.
         </div>
         <div class="chartBox tall"><canvas id="obSensitivityChart"></canvas></div>
       </div>
+
       <div class="card">
-        <div class="cardTitle">Free months effect on churn and cash</div>
+        <div class="cardTitle">Free months effect on churn and cohort cash</div>
         <div class="definition">
-          Left axis = predicted 12-month churn. Right axis = expected cumulative cash at the chosen horizon. This helps show the tradeoff between sales concession and cash timing.
+          Left axis = predicted 12-month churn. Right axis = expected cohort cash at the chosen horizon.
         </div>
         <div class="chartBox tall"><canvas id="fmSensitivityChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid1">
+      <div class="card">
+        <div class="cardTitle">Win-rate sensitivity: held demos → revenue and CAC recovery</div>
+        <div class="definition">
+          This isolates the effect of win rate. MRR, onboarding, free months, churn, leakage, CAC, and held demos stay fixed. The x-axis changes the win rate from held demos. Higher win rate creates more won customers, which increases both cohort revenue and total cohort CAC if CAC is measured per won customer.
+        </div>
+        <div class="chartBox tall"><canvas id="winRateSensitivityChart"></canvas></div>
       </div>
     </div>
 
@@ -783,20 +810,20 @@ td{
           <thead>
             <tr>
               <th>Scenario</th>
+              <th>Held demos</th>
+              <th>Win rate</th>
+              <th>Expected wins</th>
               <th>Onboarding</th>
               <th>Free months</th>
               <th>12-mo churn</th>
               <th>Breakeven</th>
-              <th>Cash at horizon</th>
+              <th>Cohort cash at horizon</th>
               <th>LTV:CAC</th>
               <th>Read</th>
             </tr>
           </thead>
           <tbody id="comparisonRows"></tbody>
         </table>
-        <div class="note">
-          <b>How to read this:</b> compare rows using the same MRR, leakage, horizon, and CAC. If a lower-onboarding row gives only a small churn improvement but pushes breakeven out materially, the extra concession is not economically justified.
-        </div>
       </div>
     </div>
   </section>
@@ -810,34 +837,9 @@ td{
 
     <div class="grid2">
       <div class="card">
-        <div class="cardTitle">Churn model used in the calculator</div>
+        <div class="cardTitle">Funnel math</div>
         <div class="definition">
-          The calculator uses the controlled 12-month churn equation from the effects output. It includes onboarding %, onboarding², effective free months, free months², log MRR, and billing leakage. Discount-depth controls are held at zero here for simplicity.
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Term</th>
-              <th>Coefficient</th>
-              <th>Meaning</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Intercept</td><td class="mono">0.2771</td><td>Baseline churn level</td></tr>
-            <tr><td>Onboarding %</td><td class="mono">-0.1158</td><td>Higher onboarding reduces churn initially</td></tr>
-            <tr><td>Onboarding²</td><td class="mono">0.0523</td><td>Diminishing benefit / curvature</td></tr>
-            <tr><td>Free months</td><td class="mono">0.0242</td><td>Slightly higher churn association</td></tr>
-            <tr><td>Free months²</td><td class="mono">-0.0020</td><td>Curvature term</td></tr>
-            <tr><td>log(MRR)</td><td class="mono">0.0171</td><td>Higher MRR slightly raises predicted churn</td></tr>
-            <tr><td>Leakage</td><td class="mono">0.5729</td><td>Higher leakage aligns with worse economics</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <div class="cardTitle">Cash and cohort math</div>
-        <div class="definition">
-          CAC is only a threshold. The calculator builds expected revenue from timing and retention. The 100-account cohort is simply 100 times the expected per-account economics, translated into account counts and revenue.
+          The calculator starts with held demos and turns them into expected won customers before applying churn and revenue.
         </div>
         <table>
           <thead>
@@ -847,31 +849,50 @@ td{
             </tr>
           </thead>
           <tbody>
-            <tr><td>Annual churn</td><td class="mono">clipped linear model output</td></tr>
+            <tr><td>Expected wins</td><td class="mono">held_demos × win_rate</td></tr>
+            <tr><td>Lost opportunities</td><td class="mono">held_demos - expected_wins</td></tr>
+            <tr><td>Total cohort CAC</td><td class="mono">expected_wins × CAC_per_won_customer</td></tr>
+            <tr><td>Month 0 onboarding cash</td><td class="mono">expected_wins × MRR × onboarding_pct</td></tr>
+            <tr><td>Paid month MRR cash</td><td class="mono">expected_wins × MRR × survival(t) × (1 - leakage)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="cardTitle">Churn and revenue model</div>
+        <div class="definition">
+          The calculator uses the controlled 12-month churn equation, then converts annual churn into a monthly hazard so it can walk revenue forward month by month.
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Formula</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>12-mo churn</td><td class="mono">controlled model output</td></tr>
             <tr><td>Monthly churn hazard</td><td class="mono">1 - (1 - annual_churn)^(1/12)</td></tr>
-            <tr><td>Survival at month t</td><td class="mono">(1 - hazard)^t</td></tr>
-            <tr><td>Month 0 cash</td><td class="mono">MRR × onboarding_pct</td></tr>
-            <tr><td>Paid month revenue</td><td class="mono">MRR × survival(t) × (1 - leakage)</td></tr>
-            <tr><td>Breakeven month</td><td class="mono">first month cumulative cash ≥ CAC</td></tr>
-            <tr><td>100-account churn count</td><td class="mono">100 × churned_share_in_month</td></tr>
+            <tr><td>Survival at month t</td><td class="mono">(1 - monthly_hazard)^t</td></tr>
+            <tr><td>Breakeven month</td><td class="mono">first month cumulative cash ≥ cohort CAC</td></tr>
+            <tr><td>Revenue lost to churn</td><td class="mono">no-churn revenue - churn-adjusted revenue</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <div class="warn">
-      <b>Limitations:</b> this is a decision-support tool built from observational regression outputs. It is best used for comparing structures and understanding timing, not as a precise causal forecast for a specific customer.
+      <b>Limitations:</b> this is a decision-support tool built from observational model outputs. It is best for comparing structures under the same MRR, win rate, and CAC assumptions. It should not be treated as a precise causal forecast for a specific customer.
     </div>
   </section>
 
-  <div class="footer">CHIIRP deal structure calculator · expanded for interpretability · cohort, curve, and nonlinear support included</div>
+  <div class="footer">CHIIRP deal structure calculator · held demos → wins → churn → revenue → CAC recovery</div>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
 const fmtDollar = v => '$' + Math.round(v).toLocaleString();
 const fmtPct = v => (v * 100).toFixed(1) + '%';
-const fmtPct1 = v => (v * 100).toFixed(1) + '%';
 const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
 
 const COLORS = {
@@ -884,7 +905,6 @@ const COLORS = {
 };
 
 const MODEL = {
-  // Controlled 12-mo churn model used for calculator interpretation.
   intercept: 0.2771,
   ob: -0.1158,
   ob2: 0.0523,
@@ -898,6 +918,8 @@ let charts = {};
 
 function getInputs(){
   return {
+    heldDemos: Number($('heldDemos').value),
+    winRate: Number($('winRate').value) / 100,
     mrr: Number($('mrr').value),
     obPct: Number($('ob').value) / 100,
     freeMonths: Number($('fm').value),
@@ -915,19 +937,22 @@ function annualChurn(params){
     + MODEL.fm2 * params.freeMonths * params.freeMonths
     + MODEL.logMrr * Math.log(Math.max(params.mrr,1))
     + MODEL.leakage * params.leakage;
+
   return clamp(raw, 0.03, 0.90);
 }
 
 function monthlyHazard(p12){
-  return 1 - Math.pow(1 - p12, 1/12);
+  return 1 - Math.pow(1 - p12, 1 / 12);
 }
 
 function buildSingleProjection(params){
   const p12 = annualChurn(params);
   const h = monthlyHazard(p12);
   const upfront = params.mrr * params.obPct;
+
   let cumulative = upfront;
   let noChurnCumulative = upfront;
+
   const rows = [{
     month:0,
     survival:1,
@@ -939,28 +964,31 @@ function buildSingleProjection(params){
     revenueLost:0
   }];
 
-  for(let t=1; t<=params.horizon; t++){
+  for(let t = 1; t <= params.horizon; t++){
     const survival = Math.pow(1 - h, t);
     const cumulativeChurn = 1 - survival;
     const paid = t > params.freeMonths;
-    const monthlyRev = paid ? params.mrr * survival * (1 - params.leakage) : 0;
-    const noChurnMonthlyRev = paid ? params.mrr * (1 - params.leakage) : 0;
-    cumulative += monthlyRev;
-    noChurnCumulative += noChurnMonthlyRev;
+
+    const monthlyRevenue = paid ? params.mrr * survival * (1 - params.leakage) : 0;
+    const noChurnMonthlyRevenue = paid ? params.mrr * (1 - params.leakage) : 0;
+
+    cumulative += monthlyRevenue;
+    noChurnCumulative += noChurnMonthlyRevenue;
+
     rows.push({
       month:t,
       survival,
       cumulativeChurn,
-      monthlyRevenue:monthlyRev,
+      monthlyRevenue,
       cumulativeRevenue:cumulative,
-      noChurnMonthlyRevenue:noChurnMonthlyRev,
+      noChurnMonthlyRevenue,
       noChurnCumulativeRevenue:noChurnCumulative,
       revenueLost:noChurnCumulative - cumulative
     });
   }
 
   const breakeven = rows.find(r => r.cumulativeRevenue >= params.cac);
-  const churnedShareMonth1 = h;
+
   return {
     p12,
     hazard:h,
@@ -969,48 +997,68 @@ function buildSingleProjection(params){
     breakevenMonth: breakeven ? breakeven.month : null,
     finalCash: rows[rows.length - 1].cumulativeRevenue,
     ltvCac: params.cac > 0 ? rows[rows.length - 1].cumulativeRevenue / params.cac : null,
-    month1Churn: churnedShareMonth1
+    month1Churn:h
   };
 }
 
-function buildCohortProjection(params, n=100){
+function buildCohortProjection(params){
   const single = buildSingleProjection(params);
+
+  const expectedWins = params.heldDemos * params.winRate;
+  const lostOpportunities = params.heldDemos - expectedWins;
+  const totalCac = params.cac * expectedWins;
+
   const rows = [];
-  const totalCac = params.cac * n;
+
   for(const r of single.rows){
     const prevSurvival = r.month === 0 ? 1 : single.rows[r.month - 1].survival;
     const churnedThisMonthShare = r.month === 0 ? 0 : Math.max(0, prevSurvival - r.survival);
+
     rows.push({
       month:r.month,
-      churnedCount: churnedThisMonthShare * n,
-      survivors: r.survival * n,
-      monthlyRevenue: r.monthlyRevenue * n,
-      cumulativeRevenue: r.cumulativeRevenue * n
+      heldDemos:params.heldDemos,
+      expectedWins,
+      lostOpportunities,
+      churnedCount:churnedThisMonthShare * expectedWins,
+      survivors:r.survival * expectedWins,
+      monthlyRevenue:r.monthlyRevenue * expectedWins,
+      cumulativeRevenue:r.cumulativeRevenue * expectedWins,
+      noChurnMonthlyRevenue:r.noChurnMonthlyRevenue * expectedWins,
+      noChurnCumulativeRevenue:r.noChurnCumulativeRevenue * expectedWins,
+      revenueLostToChurn:r.revenueLost * expectedWins
     });
   }
-  const cohortBreakeven = rows.find(r => r.cumulativeRevenue >= totalCac);
+
+  const breakeven = rows.find(r => r.cumulativeRevenue >= totalCac);
+
   return {
-    n,
+    heldDemos:params.heldDemos,
+    winRate:params.winRate,
+    expectedWins,
+    lostOpportunities,
     totalCac,
     rows,
-    breakevenMonth: cohortBreakeven ? cohortBreakeven.month : null,
+    breakevenMonth: breakeven ? breakeven.month : null,
     finalCash: rows[rows.length - 1].cumulativeRevenue,
     ltvCac: totalCac > 0 ? rows[rows.length - 1].cumulativeRevenue / totalCac : null,
     month1ChurnCount: rows[1] ? rows[1].churnedCount : 0
   };
 }
 
-function churnMinOnboarding(params){
+function churnMinOnboarding(){
   const ob = -MODEL.ob / (2 * MODEL.ob2);
-  const bounded = clamp(ob, 0, 2);
-  return bounded;
+  return clamp(ob, 0, 2);
 }
 
 function churnMinFreeMonths(params){
-  // Since fm^2 coefficient is negative, the minimum within a bounded range is at one of the boundaries.
-  const candidates = [0, 6];
+  const candidates = [];
+  for(let fm = 0; fm <= 6; fm++){
+    candidates.push(fm);
+  }
+
   let bestFm = 0;
   let bestVal = Infinity;
+
   candidates.forEach(fm => {
     const p = annualChurn({...params, freeMonths:fm});
     if(p < bestVal){
@@ -1018,19 +1066,22 @@ function churnMinFreeMonths(params){
       bestFm = fm;
     }
   });
+
   return bestFm;
 }
 
 function cashMaxOnboarding(params){
   let bestOb = 0;
   let bestCash = -Infinity;
-  for(let ob=0; ob<=2; ob+=0.01){
-    const cash = buildSingleProjection({...params, obPct:ob}).finalCash;
+
+  for(let ob = 0; ob <= 2; ob += 0.01){
+    const cash = buildCohortProjection({...params, obPct:ob}).finalCash;
     if(cash > bestCash){
       bestCash = cash;
       bestOb = ob;
     }
   }
+
   return {bestOb, bestCash};
 }
 
@@ -1049,16 +1100,23 @@ function readStatus(breakevenMonth, finalCash, cac){
 }
 
 function updateLabels(p){
+  $('heldDemosLabel').textContent = p.heldDemos.toFixed(0);
+  $('winRateLabel').textContent = (p.winRate * 100).toFixed(1) + '%';
   $('mrrLabel').textContent = fmtDollar(p.mrr);
   $('obLabel').textContent = Math.round(p.obPct * 100) + '%';
   $('fmLabel').textContent = p.freeMonths;
   $('horizonLabel').textContent = p.horizon + ' mo';
   $('leakLabel').textContent = Math.round(p.leakage * 100) + '%';
-  $('obHint').textContent = 'Upfront onboarding cash = ' + fmtDollar(p.mrr * p.obPct);
+
+  $('obHint').textContent = 'Upfront onboarding cash = ' + fmtDollar(p.mrr * p.obPct) + ' per won account';
   $('mrrStartHint').textContent = p.freeMonths + 1;
 }
 
 function updateCalculatorOutputs(params, single, cohort){
+  $('winsOut').textContent = cohort.expectedWins.toFixed(1);
+  $('lostOppsOut').textContent = cohort.lostOpportunities.toFixed(1);
+  $('cohortCacOut').textContent = fmtDollar(cohort.totalCac);
+
   $('churn12Out').textContent = fmtPct(single.p12);
   $('churn12Out').style.color = fillColorByRisk(single.p12);
   $('churnFill').style.width = Math.round(single.p12 * 100) + '%';
@@ -1070,41 +1128,46 @@ function updateCalculatorOutputs(params, single, cohort){
   $('hazardFill').style.background = fillColorByRisk(single.p12);
 
   $('breakevenOut').textContent = params.cac <= 0 ? 'No CAC' :
-    single.breakevenMonth === null ? 'Not in window' :
-    single.breakevenMonth === 0 ? 'Month 0' : 'Month ' + single.breakevenMonth;
-  $('cashOut').textContent = fmtDollar(single.finalCash);
-  $('ltvCacOut').textContent = single.ltvCac ? single.ltvCac.toFixed(2) + '×' : '—';
-  $('m1ChurnOut').textContent = fmtPct(single.month1Churn);
-
-  $('upfrontCashRow').textContent = fmtDollar(single.upfront);
-  $('mrrStartRow').textContent = 'Month ' + (params.freeMonths + 1);
-
-  const cohortMonth1Revenue = cohort.rows[1] ? cohort.rows[1].monthlyRevenue : 0;
-  $('cohortM1RevenueRow').textContent = fmtDollar(cohortMonth1Revenue);
-  $('cohortBreakevenRow').textContent = params.cac <= 0 ? 'No CAC' :
     cohort.breakevenMonth === null ? 'Not in window' :
     cohort.breakevenMonth === 0 ? 'Month 0' : 'Month ' + cohort.breakevenMonth;
-  const lostByHorizon = single.rows[single.rows.length - 1].revenueLost;
+
+  $('cashOut').textContent = fmtDollar(cohort.finalCash);
+  $('ltvCacOut').textContent = cohort.ltvCac ? cohort.ltvCac.toFixed(2) + '×' : '—';
+  $('ltvCacOut').style.color = cohort.ltvCac && cohort.ltvCac >= 1 ? COLORS.green : COLORS.red;
+  $('m1ChurnOut').textContent = cohort.month1ChurnCount.toFixed(1);
+
+  $('upfrontCashRow').textContent = fmtDollar(single.upfront * cohort.expectedWins);
+  $('mrrStartRow').textContent = 'Month ' + (params.freeMonths + 1);
+  $('cohortM1RevenueRow').textContent = cohort.rows[1] ? fmtDollar(cohort.rows[1].monthlyRevenue) : '—';
+
+  const lostByHorizon = cohort.rows[cohort.rows.length - 1].revenueLostToChurn;
   $('revenueLostRow').textContent = fmtDollar(lostByHorizon);
 
-  $('cohortM1Churn').textContent = cohort.rows[1] ? cohort.rows[1].churnedCount.toFixed(1) + ' accounts' : '—';
-  $('cohortM1Survive').textContent = cohort.rows[1] ? cohort.rows[1].survivors.toFixed(1) + ' accounts' : '—';
-  $('cohortM12Survive').textContent = cohort.rows[12] ? cohort.rows[12].survivors.toFixed(1) + ' accounts' : '—';
-  $('cohortEndSurvive').textContent = cohort.rows[cohort.rows.length - 1].survivors.toFixed(1) + ' accounts';
+  const netAfter = cohort.finalCash - cohort.totalCac;
+  $('netAfterCacRow').textContent = (netAfter >= 0 ? '+' : '') + fmtDollar(netAfter);
+  $('netAfterCacRow').style.color = netAfter >= 0 ? COLORS.green : COLORS.red;
 
-  $('cohortOnboardingCash').textContent = fmtDollar(single.upfront * cohort.n);
+  $('cohortHeldDemos').textContent = cohort.heldDemos.toFixed(0);
+  $('cohortWinRate').textContent = fmtPct(cohort.winRate);
+  $('cohortExpectedWins').textContent = cohort.expectedWins.toFixed(1) + ' accounts';
+  $('cohortLostOpps').textContent = cohort.lostOpportunities.toFixed(1) + ' demos';
+  $('cohortM1Churn').textContent = cohort.rows[1] ? cohort.rows[1].churnedCount.toFixed(1) + ' accounts' : '—';
+  $('cohortM12Survive').textContent = cohort.rows[12] ? cohort.rows[12].survivors.toFixed(1) + ' accounts' : '—';
+
+  $('cohortOnboardingCash').textContent = fmtDollar(single.upfront * cohort.expectedWins);
   $('cohortMonth1Rev').textContent = cohort.rows[1] ? fmtDollar(cohort.rows[1].monthlyRevenue) : '—';
   $('cohortMonth2Rev').textContent = cohort.rows[2] ? fmtDollar(cohort.rows[2].monthlyRevenue) : '—';
   $('cohortMonth12Rev').textContent = cohort.rows[12] ? fmtDollar(cohort.rows[12].monthlyRevenue) : '—';
   $('cohortFinalCash').textContent = fmtDollar(cohort.finalCash);
 
+  $('cohortCacPerCustomer').textContent = fmtDollar(params.cac);
   $('cohortTotalCac').textContent = fmtDollar(cohort.totalCac);
+
   $('cohortBreakEven').textContent = params.cac <= 0 ? 'No CAC' :
     cohort.breakevenMonth === null ? 'Not in window' :
     cohort.breakevenMonth === 0 ? 'Month 0' : 'Month ' + cohort.breakevenMonth;
+
   $('cohortLtvCac').textContent = cohort.ltvCac ? cohort.ltvCac.toFixed(2) + '×' : '—';
-  const netAfter = cohort.finalCash - cohort.totalCac;
-  $('cohortNetAfter').textContent = (netAfter >= 0 ? '+' : '') + fmtDollar(netAfter);
   $('cohortStatus').innerHTML = readStatus(cohort.breakevenMonth, cohort.finalCash, cohort.totalCac);
 }
 
@@ -1117,10 +1180,10 @@ function updateOutcomeCharts(params, single, cohort){
   const labels = single.rows.map(r => r.month);
   const churnCurve = single.rows.map(r => +(r.cumulativeChurn * 100).toFixed(2));
   const monthlyRevenue = single.rows.map(r => Math.round(r.monthlyRevenue));
-  const cumulativeCash = single.rows.map(r => Math.round(r.cumulativeRevenue));
-  const lostRevenue = single.rows.map(r => Math.round(r.revenueLost));
-  const noChurnCumulative = single.rows.map(r => Math.round(r.noChurnCumulativeRevenue));
-  const cacLine = labels.map(_ => params.cac);
+  const cohortCumulativeCash = cohort.rows.map(r => Math.round(r.cumulativeRevenue));
+  const cohortCacLine = cohort.rows.map(_ => cohort.totalCac);
+  const lostRevenue = cohort.rows.map(r => Math.round(r.revenueLostToChurn));
+  const noChurnCumulative = cohort.rows.map(r => Math.round(r.noChurnCumulativeRevenue));
 
   buildOrUpdateChart('singleChurnChart', {
     type:'line',
@@ -1138,7 +1201,8 @@ function updateOutcomeCharts(params, single, cohort){
       }]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{
         x:{title:{display:true,text:'Month'}},
@@ -1152,7 +1216,7 @@ function updateOutcomeCharts(params, single, cohort){
     data:{
       labels,
       datasets:[{
-        label:'Expected monthly revenue',
+        label:'Expected monthly revenue per won account',
         data:monthlyRevenue,
         backgroundColor:'rgba(26,79,214,.75)',
         borderColor:COLORS.blue,
@@ -1160,7 +1224,8 @@ function updateOutcomeCharts(params, single, cohort){
       }]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{
         x:{title:{display:true,text:'Month'}},
@@ -1175,8 +1240,8 @@ function updateOutcomeCharts(params, single, cohort){
       labels,
       datasets:[
         {
-          label:'Expected cumulative cash',
-          data:cumulativeCash,
+          label:'Expected cohort cumulative cash',
+          data:cohortCumulativeCash,
           borderColor:COLORS.blue,
           backgroundColor:'rgba(26,79,214,.08)',
           fill:true,
@@ -1185,8 +1250,8 @@ function updateOutcomeCharts(params, single, cohort){
           borderWidth:2.5
         },
         {
-          label:'CAC threshold',
-          data:cacLine,
+          label:'Cohort CAC threshold',
+          data:cohortCacLine,
           borderColor:COLORS.red,
           borderDash:[6,4],
           pointRadius:0,
@@ -1195,7 +1260,8 @@ function updateOutcomeCharts(params, single, cohort){
       ]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
       scales:{
         x:{title:{display:true,text:'Month'}},
@@ -1210,21 +1276,21 @@ function updateOutcomeCharts(params, single, cohort){
       labels,
       datasets:[
         {
-          label:'No-churn cumulative cash',
+          label:'No-churn cohort cumulative cash',
           data:noChurnCumulative,
           borderColor:COLORS.teal,
           pointRadius:0,
           borderWidth:2
         },
         {
-          label:'Churn-adjusted cumulative cash',
-          data:cumulativeCash,
+          label:'Churn-adjusted cohort cumulative cash',
+          data:cohortCumulativeCash,
           borderColor:COLORS.blue,
           pointRadius:0,
           borderWidth:2
         },
         {
-          label:'Cumulative revenue lost to churn',
+          label:'Cohort revenue lost to churn',
           data:lostRevenue,
           borderColor:COLORS.amber,
           pointRadius:0,
@@ -1234,7 +1300,8 @@ function updateOutcomeCharts(params, single, cohort){
       ]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
       scales:{
         x:{title:{display:true,text:'Month'}},
@@ -1254,7 +1321,6 @@ function updateOutcomeCharts(params, single, cohort){
   const cohortSurvivors = cohort.rows.map(r => +r.survivors.toFixed(2));
   const cohortMonthlyRev = cohort.rows.map(r => Math.round(r.monthlyRevenue));
   const cohortCumulative = cohort.rows.map(r => Math.round(r.cumulativeRevenue));
-  const cohortCacLine = cohortLabels.map(_ => cohort.totalCac);
 
   buildOrUpdateChart('cohortChurnChart', {
     data:{
@@ -1262,7 +1328,7 @@ function updateOutcomeCharts(params, single, cohort){
       datasets:[
         {
           type:'bar',
-          label:'Accounts churned in month',
+          label:'Customers churned in month',
           data:cohortChurnCounts,
           backgroundColor:'rgba(153,27,27,.7)',
           borderColor:COLORS.red,
@@ -1270,7 +1336,7 @@ function updateOutcomeCharts(params, single, cohort){
         },
         {
           type:'line',
-          label:'Survivors remaining',
+          label:'Surviving customers',
           data:cohortSurvivors,
           borderColor:COLORS.green,
           pointRadius:0,
@@ -1281,11 +1347,12 @@ function updateOutcomeCharts(params, single, cohort){
       ]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
       scales:{
         x:{title:{display:true,text:'Month'}},
-        y:{title:{display:true,text:'Accounts churned'}},
+        y:{title:{display:true,text:'Customers churned'}},
         y1:{
           position:'right',
           grid:{drawOnChartArea:false},
@@ -1329,7 +1396,8 @@ function updateOutcomeCharts(params, single, cohort){
       ]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
       scales:{
         x:{title:{display:true,text:'Month'}},
@@ -1345,13 +1413,15 @@ function updateOutcomeCharts(params, single, cohort){
   });
 }
 
-function updateCohortTable(params, cohort){
+function updateCohortTable(cohort){
   const tbody = $('cohortRows');
   tbody.innerHTML = '';
+
   cohort.rows.forEach(r => {
     const status = cohort.totalCac > 0 && r.cumulativeRevenue >= cohort.totalCac
       ? '<span class="pill ok">CAC recovered</span>'
       : '<span class="pill watch">Not yet</span>';
+
     tbody.innerHTML += `
       <tr>
         <td class="mono">${r.month}</td>
@@ -1369,24 +1439,26 @@ function updateSensitivity(params){
   const obLabels = [];
   const obChurn = [];
   const obCash = [];
-  for(let ob=0; ob<=200; ob+=5){
-    const p = {...params, obPct: ob/100};
+
+  for(let ob = 0; ob <= 200; ob += 5){
+    const p = {...params, obPct:ob / 100};
     obLabels.push(ob);
     obChurn.push(+(annualChurn(p) * 100).toFixed(2));
-    obCash.push(Math.round(buildSingleProjection(p).finalCash));
+    obCash.push(Math.round(buildCohortProjection(p).finalCash));
   }
 
   const fmLabels = [];
   const fmChurn = [];
   const fmCash = [];
-  for(let fm=0; fm<=6; fm++){
-    const p = {...params, freeMonths: fm};
+
+  for(let fm = 0; fm <= 6; fm++){
+    const p = {...params, freeMonths:fm};
     fmLabels.push(fm);
     fmChurn.push(+(annualChurn(p) * 100).toFixed(2));
-    fmCash.push(Math.round(buildSingleProjection(p).finalCash));
+    fmCash.push(Math.round(buildCohortProjection(p).finalCash));
   }
 
-  const optOb = churnMinOnboarding(params);
+  const optOb = churnMinOnboarding();
   const optFm = churnMinFreeMonths(params);
   const optCash = cashMaxOnboarding(params);
 
@@ -1395,7 +1467,7 @@ function updateSensitivity(params){
   $('optFmOut').textContent = optFm + ' mo';
   $('optFmSub').textContent = 'Bounded minimum within 0–6 months';
   $('optCashOut').textContent = Math.round(optCash.bestOb * 100) + '%';
-  $('optCashSub').textContent = 'Highest expected cash at month ' + params.horizon;
+  $('optCashSub').textContent = 'Highest expected cohort cash at month ' + params.horizon;
 
   buildOrUpdateChart('obSensitivityChart', {
     data:{
@@ -1413,28 +1485,19 @@ function updateSensitivity(params){
         },
         {
           type:'line',
-          label:'Cash at horizon',
+          label:'Cohort cash at horizon',
           data:obCash,
           borderColor:COLORS.blue,
           borderWidth:2.4,
           pointRadius:0,
           tension:.22,
           yAxisID:'y1'
-        },
-        {
-          type:'line',
-          label:'Churn-min onboarding',
-          data:obLabels.map(v => v === Math.round(optOb * 100) ? Math.max(...obChurn) : null),
-          borderColor:COLORS.green,
-          pointRadius:0,
-          borderDash:[3,5],
-          borderWidth:1.5,
-          yAxisID:'y'
         }
       ]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
       scales:{
         x:{title:{display:true,text:'Onboarding % of MRR'}},
@@ -1442,7 +1505,7 @@ function updateSensitivity(params){
         y1:{
           position:'right',
           grid:{drawOnChartArea:false},
-          title:{display:true,text:'Cash at horizon'},
+          title:{display:true,text:'Cohort cash at horizon'},
           ticks:{callback:v=>'$'+Math.round(v).toLocaleString()}
         }
       }
@@ -1465,7 +1528,7 @@ function updateSensitivity(params){
         },
         {
           type:'line',
-          label:'Cash at horizon',
+          label:'Cohort cash at horizon',
           data:fmCash,
           borderColor:COLORS.blue,
           borderWidth:2.4,
@@ -1476,7 +1539,8 @@ function updateSensitivity(params){
       ]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
+      responsive:true,
+      maintainAspectRatio:false,
       plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
       scales:{
         x:{title:{display:true,text:'Free months'}},
@@ -1484,14 +1548,96 @@ function updateSensitivity(params){
         y1:{
           position:'right',
           grid:{drawOnChartArea:false},
-          title:{display:true,text:'Cash at horizon'},
+          title:{display:true,text:'Cohort cash at horizon'},
           ticks:{callback:v=>'$'+Math.round(v).toLocaleString()}
         }
       }
     }
   });
 
+  updateWinRateSensitivity(params);
   updateComparisonTable(params);
+}
+
+function updateWinRateSensitivity(params){
+  const labels = [];
+  const wins = [];
+  const cash = [];
+  const totalCac = [];
+  const net = [];
+
+  for(let wr = 0.05; wr <= 0.60; wr += 0.025){
+    const p = {...params, winRate:wr};
+    const cohort = buildCohortProjection(p);
+
+    labels.push((wr * 100).toFixed(1) + '%');
+    wins.push(+cohort.expectedWins.toFixed(1));
+    cash.push(Math.round(cohort.finalCash));
+    totalCac.push(Math.round(cohort.totalCac));
+    net.push(Math.round(cohort.finalCash - cohort.totalCac));
+  }
+
+  buildOrUpdateChart('winRateSensitivityChart', {
+    data:{
+      labels,
+      datasets:[
+        {
+          type:'bar',
+          label:'Expected won accounts',
+          data:wins,
+          backgroundColor:'rgba(14,116,144,.65)',
+          borderColor:COLORS.teal,
+          borderWidth:1,
+          yAxisID:'y'
+        },
+        {
+          type:'line',
+          label:'Cohort cash at horizon',
+          data:cash,
+          borderColor:COLORS.blue,
+          borderWidth:2.4,
+          pointRadius:0,
+          tension:.25,
+          yAxisID:'y1'
+        },
+        {
+          type:'line',
+          label:'Total cohort CAC',
+          data:totalCac,
+          borderColor:COLORS.red,
+          borderDash:[6,4],
+          borderWidth:1.8,
+          pointRadius:0,
+          yAxisID:'y1'
+        },
+        {
+          type:'line',
+          label:'Net after CAC',
+          data:net,
+          borderColor:COLORS.green,
+          borderWidth:2.2,
+          pointRadius:0,
+          tension:.25,
+          yAxisID:'y1'
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:true, labels:{boxWidth:10,font:{size:11}}}},
+      scales:{
+        x:{title:{display:true,text:'Win rate from held demos'}},
+        y:{title:{display:true,text:'Expected won accounts'}},
+        y1:{
+          position:'right',
+          grid:{drawOnChartArea:false},
+          title:{display:true,text:'Cohort dollars'},
+          ticks:{callback:v=>'$'+Math.round(v).toLocaleString()}
+        }
+      }
+    }
+  });
 }
 
 function updateComparisonTable(params){
@@ -1502,23 +1648,32 @@ function updateComparisonTable(params){
     {name:'No free month', obPct:1.00, freeMonths:0},
     {name:'Aggressive onboarding', obPct:1.50, freeMonths:1}
   ];
+
   const tbody = $('comparisonRows');
   tbody.innerHTML = '';
+
   scenarios.forEach(s => {
-    const proj = buildSingleProjection({...params, obPct:s.obPct, freeMonths:s.freeMonths});
+    const pScenario = {...params, obPct:s.obPct, freeMonths:s.freeMonths};
+    const proj = buildSingleProjection(pScenario);
+    const cohort = buildCohortProjection(pScenario);
+
     const be = params.cac <= 0 ? '—' :
-      proj.breakevenMonth === null ? 'Not in window' :
-      proj.breakevenMonth === 0 ? 'Month 0' : 'Month ' + proj.breakevenMonth;
+      cohort.breakevenMonth === null ? 'Not in window' :
+      cohort.breakevenMonth === 0 ? 'Month 0' : 'Month ' + cohort.breakevenMonth;
+
     tbody.innerHTML += `
       <tr>
         <td><b>${s.name}</b></td>
+        <td class="mono">${params.heldDemos.toFixed(0)}</td>
+        <td class="mono">${(params.winRate * 100).toFixed(1)}%</td>
+        <td class="mono">${cohort.expectedWins.toFixed(1)}</td>
         <td class="mono">${Math.round(s.obPct * 100)}%</td>
         <td class="mono">${s.freeMonths}</td>
         <td class="mono" style="color:${fillColorByRisk(proj.p12)}">${fmtPct(proj.p12)}</td>
         <td class="mono">${be}</td>
-        <td class="mono">${fmtDollar(proj.finalCash)}</td>
-        <td class="mono">${proj.ltvCac ? proj.ltvCac.toFixed(2) + '×' : '—'}</td>
-        <td>${readStatus(proj.breakevenMonth, proj.finalCash, params.cac)}</td>
+        <td class="mono">${fmtDollar(cohort.finalCash)}</td>
+        <td class="mono">${cohort.ltvCac ? cohort.ltvCac.toFixed(2) + '×' : '—'}</td>
+        <td>${readStatus(cohort.breakevenMonth, cohort.finalCash, cohort.totalCac)}</td>
       </tr>
     `;
   });
@@ -1527,15 +1682,26 @@ function updateComparisonTable(params){
 function updateAll(){
   const params = getInputs();
   updateLabels(params);
+
   const single = buildSingleProjection(params);
-  const cohort = buildCohortProjection(params, 100);
+  const cohort = buildCohortProjection(params);
+
   updateCalculatorOutputs(params, single, cohort);
   updateOutcomeCharts(params, single, cohort);
-  updateCohortTable(params, cohort);
+  updateCohortTable(cohort);
   updateSensitivity(params);
 }
 
-['mrr','ob','fm','cac','leak','horizon'].forEach(id => {
+[
+  'heldDemos',
+  'winRate',
+  'mrr',
+  'ob',
+  'fm',
+  'cac',
+  'leak',
+  'horizon'
+].forEach(id => {
   $(id).addEventListener('input', updateAll);
   $(id).addEventListener('change', updateAll);
 });
@@ -1544,11 +1710,13 @@ document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
     tab.classList.add('active');
     $('tab-' + tab.dataset.tab).classList.add('active');
+
     setTimeout(() => {
       Object.values(charts).forEach(chart => chart.resize());
-    }, 50);
+    }, 60);
   });
 });
 
