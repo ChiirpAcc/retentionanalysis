@@ -2,554 +2,631 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CHIIRP — Onboarding & Free-Month Analysis</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CHIIRP — Onboarding & Free-Month Analysis v2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #F5F4F1;
-    --surface: #FFFFFF;
-    --border: #E2E0DB;
-    --text: #1A1917;
-    --muted: #6B6860;
-    --accent: #1C4ED8;
-    --green: #15803D;
-    --red: #B91C1C;
-    --amber: #B45309;
-    --blue: #1D4ED8;
-    --purple: #7C3AED;
-    --teal: #0F766E;
-    --c0: #1C4ED8;
-    --c1: #15803D;
-    --c2: #B45309;
-    --c3: #7C3AED;
-    --c4: #B91C1C;
-    --f0: #3B82F6;
-    --f1: #10B981;
-    --f2: #F59E0B;
-    --f3: #8B5CF6;
-    --f4: #EF4444;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
-  
-  .shell { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
-  
-  header { border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 2rem; }
-  header h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
-  header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
-  .header-meta { display: flex; gap: 1.5rem; margin-top: 1rem; }
-  .meta-pill { font-size: 12px; font-family: 'DM Mono', monospace; background: var(--surface); border: 1px solid var(--border); padding: 3px 10px; border-radius: 4px; color: var(--muted); }
+:root{
+  --bg:#F7F6F3;--s:#FFFFFF;--b:#E0DDD7;--b2:#CBC8C0;
+  --t:#18181B;--m:#6B6A66;--m2:#9C9B97;
+  --blue:#1A56DB;--green:#057A55;--amber:#92400E;--red:#9B1C1C;--purple:#5521B5;--teal:#0E7490;
+  --bl:#EBF5FF;--gl:#ECFDF5;--al:#FFFBEB;--rl:#FEF2F2;--pl:#F5F3FF;
+  --radius:8px;--radius-lg:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--t);font-size:14px;line-height:1.6;}
+.shell{max-width:1180px;margin:0 auto;padding:2.5rem 2rem 5rem;}
 
-  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
-  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.25rem; }
-  .kpi-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
-  .kpi-val { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; }
-  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+/* Header */
+.hd{border-bottom:1px solid var(--b);padding-bottom:1.75rem;margin-bottom:2rem;}
+.hd h1{font-size:1.4rem;font-weight:600;letter-spacing:-0.025em;margin-bottom:4px;}
+.hd p{font-size:13px;color:var(--m);max-width:680px;}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.pill{font-size:11px;font-family:'IBM Plex Mono',monospace;background:var(--s);border:1px solid var(--b);padding:2px 9px;border-radius:4px;color:var(--m);}
+.pill.warn{background:var(--al);border-color:#D97706;color:var(--amber);}
 
-  .section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* KPI row */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:2.25rem;}
+.kpi{background:var(--s);border:1px solid var(--b);border-radius:var(--radius);padding:1rem 1.1rem;}
+.kpi-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--m2);margin-bottom:5px;}
+.kpi-val{font-size:1.5rem;font-weight:600;letter-spacing:-0.03em;line-height:1.1;}
+.kpi-sub{font-size:11px;color:var(--m2);margin-top:3px;}
 
-  .chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
-  .chart-grid-1 { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
-  .chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
+/* Section headers */
+.sec{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin:2.25rem 0 1rem;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--b);}
+.sec-n{background:var(--t);color:#fff;font-size:9px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
-  .card-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-  .card-def { font-size: 12px; color: var(--muted); line-height: 1.55; margin-bottom: 1rem; border-left: 3px solid var(--border); padding-left: 10px; }
-  .takeaway { font-size: 12px; background: #F0F7FF; border-left: 3px solid var(--blue); padding: 8px 10px; border-radius: 0 4px 4px 0; margin-top: 12px; color: #1e3a6e; line-height: 1.5; }
-  .takeaway strong { color: var(--blue); }
-  .warn-box { font-size: 12px; background: #FFFBEB; border-left: 3px solid var(--amber); padding: 8px 10px; border-radius: 0 4px 4px 0; margin-top: 8px; color: #78350f; line-height: 1.5; }
+/* Grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;}
+.g1{display:grid;grid-template-columns:1fr;gap:1.25rem;margin-bottom:1.25rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;}
 
-  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
-  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
-  .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+/* Cards */
+.card{background:var(--s);border:1px solid var(--b);border-radius:var(--radius-lg);padding:1.4rem 1.5rem;}
+.card-ttl{font-size:13px;font-weight:600;margin-bottom:4px;}
+.card-def{font-size:12px;color:var(--m);line-height:1.6;margin-bottom:12px;padding-left:10px;border-left:2px solid var(--b2);}
+.card-stat{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--m2);margin-bottom:10px;}
 
-  canvas { display: block; }
+/* Callouts */
+.take{font-size:12px;background:var(--bl);border-left:3px solid var(--blue);padding:9px 11px;border-radius:0 var(--radius) var(--radius) 0;margin-top:12px;color:#1e3a6e;line-height:1.55;}
+.take b{color:var(--blue);font-weight:600;}
+.warn-box{font-size:12px;background:var(--al);border-left:3px solid #D97706;padding:9px 11px;border-radius:0 var(--radius) var(--radius) 0;margin-top:8px;color:var(--amber);line-height:1.55;}
+.warn-box b{font-weight:600;}
+.note{font-size:11px;color:var(--m2);font-style:italic;margin-top:6px;}
 
-  .policy-grid { display: grid; grid-template-columns: auto repeat(5, 1fr); gap: 3px; }
-  .pg-header { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); text-align: center; padding: 6px 4px; }
-  .pg-row-label { font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; padding-right: 8px; }
-  .pg-cell { border-radius: 6px; padding: 8px 6px; text-align: center; min-height: 64px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
-  .pg-n { font-size: 9px; color: var(--muted); }
-  .pg-ltv { font-size: 12px; font-weight: 600; }
-  .pg-churn { font-size: 11px; }
-  .pg-cac { font-size: 10px; font-family: 'DM Mono', monospace; }
-  .pg-empty { background: #F5F4F1; border: 1px dashed #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
-  .pg-empty span { font-size: 10px; color: #ccc; }
+/* Legend */
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--m);}
+.lb{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
 
-  .note { font-size: 11px; color: var(--muted); margin-top: 6px; font-style: italic; }
+/* Policy matrix */
+.pm-wrap{overflow-x:auto;}
+.pm{display:grid;grid-template-columns:140px repeat(5,1fr);gap:3px;min-width:600px;}
+.pm-head{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--m2);text-align:center;padding:5px 4px;}
+.pm-lbl{font-size:11px;color:var(--m);display:flex;align-items:center;padding-right:8px;font-weight:500;}
+.pm-cell{border-radius:6px;padding:7px 5px;text-align:center;display:flex;flex-direction:column;gap:2px;min-height:62px;justify-content:center;}
+.pm-n{font-size:9px;color:inherit;opacity:.6;}
+.pm-v{font-size:11px;font-weight:600;}
+.pm-c{font-size:10px;}
+.pm-r{font-size:10px;font-family:'IBM Plex Mono',monospace;}
+.pm-empty{background:#F3F2EF;border:1px dashed #D1CEC6;border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.pm-empty span{font-size:10px;color:#bbb;}
 
-  hr.divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+/* Tradeoff table */
+.tt{width:100%;border-collapse:collapse;font-size:12px;}
+.tt th{background:var(--t);color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:500;letter-spacing:.04em;}
+.tt td{padding:8px 12px;border-bottom:1px solid var(--b);vertical-align:top;}
+.tt tr:nth-child(even) td{background:var(--bg);}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;}
+.b-g{background:var(--gl);color:var(--green);}
+.b-a{background:var(--al);color:var(--amber);}
+.b-r{background:var(--rl);color:var(--red);}
+.b-b{background:var(--bl);color:var(--blue);}
+.b-n{background:var(--bg);color:var(--m);border:1px solid var(--b);}
 
-  @media (max-width: 768px) {
-    .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
-    .kpi-row { grid-template-columns: 1fr 1fr; }
-  }
+.divider{border:none;border-top:1px solid var(--b);margin:2.5rem 0;}
+.footer{text-align:center;font-size:11px;color:var(--m2);font-style:italic;}
+
+@media(max-width:780px){.g2,.g3{grid-template-columns:1fr;}.kpis{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
 <div class="shell">
 
-<header>
+<!-- HEADER -->
+<div class="hd">
   <h1>CHIIRP — Onboarding &amp; Free-Month Analysis</h1>
-  <p>How onboarding fees and free months affect lifetime value, churn, CAC recovery, and win rate</p>
-  <div class="header-meta">
-    <span class="meta-pill">2,944 customers</span>
-    <span class="meta-pill">Analysis as of March 2026</span>
-    <span class="meta-pill">CAC: 2025 only (n=725)</span>
-    <span class="meta-pill">Win rate: 2025 only (n=601)</span>
-    <span class="meta-pill">MRR controlled where noted</span>
-  </div>
-</header>
-
-<div class="kpi-row">
-  <div class="kpi"><div class="kpi-label">Total customers</div><div class="kpi-val">2,944</div></div>
-  <div class="kpi"><div class="kpi-label">Avg contract MRR</div><div class="kpi-val">$465</div><div class="kpi-sub">Median $488</div></div>
-  <div class="kpi"><div class="kpi-label">Avg LTV (w/ onboarding)</div><div class="kpi-val">$6,467</div><div class="kpi-sub">$6,035 MRR-only</div></div>
-  <div class="kpi"><div class="kpi-label">Avg CAC (2025)</div><div class="kpi-val">$5,961</div><div class="kpi-sub">Breakeven: ~5–10 months</div></div>
-</div>
-
-<!-- SECTION 1: LTV CURVES -->
-<div class="section-label">1 &amp; 2 — LTV trajectories (cumulative revenue / MRR, normalized)</div>
-<div class="chart-grid-2">
-
-  <div class="card">
-    <div class="card-title">Cumulative LTV by onboarding cohort</div>
-    <div class="card-def">Each line is the average customer's cumulative revenue collected (MRR + onboarding) divided by their contracted MRR, tracked month by month since signup. Normalizing by MRR removes the effect of price increases over time so cohorts are comparable. Onboarding cohorts are defined by contracted onboarding fee as a % of first-month MRR.</div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#3B82F6"></div>Zero (0%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#10B981"></div>Low (&lt;57%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#F59E0B"></div>Med-Low (57–100%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#8B5CF6"></div>Med-High (100–154%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#EF4444"></div>High (&gt;154%)</div>
-    </div>
-    <div style="position:relative;height:280px"><canvas id="ltv_ob" role="img" aria-label="Line chart of cumulative LTV by onboarding cohort over 36 months since signup"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> Zero-onboarding customers (blue) show the highest raw LTV/MRR because this cohort is older with longer payment histories. Med-High and Low onboarding cohorts track similarly and show strong long-run accumulation. High onboarding (red) shows slower LTV growth — consistent with higher early churn.</div>
-    <div class="note">⚠ Cohort vintage confound: zero-onboarding customers are on average older (2022–2023 signups) and have had more time to accumulate LTV. Treat differences in levels with caution; slopes are more informative.</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Cumulative LTV by free-month bucket</div>
-    <div class="card-def">Same normalized cumulative LTV metric, now grouped by number of free months granted at contract start. The 1-month line is the most representative — 68% of all customers received exactly 1 free month.</div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#3B82F6"></div>0 months</div>
-      <div class="leg"><div class="leg-dot" style="background:#10B981"></div>1 month</div>
-      <div class="leg"><div class="leg-dot" style="background:#F59E0B"></div>2 months</div>
-      <div class="leg"><div class="leg-dot" style="background:#8B5CF6"></div>3 months</div>
-      <div class="leg"><div class="leg-dot" style="background:#EF4444"></div>4+ months</div>
-    </div>
-    <div style="position:relative;height:280px"><canvas id="ltv_fm" role="img" aria-label="Line chart of cumulative LTV by free-month bucket over 36 months"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> The 1-month line (green) is the strongest consistent performer — by month 24 it leads all groups except 4+ (a small, non-standard group). Zero-free-month customers (blue) plateau early, indicating high churn. Giving 1 free month is clearly associated with better long-run revenue accumulation.</div>
-    <div class="note">⚠ 4+ months (n=77) likely represents enterprise or non-standard deals. Treat separately from the standard sales motion.</div>
-  </div>
-
-</div>
-
-<!-- SECTION 3 & 4: CHURN SURVIVAL -->
-<div class="section-label">3 &amp; 4 — Retention (survival curves)</div>
-<div class="chart-grid-2">
-
-  <div class="card">
-    <div class="card-title">Retention curve by onboarding cohort</div>
-    <div class="card-def">Percentage of customers still paying MRR at each month since signup. Only customers who have been active long enough to be observed at each time point are included (eligibility-adjusted). A steeper drop = faster churn. This chart does not separate by signup year — see the vintage caveat below.</div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#3B82F6"></div>Zero (0%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#10B981"></div>Low (&lt;57%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#F59E0B"></div>Med-Low (57–100%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#8B5CF6"></div>Med-High (100–154%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#EF4444"></div>High (&gt;154%)</div>
-    </div>
-    <div style="position:relative;height:280px"><canvas id="surv_ob" role="img" aria-label="Retention curve by onboarding cohort over 36 months"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> Med-High onboarding (purple) shows the flattest early drop — these customers retain best in the first 6 months. Zero-onboarding (blue) falls fastest. All cohorts converge toward similar rates by month 24+, suggesting the onboarding effect is strongest on early churn. Regression did not find statistically significant onboarding effects after controlling for MRR and vintage — this pattern is directional.</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Retention curve by free-month bucket</div>
-    <div class="card-def">Same survival analysis broken by free months at contract start. The zero-month group churns dramatically faster in the first 12 months. All groups with at least 1 free month show noticeably better early retention.</div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#3B82F6"></div>0 months</div>
-      <div class="leg"><div class="leg-dot" style="background:#10B981"></div>1 month</div>
-      <div class="leg"><div class="leg-dot" style="background:#F59E0B"></div>2 months</div>
-      <div class="leg"><div class="leg-dot" style="background:#8B5CF6"></div>3 months</div>
-      <div class="leg"><div class="leg-dot" style="background:#EF4444"></div>4+ months</div>
-    </div>
-    <div style="position:relative;height:280px"><canvas id="surv_fm" role="img" aria-label="Retention curve by free-month bucket over 36 months"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> The gap between 0 free months (blue) and 1 free month (green) is large and consistent across all time windows. By month 12, zero-free-month customers are at ~40% retention vs ~58% for 1-month. Free month squared term is statistically significant in the churn model (p=0.046) — the benefit peaks around 1 month and flattens beyond that.</div>
-  </div>
-
-</div>
-
-<!-- SECTION 5 & 6 & 7: CAC -->
-<div class="section-label">5, 6 &amp; 7 — CAC recovery (2025 customers only, n=725)</div>
-<div class="chart-grid-2">
-
-  <div class="card">
-    <div class="card-title">Median months to CAC breakeven — by onboarding cohort</div>
-    <div class="card-def">How long the average customer takes to pay back their acquisition cost, accounting for onboarding revenue collected upfront. Formula: (CAC − onboarding collected) ÷ avg monthly MRR collected. Controlling for onboarding % of MRR means MRR-level differences are absorbed into the denominator. Shorter = better.</div>
-    <div style="position:relative;height:220px"><canvas id="be_ob" role="img" aria-label="Bar chart of median months to CAC breakeven by onboarding cohort"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> Med-High onboarding (100–154% of MRR) breaks even in a median of 4.7 months — the fastest of any group. Zero-onboarding takes 8.6 months. High onboarding takes 10 months, possibly because those customers churn early before repaying. Using onboarding % of MRR as the measure controls for the fact that higher-MRR customers now pay higher absolute onboarding fees.</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Median months to CAC breakeven — by free-month bucket</div>
-    <div class="card-def">Same breakeven metric by free months. Note: free months delay the first MRR payment, which mechanically extends breakeven. The question is whether the improved retention offsets the delay. Compare breakeven months here against the LTV and survival curves above.</div>
-    <div style="position:relative;height:220px"><canvas id="be_fm" role="img" aria-label="Bar chart of median months to CAC breakeven by free month bucket"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> 1 free month breaks even in 4.9 months — faster than zero free months (9.5 months). This seems counterintuitive but reflects that zero-free-month customers churn faster and collect less total MRR. 3 free months = 4.3 months (fastest), though n=6. 4+ months = 8.5 months, reflecting longer delay before payments begin.</div>
-    <div class="warn-box">⚠ <strong>3 free months is the most important tradeoff:</strong> breakeven looks fast here (n=6), but if win rate doesn't increase materially, offering 3+ free months delays cash and creates CAC risk. See win rate charts below before drawing conclusions.</div>
-  </div>
-
-</div>
-
-<div class="chart-grid-1">
-  <div class="card">
-    <div class="card-title">CAC breakeven trend by signup quarter (MRR-aware)</div>
-    <div class="card-def">Median months to breakeven for customers signing up each quarter in 2025–2026. This is the cleanest MRR-controlled view: because we're using breakeven months (a ratio of CAC to MRR collected), MRR growth over time is partially absorbed. The trend here captures real changes in CAC efficiency, not just pricing inflation. Q4 2025 and Q1 2026 customers are immature — their longer breakeven times partly reflect incomplete payment histories, not just worse economics. Average MRR is shown as a secondary line for context.</div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#1D4ED8"></div>Median months to breakeven</div>
-      <div class="leg"><div class="leg-dot" style="background:#D97706; border-radius:50%"></div>Avg contract MRR (right axis)</div>
-    </div>
-    <div style="position:relative;height:240px"><canvas id="be_trend" role="img" aria-label="Line chart of CAC breakeven months by signup quarter with MRR overlay"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> Q1 2025 had the fastest breakeven (4.2 months) and the most mature data. Breakeven has lengthened through the year. Part of this is a maturity artifact — Q4 2025 customers haven't had enough time to pay back CAC. Q4 also shows rising CAC ($8k avg). If CAC continues to climb faster than MRR, breakeven will worsen structurally even with good onboarding policy. Executive action: watch CAC trajectory alongside onboarding policy changes.</div>
-    <div class="note">⚠ Q4 2025 and Q1 2026 are immature cohorts. Extended breakeven is partly a data cutoff artifact, not purely an efficiency signal.</div>
+  <p>How onboarding fees and free months affect LTV, churn, CAC recovery, and win rate — with full MRR, time, and discount controls.</p>
+  <div class="pills">
+    <span class="pill">2,944 customers</span>
+    <span class="pill">Analysis cutoff: March 2026</span>
+    <span class="pill">LTV models: N=2,863, R²=0.363</span>
+    <span class="pill">CAC: 2025 only (N=725)</span>
+    <span class="pill">Win rate: 2025 monthly (12 obs)</span>
+    <span class="pill warn">⚠ All findings are correlational, not causal</span>
   </div>
 </div>
 
-<!-- SECTION 8, 9, 10: WIN RATE -->
-<div class="section-label">8, 9 &amp; 10 — Win rate (2025 only, n=601, MRR-controlled)</div>
-<div class="chart-grid-1">
+<!-- KPIs -->
+<div class="kpis">
+  <div class="kpi"><div class="kpi-lbl">Total customers</div><div class="kpi-val">2,944</div></div>
+  <div class="kpi"><div class="kpi-lbl">Avg contract MRR</div><div class="kpi-val">$465</div><div class="kpi-sub">Median $488 · Rising over time</div></div>
+  <div class="kpi"><div class="kpi-lbl">Avg LTV / MRR (normalized)</div><div class="kpi-val">71.6×</div><div class="kpi-sub">Median 9.6× · Highly skewed</div></div>
+  <div class="kpi"><div class="kpi-lbl">Avg CAC (2025)</div><div class="kpi-val">$5,961</div><div class="kpi-sub">Rising through H2 2025</div></div>
+  <div class="kpi"><div class="kpi-lbl">Avg months to break even</div><div class="kpi-val">6.3 mo</div><div class="kpi-sub">Median · 2025 cohorts only</div></div>
+</div>
+
+<!-- CONFOUND CONTEXT -->
+<div class="sec"><div class="sec-n">⚠</div> MRR &amp; policy context — read before charts</div>
+<div class="g1">
   <div class="card">
-    <div class="card-title">Win rate by month (2025)</div>
-    <div class="card-def">Monthly average win rate (deals won ÷ held demos) for customers in our dataset, by the month they signed up. Win rate data is only available for 2025. Average contract MRR for that month is shown as a secondary line to illustrate that rising MRR (harder sell) may explain some win rate pressure — not onboarding or free-month policy alone. The regression model (R²=0.16) confirms that higher MRR is associated with lower win rate (p&lt;0.001), while higher onboarding % is associated with slightly higher win rate (p&lt;0.001) and more free months also correlates with higher win rate (p=0.001).</div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#1D4ED8"></div>Win rate (%)</div>
-      <div class="leg"><div class="leg-dot" style="background:#D97706; border-radius:50%"></div>Avg MRR (right axis)</div>
-    </div>
-    <div style="position:relative;height:240px"><canvas id="wr_trend" role="img" aria-label="Line chart of monthly win rate in 2025 with average MRR overlay"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> Win rate peaked in Feb 2025 (33.7%) and has trended down through Dec 2025 (17.7%). MRR has risen over the same period — higher-priced deals are harder to close. The regression controls for this: after adjusting for MRR, <strong>more onboarding is associated with higher win rate</strong> and <strong>more free months are also associated with higher win rate</strong>. This is the most important caveat: onboarding and free months may improve close rates enough to justify their cost.</div>
-    <div class="warn-box">⚠ <strong>Critical limitation:</strong> Win rate data is a monthly aggregate — every customer in the same month gets the same win rate value. This means these are period-level correlations, not customer-level causation. More data (deal-level win/loss) is needed to make this analysis definitive.</div>
+    <div class="card-ttl">Why MRR control matters: deal terms changed as prices rose</div>
+    <div class="card-def">Onboarding as % of MRR was near zero in 2022–2023, then rose sharply to 100%+ by 2024Q3–2025Q1. Free months also dropped from ~1.5–2.0 to &lt;0.5 by late 2025. MRR itself rose. This means raw comparisons between cohorts confound pricing policy with customer-era differences. All regression models below control for: contract MRR (log), signup quarter fixed effects, discount %, observation window, and refund rate.</div>
+    <div style="position:relative;height:190px"><canvas id="mrr_context" role="img" aria-label="Time series of avg MRR, onboarding pct, and free months by signup quarter 2022-2026"></canvas></div>
+    <div class="take"><b>What this means for the analysis:</b> Any raw cohort differences in LTV or churn partly reflect who the customers were, not just the deal terms. The regression models strip out MRR level, signup quarter, and discounts before attributing effects to onboarding and free months.</div>
   </div>
 </div>
 
-<div class="chart-grid-2">
+<!-- SECTION 1 & 2: LTV CURVES -->
+<div class="sec"><div class="sec-n">1</div> LTV trajectories — cumulative revenue ÷ MRR (MRR-normalized)</div>
+<div class="g2">
   <div class="card">
-    <div class="card-title">Win rate by onboarding cohort (MRR-adjusted, 2025)</div>
-    <div class="card-def">Average win rate for 2025 customers in each onboarding cohort, adjusted for contract MRR using OLS residuals. Raw win rates are shown as lighter bars for comparison. The adjustment removes the effect of higher-MRR customers being in certain cohorts — so this shows whether onboarding % itself is associated with close rate, independent of deal size.</div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#1D4ED8"></div>MRR-adjusted win rate</div>
-      <div class="leg"><div class="leg-dot" style="background:#93C5FD"></div>Raw win rate</div>
+    <div class="card-ttl">Cumulative LTV/MRR by onboarding cohort</div>
+    <div class="card-def"><b>What it shows:</b> Average cumulative revenue collected (MRR + onboarding) divided by contracted MRR, month by month since signup. Dividing by MRR removes the pricing-inflation effect — cohorts are comparable regardless of when they signed up. <b>Onboarding cohort thresholds</b> are percentile-based on the positive-onboarding population: Low &lt;57%, Med-Low 57–100%, Med-High 100–154%, High &gt;154%.</div>
+    <div class="card-stat">Model A: ob coef=+0.44 (p=0.044) · ob² coef=−0.30 (p=0.034) · turning point: ~74% of MRR</div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:#1A56DB"></div>Zero (0%)</div>
+      <div class="li"><div class="lb" style="background:#057A55"></div>Low (&lt;57%)</div>
+      <div class="li"><div class="lb" style="background:#B45309"></div>Med-Low (57–100%)</div>
+      <div class="li"><div class="lb" style="background:#5521B5"></div>Med-High (100–154%)</div>
+      <div class="li"><div class="lb" style="background:#9B1C1C"></div>High (&gt;154%)</div>
     </div>
-    <div style="position:relative;height:220px"><canvas id="wr_ob" role="img" aria-label="Bar chart of MRR-adjusted win rate by onboarding cohort"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> Low onboarding cohort (&lt;57% of MRR) has the highest adjusted win rate (27.6%). This may reflect that lower-resistance prospects convert more readily at lower price points. There is no clear monotonic relationship — Med-Low has the lowest rate. More data is needed before setting onboarding-as-price policy based on win rate alone.</div>
+    <div style="position:relative;height:260px"><canvas id="ltv_ob" role="img" aria-label="Cumulative LTV/MRR curves by onboarding cohort"></canvas></div>
+    <div class="take"><b>Takeaway:</b> Zero-onboarding (blue) appears highest because those customers are predominantly 2022–2023 vintage with more time to accumulate LTV. After controlling for observation window in the regression, onboarding has a statistically significant positive effect up to ~74% of MRR, then diminishing returns. Med-High and Low cohorts show strong mid-term slopes. High onboarding flattens early — consistent with higher early churn.</div>
+    <div class="note">⚠ Vintage confound is real. Slopes (not levels) are the more reliable signal here.</div>
   </div>
 
   <div class="card">
-    <div class="card-title">Win rate by free-month bucket (MRR-adjusted, 2025)</div>
-    <div class="card-def">Same MRR-adjusted win rate by free months. The regression coefficient on free months is positive and significant (coef=+0.0067, p=0.001) — each additional free month is associated with ~0.7pp higher win rate, after controlling for MRR. This is the key tradeoff chart for the exec team.</div>
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:#1D4ED8"></div>MRR-adjusted win rate</div>
-      <div class="leg"><div class="leg-dot" style="background:#93C5FD"></div>Raw win rate</div>
+    <div class="card-ttl">Cumulative LTV/MRR by free-month bucket</div>
+    <div class="card-def"><b>What it shows:</b> Same metric broken by number of free months granted at contract start. Free months delay first MRR collection, so the 1-month line starts lower at month 1 but the slope reflects how well customers retain after the free period. <b>68% of all customers received exactly 1 free month.</b></div>
+    <div class="card-stat">Model A: fm coef=−0.045 (p=0.087) · fm² coef=+0.0026 (p=0.013) · turning point: ~8.5 mo (implausible range; reflects outliers)</div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:#1A56DB"></div>0 months</div>
+      <div class="li"><div class="lb" style="background:#057A55"></div>1 month</div>
+      <div class="li"><div class="lb" style="background:#B45309"></div>2 months</div>
+      <div class="li"><div class="lb" style="background:#5521B5"></div>3 months</div>
+      <div class="li"><div class="lb" style="background:#9B1C1C"></div>4+ months</div>
     </div>
-    <div style="position:relative;height:220px"><canvas id="wr_fm" role="img" aria-label="Bar chart of MRR-adjusted win rate by free-month bucket"></canvas></div>
-    <div class="takeaway"><strong>Key takeaway:</strong> 3 free months has the highest adjusted win rate (26.2%), but n=6 — too small to be definitive. 1 and 2 free months are roughly equivalent on win rate (23.3% / 24.3%). <strong>The tradeoff: 3+ free months may win slightly more deals, but significantly delays CAC recovery (see Section 7). 1 free month appears to be the best balance across all three outcomes.</strong></div>
+    <div style="position:relative;height:260px"><canvas id="ltv_fm" role="img" aria-label="Cumulative LTV/MRR curves by free month bucket"></canvas></div>
+    <div class="take"><b>Takeaway:</b> 1 free month (green) is the strongest consistent performer — by month 18 it leads all standard groups. Zero-free-month customers plateau quickly, reflecting high early churn. The fm² term is significant (p=0.013): a U-shape where some free months help but many hurt. In plain terms, 1 free month appears to be economically justified; the incremental benefit of 2–3+ is unclear.</div>
+  </div>
+</div>
+
+<!-- SECTION 3 & 4: CHURN -->
+<div class="sec"><div class="sec-n">2</div> Retention curves — eligibility-adjusted survival</div>
+<div class="g2">
+  <div class="card">
+    <div class="card-ttl">Customer survival by onboarding cohort</div>
+    <div class="card-def"><b>What it shows:</b> % of customers still paying MRR at each month since signup. Only customers with enough observation time are counted at each point (eligibility-adjusted — newer customers are not treated as retained simply because they haven't had time to churn). <b>6-month churn model:</b> ob coef=+1.39 (p=0.006), ob²=−0.86 (p=0.008) — onboarding has a statistically significant inverted-U effect on 6-month churn, peaking at ~81% of MRR.</div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:#1A56DB"></div>Zero (0%)</div>
+      <div class="li"><div class="lb" style="background:#057A55"></div>Low (&lt;57%)</div>
+      <div class="li"><div class="lb" style="background:#B45309"></div>Med-Low (57–100%)</div>
+      <div class="li"><div class="lb" style="background:#5521B5"></div>Med-High (100–154%)</div>
+      <div class="li"><div class="lb" style="background:#9B1C1C"></div>High (&gt;154%)</div>
+    </div>
+    <div style="position:relative;height:260px"><canvas id="surv_ob" role="img" aria-label="Retention survival curves by onboarding cohort"></canvas></div>
+    <div class="take"><b>Takeaway:</b> Med-High onboarding (purple) shows the flattest early drop — best retention in months 1–12. Zero-onboarding churns fastest. The 6-month logistic regression confirms a statistically significant concave effect: onboarding reduces churn up to ~81% of MRR, then increases it. This is the strongest causal-looking result in the dataset.</div>
+    <div class="warn-box"><b>Caveat:</b> 12-month churn model did not converge cleanly (p=0.26 for ob, 0.23 for ob²). The 6-month model is the most reliable window.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-ttl">Customer survival by free-month bucket</div>
+    <div class="card-def"><b>What it shows:</b> Same survival curves by free months. Zero-free-month customers churn dramatically faster. The fm² term is statistically significant at 12 months (p=0.070) — the retention benefit peaks early and diminishes beyond 1–2 months. <b>Important:</b> the 4+ group (n=77) is likely non-standard deals (enterprise, pilots) — treat separately.</div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:#1A56DB"></div>0 months</div>
+      <div class="li"><div class="lb" style="background:#057A55"></div>1 month</div>
+      <div class="li"><div class="lb" style="background:#B45309"></div>2 months</div>
+      <div class="li"><div class="lb" style="background:#5521B5"></div>3 months</div>
+      <div class="li"><div class="lb" style="background:#9B1C1C"></div>4+ months</div>
+    </div>
+    <div style="position:relative;height:260px"><canvas id="surv_fm" role="img" aria-label="Retention survival curves by free month bucket"></canvas></div>
+    <div class="take"><b>Takeaway:</b> The gap between 0 and 1 free month is large and consistent across all time windows. At month 12, zero-free-month customers are at ~40% retention vs ~58% for 1-month. The churn model confirms: after controlling for MRR and signup quarter, the fm² term suggests the benefit peaks around 1–1.4 months (p=0.07). Offering 2–3+ months provides diminishing retention uplift relative to its cost.</div>
+  </div>
+</div>
+
+<!-- SECTION 5,6,7: CAC -->
+<div class="sec"><div class="sec-n">3</div> CAC recovery — 2025 customers only (N=725)</div>
+<div class="g2">
+  <div class="card">
+    <div class="card-ttl">LTV:CAC ratio by onboarding cohort</div>
+    <div class="card-def"><b>What it shows:</b> Average LTV (with onboarding) divided by customer acquisition cost. Values above 1.0× mean CAC is fully recovered. Because onboarding % of MRR normalizes for deal size, this comparison is valid across MRR levels. CAC data is 2025 only. <b>CAC recovery logistic model: onboarding coefficient not significant (p=0.67)</b> — the cohort differences below are largely explained by MRR and signup quarter.</div>
+    <div style="position:relative;height:220px"><canvas id="ltv_cac_ob" role="img" aria-label="LTV:CAC ratio by onboarding cohort with break-even line"></canvas></div>
+    <div class="take"><b>Takeaway:</b> Med-High onboarding delivers the best LTV:CAC (1.62×) and highest recovery rate (68%). Zero-onboarding is at 0.77× — underwater. However, the regression does not find a statistically significant independent effect of onboarding on recovery after controlling for MRR and quarter. The cohort differences likely reflect customer mix in 2025, not onboarding alone.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-ttl">LTV:CAC ratio by free-month bucket</div>
+    <div class="card-def"><b>What it shows:</b> Same LTV:CAC metric by free months. <b>CAC recovery logistic model: fm coef=+0.78 (p=0.001)</b> — statistically significant. 1 free month is associated with meaningfully higher probability of recovering CAC. The fm² term is also significant (p=0.035), indicating diminishing returns beyond ~1–2 months.</div>
+    <div style="position:relative;height:220px"><canvas id="ltv_cac_fm" role="img" aria-label="LTV:CAC ratio by free month bucket with break-even line"></canvas></div>
+    <div class="take"><b>Takeaway:</b> Zero-free-month customers recover only 64 cents per dollar of CAC (10% recovery rate). Every group with ≥1 free month exceeds 1.0×. This is the strongest finding in the CAC analysis: free months are <i>positively</i> associated with CAC recovery, despite delaying first payment. The most likely mechanism: 1 free month increases retention enough that customers pay back more total MRR before churning.</div>
+  </div>
+</div>
+
+<div class="g1">
+  <div class="card">
+    <div class="card-ttl">CAC breakeven months by signup quarter — trend with MRR context</div>
+    <div class="card-def"><b>What it shows:</b> Median months to recover CAC for customers signing up each quarter. Formula: (CAC − onboarding collected) ÷ avg monthly MRR paid. Using months (a ratio) rather than dollars partially controls for rising MRR. The right axis shows average contract MRR and average CAC to make the structural cost trend visible. <b>Q4 2025 and Q1 2026 are immature</b> — those cohorts have not had enough payment history for their true breakeven to appear.</div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:#1A56DB"></div>Median months to breakeven</div>
+      <div class="li"><div class="lb" style="background:#9B1C1C;border-radius:50%"></div>Avg CAC ($, right axis)</div>
+      <div class="li"><div class="lb" style="background:#057A55;border-radius:50%"></div>Avg MRR ($, right axis)</div>
+    </div>
+    <div style="position:relative;height:230px"><canvas id="be_trend" role="img" aria-label="CAC breakeven months by signup quarter with CAC and MRR overlay"></canvas></div>
+    <div class="take"><b>Takeaway:</b> Q1 2025 shows the fastest mature breakeven (4.2 months) with the lowest CAC ($4k avg). Through 2025, CAC rose to $8k+ while breakeven lengthened. This is partly a maturity artifact for Q4+ — but the CAC increase is real. If CAC continues rising without proportional MRR growth, breakeven will worsen structurally regardless of onboarding policy. <b>Executive action:</b> monitor CAC/MRR ratio quarterly alongside onboarding policy.</div>
+    <div class="note">⚠ Q4 2025 and Q1 2026 are immature cohorts. Their longer breakeven times partially reflect incomplete payment histories, not purely worse economics.</div>
+  </div>
+</div>
+
+<div class="g2">
+  <div class="card">
+    <div class="card-ttl">Median months to breakeven by onboarding cohort</div>
+    <div class="card-def"><b>What it shows:</b> Same breakeven calculation split by onboarding cohort. Onboarding collected upfront reduces the "CAC remaining after onboarding" numerator, which mechanically improves this metric for higher-onboarding cohorts. This is the intended mechanism — onboarding accelerates cash recovery.</div>
+    <div style="position:relative;height:200px"><canvas id="be_ob" role="img" aria-label="Months to CAC breakeven by onboarding cohort"></canvas></div>
+    <div class="take"><b>Takeaway:</b> Med-High onboarding breaks even in 4.7 months (fastest). Zero-onboarding takes 8.6 months. High onboarding is 10 months — likely because those customers churn before repaying. The onboarding mechanism works as intended up to ~100–150% of MRR.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-ttl">Median months to breakeven by free-month bucket</div>
+    <div class="card-def"><b>What it shows:</b> Breakeven months by free months. Counterintuitively, 1 free month breaks even <i>faster</i> than 0 free months (4.9 vs 9.5 months). The mechanism: zero-free-month customers churn so quickly that very little MRR is collected, making their effective payback period extremely long. Free months that improve retention collect more total MRR even after the delay.</div>
+    <div style="position:relative;height:200px"><canvas id="be_fm" role="img" aria-label="Months to CAC breakeven by free month bucket"></canvas></div>
+    <div class="take"><b>Takeaway:</b> 1 free month (4.9 mo) and 3 free months (4.3 mo, n=6) are both faster than zero. 4+ is slower (8.5 mo). The pattern confirms that free months improve retention enough to offset delayed cash — but only up to 1–2 months. 4+ is likely a deal-structure artifact.</div>
+    <div class="warn-box"><b>3 free months critical caveat:</b> breakeven looks fast (4.3 mo) but n=6. Do not use this to standardize 3 free months. See win rate section for the full tradeoff.</div>
+  </div>
+</div>
+
+<!-- SECTION 8–10: WIN RATE -->
+<div class="sec"><div class="sec-n">4</div> Win rate — 2025 monthly data only · aggregate-level analysis</div>
+<div class="g1">
+  <div class="card">
+    <div class="card-ttl">Monthly win rate trend with MRR and CAC context (2025)</div>
+    <div class="card-def"><b>What it shows:</b> Average win rate (deals won ÷ held demos) for customers by their signup month in 2025. Right axis shows average contract MRR and CAC for context. <b>Critical limitation:</b> win rate is a monthly aggregate — every customer in the same month gets the same value. This means we have only 12 data points for modeling, not 601 customers. All win rate models are weighted monthly regressions (weight = N customers in that month). <b>Model B (free months only): fm coef=−0.268 (p=0.059), R²=0.654.</b> After controlling for MRR and CAC, more free months per month is associated with lower win rate — opposite of the raw correlation.</div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:#1A56DB"></div>Win rate (%)</div>
+      <div class="li"><div class="lb" style="background:#9B1C1C;border-radius:50%"></div>Avg CAC (right)</div>
+      <div class="li"><div class="lb" style="background:#057A55;border-radius:50%"></div>Avg MRR (right)</div>
+    </div>
+    <div style="position:relative;height:230px"><canvas id="wr_trend" role="img" aria-label="Monthly win rate trend 2025 with CAC and MRR overlays"></canvas></div>
+    <div class="take"><b>Takeaway:</b> Win rate peaked at 33.7% in Feb 2025 and trended down through Dec 2025 (17.7%). CAC and MRR both rose over the same period. After controlling for MRR and CAC in the monthly model, the time trend alone explains most of the win rate decline. Neither onboarding nor free months shows a clean positive association with win rate at the monthly level — <b>the earlier finding of a positive free-month/win-rate relationship does not survive the monthly aggregation test.</b></div>
+    <div class="warn-box"><b>Most important caveat in this entire analysis:</b> Win rate data is a monthly aggregate. We cannot tell from this dataset whether individual deals with more free months close at higher rates — that would require deal-level won/lost data. The monthly model with only 12 observations is too underpowered to be definitive. Collect deal-level win/loss data before making win-rate-based policy decisions.</div>
+  </div>
+</div>
+
+<div class="g2">
+  <div class="card">
+    <div class="card-ttl">Win rate by onboarding cohort (raw vs MRR-adjusted, 2025)</div>
+    <div class="card-def"><b>What it shows:</b> Average win rate for 2025 customers by onboarding cohort. "Raw" = direct average. "MRR-adjusted" = OLS residuals after regressing out MRR and free months, shifted to the grand mean. The adjustment shows whether onboarding cohort is associated with win rate independent of deal size. <b>Model A: onboarding coef not significant (p=0.33) at monthly level.</b></div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:#1A56DB"></div>MRR-adjusted</div>
+      <div class="li"><div class="lb" style="background:#93C5FD"></div>Raw</div>
+    </div>
+    <div style="position:relative;height:210px"><canvas id="wr_ob" role="img" aria-label="Win rate by onboarding cohort raw vs MRR-adjusted"></canvas></div>
+    <div class="take"><b>Takeaway:</b> Low onboarding has the highest raw win rate (27.9%), but after MRR adjustment the differences narrow. The monthly model finds no statistically significant relationship between avg onboarding % and win rate. <b>Cannot conclude that onboarding hurts or helps win rate with this data.</b></div>
+  </div>
+
+  <div class="card">
+    <div class="card-ttl">Win rate by free-month bucket (raw vs MRR-adjusted, 2025)</div>
+    <div class="card-def"><b>What it shows:</b> Same comparison for free months. The monthly model (Model B, R²=0.654) finds a <i>negative</i> free-month coefficient after controlling for MRR and CAC — more free months in a given month is associated with lower win rate, holding other factors constant. This is the opposite of the customer-level result seen earlier, which was spurious (win rate repeated per customer inflated sample size).</div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:#1A56DB"></div>MRR-adjusted</div>
+      <div class="li"><div class="lb" style="background:#93C5FD"></div>Raw</div>
+    </div>
+    <div style="position:relative;height:210px"><canvas id="wr_fm" role="img" aria-label="Win rate by free month bucket raw vs MRR-adjusted"></canvas></div>
+    <div class="take"><b>Takeaway:</b> After MRR control, 4+ months actually shows the <i>lowest</i> adjusted win rate. 3 months appears highest but n=6. The corrected monthly model suggests free months are at best neutral to win rate — they do not appear to drive close rates in the 2025 data. This is a significant revision from the earlier analysis. The implication: 3 free months is "devastating for CAC breakeven" (as noted) and does <i>not</i> appear to compensate with meaningfully higher win rates.</div>
   </div>
 </div>
 
 <!-- SECTION 11: POLICY MATRIX -->
-<div class="section-label">11 — Policy matrix: onboarding cohort × free-month bucket</div>
-<div class="chart-grid-1">
+<div class="sec"><div class="sec-n">5</div> Policy matrix — onboarding cohort × free-month bucket</div>
+<div class="g1">
   <div class="card">
-    <div class="card-title">Deal structure outcomes heatmap</div>
-    <div class="card-def">Each cell shows outcomes for customers with that combination of onboarding level and free months. Top number = avg LTV ÷ MRR ratio (higher = more revenue per dollar of MRR). Middle = 12-month churn rate. Bottom = avg LTV:CAC ratio (where available; requires 2025 CAC data). Color encodes LTV:CAC — green cells are profitable, red are underwater. Cells with fewer than 5 customers are shown as empty. Use this as a quick-scan guide for which deal structures to standardize vs. avoid.</div>
-    <p class="note" style="margin-bottom:12px">Cell format: LTV/MRR ratio · 12-mo churn % · LTV:CAC (if available). Color = LTV:CAC performance.</p>
-    <div class="policy-grid" id="policy-matrix"></div>
-    <div class="takeaway" style="margin-top:16px"><strong>Key takeaway:</strong> The strongest cells are Low onboarding + 1 free month (LTV:CAC 1.94x, 43.6% churn) and Low + 2 free months (LTV:CAC 2.60x, 10% churn — but small n). Med-High + 0 free months also stands out (LTV:CAC 1.65x, 39.8% churn). The worst outcomes are High onboarding + 0 free months (100% churn, 0.37x LTV:CAC) and Med-Low + 0 free months (81.3% churn). <strong>Standard recommendation: Low-to-Med-High onboarding with 1 free month.</strong></div>
+    <div class="card-ttl">Deal structure outcomes heatmap</div>
+    <div class="card-def"><b>What it shows:</b> Each cell = customers in that onboarding + free-month combination. Top: median normalized LTV (revenue collected ÷ MRR). Middle: 12-month churn rate (eligible customers only). Bottom: avg LTV:CAC ratio (2025 customers with CAC data only). <b>Color encodes LTV:CAC</b> — green = above 1.0× (profitable), yellow = 0.7–1.0×, red = below 0.7×. Cells with fewer than 5 customers are empty. Use this as a quick-scan guide for which deal structures to standardize vs. discontinue.</div>
+    <div class="pm-wrap">
+      <div class="pm" id="policy-matrix">
+      </div>
+    </div>
+    <div class="take" style="margin-top:14px"><b>Strongest cells:</b> Low ob + 1 free month (LTV:CAC 1.94×, 43.6% churn) · Low ob + 2 free months (2.60×, 10% churn — small n) · Med-High ob + 0 free months (1.65×, 39.8% churn). <b>Worst cells:</b> High ob + 0 free months (100% churn, 0.37× LTV:CAC) · Low ob + 0 free months (95.7% churn, 0.33×). <b>Standard recommendation: Low-to-Med-High onboarding + 1 free month.</b></div>
   </div>
 </div>
 
 <!-- SECTION 12: MARGINAL EFFECTS -->
-<div class="section-label">12 — Predicted marginal effects on the Big 3</div>
-<div class="chart-grid-2">
+<div class="sec"><div class="sec-n">6</div> Predicted marginal effects — regression-adjusted</div>
+<div class="g2">
   <div class="card">
-    <div class="card-title">Marginal effect of onboarding % on each outcome</div>
-    <div class="card-def">From the regression models, how each additional 10 percentage points of onboarding (as % of MRR) changes each of the three outcomes, holding MRR and free months constant. The LTV effect peaks around 80% and turns negative. The churn effect was not statistically significant. The win rate effect is positive (+0.002 per 10pp), meaning higher onboarding doesn't appear to hurt close rates in 2025.</div>
-    <div style="position:relative;height:260px"><canvas id="me_ob" role="img" aria-label="Line chart of marginal effects of onboarding percentage on LTV, churn, and win rate"></canvas></div>
-    <div class="legend" style="margin-top:8px">
-      <div class="leg"><div class="leg-dot" style="background:#10B981"></div>LTV/MRR (log scale, left)</div>
-      <div class="leg"><div class="leg-dot" style="background:#EF4444"></div>Churn logit (not sig.)</div>
-      <div class="leg"><div class="leg-dot" style="background:#3B82F6"></div>Win rate (right)</div>
+    <div class="card-ttl">Marginal effect of onboarding % on LTV and 6-month churn</div>
+    <div class="card-def"><b>What it shows:</b> From the controlled regression models, how each additional 10pp of onboarding (as % of MRR) changes outcomes, holding MRR, free months, discounts, signup quarter, and observation window constant. LTV effect is in log-units of normalized LTV (positive = higher LTV). Churn effect is in log-odds (positive = more churn risk). Win rate: not significant at monthly level — not shown. The LTV turning point is ~74% of MRR (where marginal effect crosses zero). The 6-month churn turning point is ~81%.</div>
+    <div style="position:relative;height:240px"><canvas id="me_ob" role="img" aria-label="Marginal effects of onboarding pct on LTV and churn"></canvas></div>
+    <div class="leg" style="margin-top:8px">
+      <div class="li"><div class="lb" style="background:#057A55"></div>LTV marginal effect (log units)</div>
+      <div class="li"><div class="lb" style="background:#9B1C1C"></div>6-mo churn log-odds (inverted: ↑ = more churn)</div>
     </div>
-    <div class="takeaway"><strong>Optimal onboarding: 80–100% of MRR.</strong> This maximizes LTV, doesn't harm win rate (positive coefficient), and sits in the zone where CAC recovery is fastest. Charging above ~150% of MRR has diminishing or negative LTV returns.</div>
+    <div class="take"><b>Optimal zone: 60–100% of MRR.</b> Below 74%: each 10pp of onboarding adds ~+0.044 log-units of normalized LTV and reduces 6-month churn. Above 74%: LTV returns diminish. Above 81%: churn risk begins rising. These turning points are statistically robust (ob p=0.044, ob² p=0.034 for LTV; p=0.006/0.008 for 6-month churn).</div>
   </div>
 
   <div class="card">
-    <div class="card-title">Marginal effect of free months on each outcome</div>
-    <div class="card-def">How each additional free month shifts each outcome. The LTV effect is mildly negative (each free month slightly reduces LTV in isolation — the direct revenue delay effect). The churn effect peaks in benefit around 1 month (statistically significant squared term, p=0.046). The win rate effect is positive and significant (+0.67pp per free month after MRR control).</div>
-    <div style="position:relative;height:260px"><canvas id="me_fm" role="img" aria-label="Line chart of marginal effects of free months on LTV, churn, and win rate"></canvas></div>
-    <div class="legend" style="margin-top:8px">
-      <div class="leg"><div class="leg-dot" style="background:#10B981"></div>LTV/MRR (log scale)</div>
-      <div class="leg"><div class="leg-dot" style="background:#EF4444"></div>Churn logit</div>
-      <div class="leg"><div class="leg-dot" style="background:#3B82F6"></div>Win rate</div>
+    <div class="card-ttl">Marginal effect of free months on LTV, churn, and CAC recovery</div>
+    <div class="card-def"><b>What it shows:</b> Same format for free months. <b>LTV direct effect is mildly negative</b> (each free month delays revenue). <b>Churn effect is concave</b> — fm² term is statistically significant (p=0.013 for LTV, p=0.07 for 12-mo churn). <b>CAC recovery logistic</b>: fm coef=+0.78 (p=0.001), fm² =−0.062 (p=0.035) — significant inverted-U, peaking around 6 free months (implausible; driven by small high-fm group). In practice, 1 month is the actionable optimum.</div>
+    <div style="position:relative;height:240px"><canvas id="me_fm" role="img" aria-label="Marginal effects of free months on LTV, churn, and CAC recovery"></canvas></div>
+    <div class="leg" style="margin-top:8px">
+      <div class="li"><div class="lb" style="background:#057A55"></div>LTV marginal effect</div>
+      <div class="li"><div class="lb" style="background:#9B1C1C"></div>12-mo churn log-odds (inverted)</div>
+      <div class="li"><div class="lb" style="background:#0E7490"></div>CAC recovery log-odds</div>
     </div>
-    <div class="takeaway"><strong>Optimal free months: 1.</strong> Win rate benefit is real but modest per additional month. Churn benefit peaks near 1 month. LTV cost accumulates with each additional free month. The complete picture — win rate + churn + LTV + CAC — all point to 1 free month as the policy sweet spot. If win rate is the primary constraint, test offering 2 months on a subset before standardizing.</div>
-    <div class="warn-box">⚠ <strong>3 free months warning:</strong> win rate benefit (+2pp) vs. CAC delay (+4 months to breakeven) is a poor tradeoff at current CAC levels ($5.9k avg). Only justified for high-MRR deals (&gt;$1k/mo) where the math tilts favorably.</div>
+    <div class="take"><b>Optimal free months: 1.</b> The LTV cost of each free month is small and partially offset by the churn benefit. The CAC recovery effect is large and significant for 1 month. Beyond 1–2 months, all three curves converge toward neutral or negative. <b>Win rate is not shown here because the monthly model finds no significant positive effect — a key revision.</b></div>
+    <div class="warn-box"><b>3+ free months:</b> no detectable win rate benefit in monthly data, meaningful CAC delay, and churn benefit is exhausted by month 2. Not recommended as standard policy.</div>
+  </div>
+</div>
+
+<!-- SECTION: TRADEOFF TABLE -->
+<div class="sec"><div class="sec-n">7</div> Final policy tradeoff table</div>
+<div class="g1">
+  <div class="card">
+    <div class="card-ttl">Deal structure policy recommendations</div>
+    <div class="card-def">Synthesizing all controlled models. Each row is a policy option. Effects are based on regression-adjusted estimates where available, supplemented by cohort data where models are underpowered. Confidence = how reliable the underlying estimates are given sample size and statistical significance.</div>
+    <div style="overflow-x:auto">
+    <table class="tt" id="tradeoff-table">
+      <thead><tr>
+        <th style="width:200px">Policy option</th>
+        <th>LTV impact</th>
+        <th>Churn impact</th>
+        <th>CAC recovery</th>
+        <th>Win rate impact</th>
+        <th>Confidence</th>
+        <th>Recommendation</th>
+      </tr></thead>
+      <tbody id="tt-body"></tbody>
+    </table>
+    </div>
+    <div class="take" style="margin-top:14px"><b>Bottom line:</b> The data most strongly supports <b>Low-to-Med-High onboarding (50–150% of MRR) combined with exactly 1 free month</b> as the standard deal structure. This combination maximizes CAC recovery, improves retention, produces competitive LTV, and has no detectable win-rate cost. Offering 0 free months is the biggest identifiable risk — zero-free-month customers churn at nearly 60% within 12 months and recover only 64 cents per dollar of CAC. Charging more than ~150% in onboarding produces diminishing LTV returns and rising early churn.</div>
   </div>
 </div>
 
 <hr class="divider">
-<p class="note" style="text-align:center; font-size:11px;">All findings are correlational. MRR is controlled where noted. CAC data covers 2025 only. Win rate data is a monthly aggregate, not deal-level. Do not interpret as causal without further experimentation. · CHIIRP Internal Analysis · March 2026</p>
+<p class="footer">All findings are observational and correlational. Models control for contract MRR, signup quarter, discount %, observation window, and refund rate. CAC and win rate data are 2025 only. Win rate analysis is monthly aggregate (N=12) — deal-level won/loss data needed for stronger inference. · CHIIRP Internal Analysis · March 2026</p>
 
-</div>
+</div><!-- end shell -->
 
 <script>
-const DATA = {
-  ltv_ob: {
-    "0_zero":[0.0,5.65,10.8,15.47,19.88,24.23,28.51,32.74,36.92,40.66,44.37,47.66,50.94,53.87,56.97,60.3,63.49,66.49,69.08,71.85,74.5,77.04,79.45,81.82,84.01,86.17,88.21,90.14,91.94,93.65,95.39,96.99,98.44,99.83,101.23,102.61,103.96],
-    "1_low":[0.0,1.67,3.05,4.43,5.81,7.07,8.27,9.47,10.59,11.68,12.66,13.63,14.48,15.26,16.09,16.83,17.54,18.19,18.82,19.36,19.9,20.37,20.84,21.24,21.6,21.93,22.25,22.55,22.84,23.09,23.33,23.57,23.81,24.06,24.29,24.52,24.73],
-    "2_med_low":[0.0,2.15,3.45,4.67,5.81,6.87,7.86,8.75,9.59,10.38,11.11,11.75,12.33,12.84,13.33,13.79,14.2,14.56,14.89,15.18,15.44,15.69,15.92,16.14,16.33,16.53,16.72,16.89,17.06,17.22,17.37,17.51,17.64,17.77,17.9,18.03,18.15],
-    "3_med_high":[0.0,3.36,4.51,5.55,6.53,7.5,8.45,9.36,10.23,11.06,11.83,12.48,12.96,13.43,13.87,14.23,14.57,14.89,15.15,15.37,15.57,15.76,15.94,16.07,16.17,16.27,16.37,16.46,16.55,16.63,16.71,16.79,16.87,16.95,17.03,17.1,17.18],
-    "4_high":[0.0,2.1,2.97,3.76,4.44,5.08,5.67,6.18,6.67,7.12,7.48,7.77,8.0,8.19,8.37,8.52,8.64,8.74,8.83,8.91,8.98,9.04,9.1,9.15,9.2,9.24,9.28,9.32,9.36,9.4,9.44,9.48,9.52,9.55,9.59,9.63,9.66]
-  },
-  ltv_fm: {
-    "0":[0.0,1.7,2.7,3.58,4.32,4.97,5.54,6.05,6.49,6.86,7.22,7.55,7.84,8.09,8.33,8.55,8.73,8.88,9.02,9.14,9.25,9.35,9.44,9.52,9.59,9.65,9.71,9.76,9.81,9.85,9.89,9.93,9.97,10.0,10.03,10.06,10.09],
-    "1":[0.0,6.34,11.62,16.41,20.97,25.48,29.94,34.35,38.72,42.64,46.51,49.95,53.33,56.46,59.68,63.01,66.18,69.15,71.8,74.56,77.22,79.76,82.17,84.47,86.62,88.68,90.62,92.44,94.13,95.72,97.34,98.84,100.22,101.55,102.87,104.16,105.42],
-    "2":[0.0,2.05,3.72,5.35,6.88,8.3,9.64,10.92,12.12,13.22,14.27,15.22,16.08,16.84,17.56,18.22,18.81,19.33,19.8,20.22,20.6,20.95,21.26,21.53,21.76,21.97,22.14,22.3,22.45,22.58,22.7,22.82,22.93,23.03,23.13,23.22,23.31],
-    "3":[0.0,1.58,2.96,4.27,5.47,6.55,7.56,8.46,9.31,10.06,10.75,11.35,11.86,12.31,12.71,13.07,13.38,13.65,13.89,14.1,14.29,14.46,14.62,14.76,14.89,15.01,15.12,15.22,15.31,15.4,15.48,15.55,15.62,15.69,15.75,15.81,15.87],
-    "4+":[0.0,4.22,7.55,10.64,13.55,16.3,18.88,21.32,23.6,25.7,27.67,29.47,31.14,32.68,34.1,35.43,36.67,37.81,38.84,39.78,40.64,41.44,42.18,42.86,43.48,44.04,44.55,45.01,45.42,45.78,46.1,46.38,46.63,46.85,47.04,47.2,47.34]
-  },
+/* ---- DATA ---- */
+const D = {
   surv_ob: {
-    "0_zero":[100,96.6,88.2,80.3,73.3,68.1,64.7,60.8,57.6,54.3,51.3,48.5,46.0,43.6,41.2,39.8,38.4,37.1,35.3,34.1,33.0,31.8,30.2,29.2,27.7,26.8,25.8,24.9,24.1,23.3,22.5,21.7,20.9,20.1,19.3,18.5,17.7],
-    "1_low":[100,100,94.3,84.3,80.4,75.7,72.6,68.7,65.7,63.5,60.4,58.3,54.3,50.0,50.5,49.5,47.5,45.5,42.4,40.4,38.4,36.4,35.0,33.6,31.8,30.0,28.2,26.4,24.6,22.8,21.0,19.2,17.4,15.6,13.8,12.0,10.2],
-    "2_med_low":[100,99.2,93.7,84.9,78.2,74.4,72.3,69.3,66.8,64.7,62.2,60.1,58.4,55.5,51.1,50.2,49.3,48.0,46.3,44.8,43.0,41.2,40.0,38.4,36.4,34.7,32.9,31.1,29.3,27.5,25.7,23.9,22.1,20.3,18.5,16.7,14.9],
-    "3_med_high":[100,98.4,90.7,81.7,75.7,74.4,72.2,69.8,66.5,64.4,62.3,58.7,51.5,45.6,44.4,45.5,41.3,41.5,37.9,35.6,30.4,36.5,30.0,26.7,26.7,25.0,23.3,21.6,19.9,18.2,16.5,14.8,13.1,11.4,9.7,8.0,6.3],
-    "4_high":[100,100,90.0,86.0,82.0,80.0,80.0,78.0,76.0,74.0,72.0,70.0,68.0,66.0,64.0,62.0,60.0,58.0,56.0,54.0,52.0,50.0,48.0,46.0,44.0,42.0,40.0,38.0,36.0,34.0,32.0,30.0,28.0,26.0,24.0,22.0,20.0]
+    "0_zero":[100,96.6,88.2,80.3,73.3,68.2,64.6,60.7,57.6,54.3,51.3,48.5,46.0,43.6,41.2,39.8,38.4,37.1,35.3,34.1,33.0,31.8,30.2,29.2,27.7,26.8,25.8,24.9,24.1,23.3,22.5],
+    "1_low":[100,100,94.3,84.3,80.4,75.7,72.6,68.7,65.7,63.5,60.4,58.3,54.3,50.0,50.5,49.5,47.5,45.5,42.4,40.4,38.4,36.4,35.0,33.6,31.8,30.0,28.2,26.4,24.6,22.8,21.0],
+    "2_med_low":[100,99.2,93.7,84.9,78.2,74.4,72.3,69.3,66.8,64.7,62.2,60.1,58.4,55.5,51.1,50.2,49.3,48.0,46.3,44.8,43.0,41.2,40.0,38.4,36.4,34.7,32.9,31.1,29.3,27.5,25.7],
+    "3_med_high":[100,98.4,90.7,81.7,75.7,74.4,72.2,69.8,66.5,64.4,62.3,58.7,51.5,45.6,44.4,45.5,41.3,41.5,37.9,35.6,30.4,36.5,30.0,26.7,26.7,25.0,23.3,21.6,19.9,18.2,16.5],
+    "4_high":[100,100,90.0,86.0,82.0,80.0,80.0,78.0,76.0,74.0,72.0,70.0,68.0,66.0,64.0,62.0,60.0,58.0,56.0,54.0,52.0,50.0,48.0,46.0,44.0,42.0,40.0,38.0,36.0,34.0,32.0]
   },
   surv_fm: {
-    "0":[100,95.2,83.2,72.4,63.6,56.4,51.3,47.2,43.3,40.0,37.0,34.2,31.7,29.6,27.8,26.4,25.1,23.9,22.5,21.2,20.1,19.0,17.9,16.9,15.9,14.9,14.0,13.1,12.2,11.3,10.4,9.5,8.6,7.7,6.8,5.9,5.0],
-    "1":[100,97.0,90.3,82.7,76.6,72.4,69.0,65.6,62.4,59.3,56.5,53.9,51.6,49.5,47.4,45.6,43.9,42.3,40.5,38.9,37.5,36.1,34.5,33.1,31.6,30.3,29.0,27.7,26.5,25.3,24.2,23.1,22.0,21.0,20.0,19.1,18.2],
-    "2":[100,100,94.3,85.7,77.1,71.4,67.6,63.8,60.0,56.2,53.3,50.5,47.6,44.8,42.9,40.0,37.1,34.3,31.4,28.6,25.7,22.9,20.0,17.1,14.3,11.4,8.6,5.7,2.9,0.0,null,null,null,null,null,null,null],
-    "3":[100,100,95.7,87.0,78.3,73.9,69.6,65.2,60.9,56.5,52.2,47.8,43.5,39.1,34.8,30.4,26.1,21.7,17.4,13.0,8.7,4.3,0.0,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
-    "4+":[100,100,98.7,94.8,88.3,84.4,81.8,79.2,76.6,74.0,71.4,68.8,66.2,63.6,61.0,58.4,55.8,53.2,50.6,48.1,45.6,43.1,40.6,38.1,35.6,33.1,30.6,28.1,25.6,23.1,20.6,18.1,15.6,13.1,10.6,8.1,5.6]
+    "0":[100,95.2,83.2,72.4,63.6,56.4,51.3,47.2,43.3,40.0,37.0,34.2,31.7,29.6,27.8,26.4,25.1,23.9,22.5,21.2,20.1,19.0,17.9,16.9,15.9,14.9,14.0,13.1,12.2,11.3,10.4],
+    "1":[100,97.0,90.3,82.7,76.6,72.4,69.0,65.6,62.4,59.3,56.5,53.9,51.6,49.5,47.4,45.6,43.9,42.3,40.5,38.9,37.5,36.1,34.5,33.1,31.6,30.3,29.0,27.7,26.5,25.3,24.2],
+    "2":[100,100,94.3,85.7,77.1,71.4,67.6,63.8,60.0,56.2,53.3,50.5,47.6,44.8,42.9,40.0,37.1,34.3,31.4,28.6,25.7,22.9,20.0,17.1,14.3,null,null,null,null,null,null],
+    "3":[100,100,95.7,87.0,78.3,73.9,69.6,65.2,60.9,56.5,52.2,47.8,43.5,39.1,34.8,30.4,26.1,21.7,17.4,13.0,null,null,null,null,null,null,null,null,null,null,null],
+    "4+":[100,100,98.7,94.8,88.3,84.4,81.8,79.2,76.6,74.0,71.4,68.8,66.2,63.6,61.0,58.4,55.8,53.2,50.6,48.1,45.6,43.1,40.6,38.1,35.6,33.1,30.6,28.1,25.6,23.1,20.6]
+  },
+  ltv_ob: {
+    "0_zero":[0,5.65,10.8,15.47,19.88,24.23,28.51,32.74,36.92,40.66,44.37,47.66,50.94,53.87,56.97,60.3,63.49,66.49,69.08,71.85,74.5,77.04,79.45,81.82,84.01,86.17,88.21,90.14,91.94,93.65,95.39],
+    "1_low":[0,1.67,3.05,4.43,5.81,7.07,8.27,9.47,10.59,11.68,12.66,13.63,14.48,15.26,16.09,16.83,17.54,18.19,18.82,19.36,19.9,20.37,20.84,21.24,21.6,21.93,22.25,22.55,22.84,23.09,23.33],
+    "2_med_low":[0,2.15,3.45,4.67,5.81,6.87,7.86,8.75,9.59,10.38,11.11,11.75,12.33,12.84,13.33,13.79,14.2,14.56,14.89,15.18,15.44,15.69,15.92,16.14,16.33,16.53,16.72,16.89,17.06,17.22,17.37],
+    "3_med_high":[0,3.36,4.51,5.55,6.53,7.5,8.45,9.36,10.23,11.06,11.83,12.48,12.96,13.43,13.87,14.23,14.57,14.89,15.15,15.37,15.57,15.76,15.94,16.07,16.17,16.27,16.37,16.46,16.55,16.63,16.71],
+    "4_high":[0,2.1,2.97,3.76,4.44,5.08,5.67,6.18,6.67,7.12,7.48,7.77,8.0,8.19,8.37,8.52,8.64,8.74,8.83,8.91,8.98,9.04,9.1,9.15,9.2,9.24,9.28,9.32,9.36,9.4,9.44]
+  },
+  ltv_fm: {
+    "0":[0,1.7,2.7,3.58,4.32,4.97,5.54,6.05,6.49,6.86,7.22,7.55,7.84,8.09,8.33,8.55,8.73,8.88,9.02,9.14,9.25,9.35,9.44,9.52,9.59,9.65,9.71,9.76,9.81,9.85,9.89],
+    "1":[0,6.34,11.62,16.41,20.97,25.48,29.94,34.35,38.72,42.64,46.51,49.95,53.33,56.46,59.68,63.01,66.18,69.15,71.8,74.56,77.22,79.76,82.17,84.47,86.62,88.68,90.62,92.44,94.13,95.72,97.34],
+    "2":[0,2.05,3.72,5.35,6.88,8.3,9.64,10.92,12.12,13.22,14.27,15.22,16.08,16.84,17.56,18.22,18.81,19.33,19.8,20.22,20.6,20.95,21.26,21.53,21.76,21.97,22.14,22.3,22.45,22.58,22.7],
+    "3":[0,1.58,2.96,4.27,5.47,6.55,7.56,8.46,9.31,10.06,10.75,11.35,11.86,12.31,12.71,13.07,13.38,13.65,13.89,14.1,14.29,14.46,14.62,14.76,14.89,15.01,15.12,15.22,15.31,15.4,15.48],
+    "4+":[0,4.22,7.55,10.64,13.55,16.3,18.88,21.32,23.6,25.7,27.67,29.47,31.14,32.68,34.1,35.43,36.67,37.81,38.84,39.78,40.64,41.44,42.18,42.86,43.48,44.04,44.55,45.01,45.42,45.78,46.1]
+  },
+  be_q:{labels:['2025Q1','2025Q2','2025Q3','2025Q4','2026Q1'],med_be:[4.16,5.41,5.63,10.33,9.26],avg_cac:[4003,4980,5444,8057,7968],avg_mrr:[570,519,663,721,1214]},
+  be_ob:{labels:['Zero','Low','Med-Low','Med-High','High'],med_be:[8.58,5.35,7.68,4.69,10.06]},
+  be_fm:{labels:['0 mo','1 mo','2 mo','3 mo','4+ mo'],med_be:[9.45,4.87,5.39,4.30,8.52]},
+  ltv_cac_ob:{labels:['Zero','Low','Med-Low','Med-High','High'],vals:[0.773,1.408,1.024,1.619,0.959],pct:[0.22,0.468,0.379,0.678,0.30]},
+  ltv_cac_fm:{labels:['0 mo','1 mo','2 mo','3 mo','4+ mo'],vals:[0.636,1.529,1.400,1.473,1.371],pct:[0.099,0.651,0.485,0.667,0.333]},
+  wr_monthly:{
+    labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    n:[51,59,51,42,49,47,54,60,51,64,34,39],
+    win_rate:[27.8,33.7,23.6,20.8,22.7,20.6,28.4,17.6,19.1,23.3,21.4,17.7],
+    avg_mrr:[512,600,593,581,498,486,537,679,777,758,639,730],
+    avg_cac:[3502,4465,3971,4818,3959,6188,3769,4642,8162,7233,8831,8736]
+  },
+  wr_ob:{
+    labels:['Zero','Low','Med-Low','Med-High','High'],
+    raw:[20.8,27.9,20.8,25.0,25.9],adj:[22.7,27.6,21.9,23.0,24.3]
+  },
+  wr_fm:{
+    labels:['0 mo','1 mo','2 mo','3 mo','4+ mo'],
+    raw:[22.1,23.8,25.3,26.7,24.4],adj:[23.3,23.3,24.3,26.2,21.6]
+  },
+  mrr_trend:{
+    labels:['22Q1','22Q2','22Q3','22Q4','23Q1','23Q2','23Q3','23Q4','24Q1','24Q2','24Q3','24Q4','25Q1','25Q2','25Q3','25Q4','26Q1'],
+    avg_mrr:[220,273,224,440,296,727,545,587,612,509,525,518,570,519,663,721,1214],
+    avg_ob:[0.0,0.024,0.0,0.0,0.058,0.285,0.0,0.0,0.113,0.261,1.003,0.838,1.118,1.020,0.578,0.499,0.191],
+    avg_fm:[1.30,2.06,1.65,1.61,1.31,1.29,1.47,1.06,1.59,1.26,0.85,0.90,1.14,0.96,0.80,0.33,0.12]
+  },
+  policy:{
+    "0_zero":{"0":{n:460,ltv:12.0,churn:78.3,cac:0.46},"1":{n:1458,ltv:127.8,churn:45.2,cac:1.28},"2":{n:62,ltv:20.9,churn:74.2,cac:0.46},"3":{n:14,ltv:54.9,churn:64.3,cac:0.75},"4+":{n:65,ltv:39.8,churn:10.8,cac:0.05}},
+    "1_low":{"0":{n:47,ltv:4.2,churn:95.7,cac:0.33},"1":{n:163,ltv:23.6,churn:43.6,cac:1.94},"2":{n:10,ltv:27.6,churn:10.0,cac:2.60},"3":null,"4+":{n:6,ltv:21.1,churn:16.7,cac:1.98}},
+    "2_med_low":{"0":{n:91,ltv:10.0,churn:81.3,cac:0.88},"1":{n:129,ltv:19.0,churn:63.6,cac:1.25},"2":{n:14,ltv:11.8,churn:78.6,cac:0.69},"3":null,"4+":null},
+    "3_med_high":{"0":{n:103,ltv:16.2,churn:39.8,cac:1.65},"1":{n:240,ltv:14.0,churn:35.6,cac:1.61},"2":{n:17,ltv:17.1,churn:52.9,cac:1.38},"3":null,"4+":{n:5,ltv:20.8,churn:20.0,cac:null}},
+    "4_high":{"0":{n:27,ltv:4.3,churn:100.0,cac:0.37},"1":{n:21,ltv:11.3,churn:19.0,cac:1.41},"2":null,"3":null,"4+":null}
   }
 };
 
-const months36 = Array.from({length:37},(_,i)=>i);
-const pct = v => v == null ? null : v/100;
+const mo30 = Array.from({length:31},(_,i)=>i);
+const OB_KEYS=['0_zero','1_low','2_med_low','3_med_high','4_high'];
+const FM_KEYS=['0','1','2','3','4+'];
+const OB_LABELS=['Zero (0%)','Low (<57%)','Med-Low (57–100%)','Med-High (100–154%)','High (>154%)'];
+const OB_SHORT=['Zero','Low','Med-Low','Med-High','High'];
+const FM_LABELS=['0 months','1 month','2 months','3 months','4+ months'];
+const COLORS=['#1A56DB','#057A55','#B45309','#5521B5','#9B1C1C'];
+const gc={color:'rgba(0,0,0,0.07)'};
+const tf={size:11};
+const baseOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:gc,ticks:{font:tf}},y:{grid:gc,ticks:{font:tf}}}};
 
-const OB_LABELS = ['Zero (0%)','Low (<57%)','Med-Low (57–100%)','Med-High (100–154%)','High (>154%)'];
-const OB_KEYS = ['0_zero','1_low','2_med_low','3_med_high','4_high'];
-const FM_LABELS = ['0 months','1 month','2 months','3 months','4+ months'];
-const FM_KEYS = ['0','1','2','3','4+'];
-const OB_COLORS = ['#3B82F6','#10B981','#F59E0B','#8B5CF6','#EF4444'];
-const FM_COLORS = ['#3B82F6','#10B981','#F59E0B','#8B5CF6','#EF4444'];
-
-const gridOpts = () => ({color:'rgba(100,100,100,0.08)'});
-const tickFont = {size:11};
-const def = {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:gridOpts(),ticks:{font:tickFont}}, y:{grid:gridOpts(),ticks:{font:tickFont}}}};
-
-// CHART 1: LTV OB spaghetti
-new Chart(document.getElementById('ltv_ob'), {
-  type:'line',
-  data:{labels:months36, datasets: OB_KEYS.map((k,i)=>({label:OB_LABELS[i], data:DATA.ltv_ob[k], borderColor:OB_COLORS[i], backgroundColor:'transparent', tension:0.3, borderWidth:2.5, pointRadius:0, pointHoverRadius:4}))},
-  options:{...def, scales:{x:{...def.scales.x, title:{display:true,text:'Months since signup',font:{size:11}}}, y:{...def.scales.y, title:{display:true,text:'Cumulative LTV / MRR',font:{size:11}}}}}
-});
-
-// CHART 2: LTV FM spaghetti
-new Chart(document.getElementById('ltv_fm'), {
-  type:'line',
-  data:{labels:months36, datasets: FM_KEYS.map((k,i)=>({label:FM_LABELS[i], data:DATA.ltv_fm[k], borderColor:FM_COLORS[i], backgroundColor:'transparent', tension:0.3, borderWidth:2.5, pointRadius:0, pointHoverRadius:4}))},
-  options:{...def, scales:{x:{...def.scales.x, title:{display:true,text:'Months since signup',font:{size:11}}}, y:{...def.scales.y, title:{display:true,text:'Cumulative LTV / MRR',font:{size:11}}}}}
-});
-
-// CHART 3: Survival OB
-new Chart(document.getElementById('surv_ob'), {
-  type:'line',
-  data:{labels:months36, datasets: OB_KEYS.map((k,i)=>({label:OB_LABELS[i], data:DATA.surv_ob[k], borderColor:OB_COLORS[i], backgroundColor:'transparent', tension:0.3, borderWidth:2.5, pointRadius:0, pointHoverRadius:4}))},
-  options:{...def, scales:{x:{...def.scales.x, title:{display:true,text:'Months since signup',font:{size:11}}}, y:{...def.scales.y, min:0, max:100, title:{display:true,text:'% still active',font:{size:11}}, ticks:{...tickFont, callback:v=>v+'%'}}}}
-});
-
-// CHART 4: Survival FM
-new Chart(document.getElementById('surv_fm'), {
-  type:'line',
-  data:{labels:months36, datasets: FM_KEYS.map((k,i)=>({label:FM_LABELS[i], data:DATA.surv_fm[k], borderColor:FM_COLORS[i], backgroundColor:'transparent', tension:0.3, borderWidth:2.5, pointRadius:0, pointHoverRadius:4}))},
-  options:{...def, scales:{x:{...def.scales.x, title:{display:true,text:'Months since signup',font:{size:11}}}, y:{...def.scales.y, min:0, max:100, title:{display:true,text:'% still active',font:{size:11}}, ticks:{...tickFont, callback:v=>v+'%'}}}}
-});
-
-// CHART 5: Breakeven OB
-const beObVals = [8.58,5.35,7.68,4.69,10.06];
-const beObColors = beObVals.map(v => v<=6 ? '#10B981' : v<=8 ? '#F59E0B' : '#EF4444');
-new Chart(document.getElementById('be_ob'), {
-  type:'bar',
-  data:{labels:['Zero','Low','Med-Low','Med-High','High'], datasets:[{data:beObVals, backgroundColor:beObColors, borderRadius:5}]},
-  options:{...def, scales:{x:{grid:{display:false},ticks:{font:tickFont}}, y:{...def.scales.y, title:{display:true,text:'Median months',font:{size:11}}, ticks:{...tickFont, callback:v=>v+'mo'}}},
-    plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y.toFixed(1)} months to break even`}}}}
-});
-
-// CHART 6: Breakeven FM
-const beFmVals = [9.45,4.87,5.39,4.30,8.52];
-const beFmColors = beFmVals.map(v => v<=6 ? '#10B981' : v<=8 ? '#F59E0B' : '#EF4444');
-new Chart(document.getElementById('be_fm'), {
-  type:'bar',
-  data:{labels:['0 mo','1 mo','2 mo','3 mo','4+ mo'], datasets:[{data:beFmVals, backgroundColor:beFmColors, borderRadius:5}]},
-  options:{...def, scales:{x:{grid:{display:false},ticks:{font:tickFont}}, y:{...def.scales.y, title:{display:true,text:'Median months',font:{size:11}}, ticks:{...tickFont, callback:v=>v+'mo'}}},
-    plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y.toFixed(1)} months to break even`}}}}
-});
-
-// CHART 7: CAC breakeven trend
-const beQ_labels = ['2025 Q1','2025 Q2','2025 Q3','2025 Q4','2026 Q1'];
-const beQ_be = [4.16, 5.41, 5.63, 10.33, 9.26];
-const beQ_mrr = [570, 519, 663, 721, 1214];
-new Chart(document.getElementById('be_trend'), {
-  type:'line',
-  data:{labels:beQ_labels, datasets:[
-    {label:'Median months to breakeven', data:beQ_be, borderColor:'#1D4ED8', backgroundColor:'rgba(29,78,216,0.06)', fill:true, tension:0.35, borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#1D4ED8', yAxisID:'y'},
-    {label:'Avg MRR ($)', data:beQ_mrr, borderColor:'#D97706', backgroundColor:'transparent', tension:0.35, borderWidth:2, pointRadius:4, pointBackgroundColor:'#D97706', borderDash:[5,4], yAxisID:'y2'}
+/* ---- CHARTS ---- */
+/* MRR Context */
+new Chart(document.getElementById('mrr_context'),{type:'bar',
+  data:{labels:D.mrr_trend.labels,datasets:[
+    {label:'Avg MRR ($)',data:D.mrr_trend.avg_mrr,backgroundColor:'rgba(26,86,219,0.15)',yAxisID:'y'},
+    {type:'line',label:'Avg OB % (×100)',data:D.mrr_trend.avg_ob.map(v=>v*100),borderColor:'#9B1C1C',backgroundColor:'transparent',yAxisID:'y2',tension:.35,borderWidth:2,pointRadius:3},
+    {type:'line',label:'Avg free months',data:D.mrr_trend.avg_fm,borderColor:'#057A55',backgroundColor:'transparent',yAxisID:'y3',tension:.35,borderWidth:2,pointRadius:3,borderDash:[4,3]}
   ]},
-  options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
     scales:{
-      x:{grid:{display:false},ticks:{font:tickFont}},
-      y:{grid:gridOpts(), position:'left', title:{display:true,text:'Months to break even',font:{size:11}}, ticks:{font:tickFont, callback:v=>v+'mo'}, min:0},
-      y2:{position:'right', grid:{display:false}, title:{display:true,text:'Avg MRR ($)',font:{size:11}}, ticks:{font:tickFont, callback:v=>'$'+v}}
+      x:{grid:{display:false},ticks:{font:{size:10}}},
+      y:{grid:gc,position:'left',ticks:{font:tf,callback:v=>'$'+v},title:{display:true,text:'Avg MRR',font:{size:10}}},
+      y2:{position:'right',grid:{display:false},ticks:{font:tf,callback:v=>v+'%'},title:{display:true,text:'OB% ×100',font:{size:10}}},
+      y3:{position:'right',grid:{display:false},ticks:{font:tf},title:{display:true,text:'Free months',font:{size:10}},offset:true}
     }}
 });
 
-// CHART 8: Win rate trend
-const wr_labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const wr_vals = [27.8,33.7,23.6,20.8,22.7,20.6,28.4,17.6,19.1,23.3,21.4,17.7];
-const wr_mrr = [512,600,593,581,498,486,537,679,777,758,639,730];
-new Chart(document.getElementById('wr_trend'), {
-  type:'line',
-  data:{labels:wr_labels, datasets:[
-    {label:'Win rate', data:wr_vals, borderColor:'#1D4ED8', backgroundColor:'rgba(29,78,216,0.06)', fill:true, tension:0.35, borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#1D4ED8', yAxisID:'y'},
-    {label:'Avg MRR', data:wr_mrr, borderColor:'#D97706', backgroundColor:'transparent', tension:0.35, borderWidth:2, pointRadius:3, pointBackgroundColor:'#D97706', borderDash:[5,4], yAxisID:'y2'}
-  ]},
-  options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-    scales:{
-      x:{grid:{display:false},ticks:{font:tickFont}},
-      y:{grid:gridOpts(), position:'left', title:{display:true,text:'Win rate (%)',font:{size:11}}, ticks:{font:tickFont, callback:v=>v+'%'}, min:10, max:40},
-      y2:{position:'right', grid:{display:false}, title:{display:true,text:'Avg MRR ($)',font:{size:11}}, ticks:{font:tickFont, callback:v=>'$'+v}}
-    }}
+/* LTV curves */
+new Chart(document.getElementById('ltv_ob'),{type:'line',data:{labels:mo30,datasets:OB_KEYS.map((k,i)=>({label:OB_LABELS[i],data:D.ltv_ob[k],borderColor:COLORS[i],backgroundColor:'transparent',tension:.3,borderWidth:2.5,pointRadius:0,pointHoverRadius:4}))},options:{...baseOpts,scales:{x:{...baseOpts.scales.x,title:{display:true,text:'Months since signup',font:tf}},y:{...baseOpts.scales.y,title:{display:true,text:'Cumul. LTV / MRR',font:tf}}}}});
+new Chart(document.getElementById('ltv_fm'),{type:'line',data:{labels:mo30,datasets:FM_KEYS.map((k,i)=>({label:FM_LABELS[i],data:D.ltv_fm[k],borderColor:COLORS[i],backgroundColor:'transparent',tension:.3,borderWidth:2.5,pointRadius:0,pointHoverRadius:4}))},options:{...baseOpts,scales:{x:{...baseOpts.scales.x,title:{display:true,text:'Months since signup',font:tf}},y:{...baseOpts.scales.y,title:{display:true,text:'Cumul. LTV / MRR',font:tf}}}}});
+
+/* Survival curves */
+new Chart(document.getElementById('surv_ob'),{type:'line',data:{labels:mo30,datasets:OB_KEYS.map((k,i)=>({label:OB_LABELS[i],data:D.surv_ob[k],borderColor:COLORS[i],backgroundColor:'transparent',tension:.3,borderWidth:2.5,pointRadius:0,pointHoverRadius:4}))},options:{...baseOpts,scales:{x:{...baseOpts.scales.x,title:{display:true,text:'Months since signup',font:tf}},y:{...baseOpts.scales.y,min:0,max:100,title:{display:true,text:'% still paying',font:tf},ticks:{...tf,callback:v=>v+'%'}}}}});
+new Chart(document.getElementById('surv_fm'),{type:'line',data:{labels:mo30,datasets:FM_KEYS.map((k,i)=>({label:FM_LABELS[i],data:D.surv_fm[k],borderColor:COLORS[i],backgroundColor:'transparent',tension:.3,borderWidth:2.5,pointRadius:0,pointHoverRadius:4}))},options:{...baseOpts,scales:{x:{...baseOpts.scales.x,title:{display:true,text:'Months since signup',font:tf}},y:{...baseOpts.scales.y,min:0,max:100,title:{display:true,text:'% still paying',font:tf},ticks:{...tf,callback:v=>v+'%'}}}}});
+
+/* LTV:CAC bars with breakeven line plugin */
+const bePlugin=(id)=>({id,afterDraw(c){const{ctx,chartArea,scales}=c;const y=scales.y.getPixelForValue(1);ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(0,0,0,0.35)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(chartArea.left,y);ctx.lineTo(chartArea.right,y);ctx.stroke();ctx.restore();ctx.fillStyle='rgba(0,0,0,0.4)';ctx.font='10px IBM Plex Sans';ctx.fillText('break-even 1.0×',chartArea.right-90,y-4);}});
+
+new Chart(document.getElementById('ltv_cac_ob'),{type:'bar',
+  data:{labels:D.ltv_cac_ob.labels,datasets:[{data:D.ltv_cac_ob.vals,backgroundColor:D.ltv_cac_ob.vals.map(v=>v>=1?'#057A55':v>=0.7?'#B45309':'#9B1C1C'),borderRadius:5}]},
+  options:{...baseOpts,scales:{x:{grid:{display:false},ticks:{font:tf}},y:{...baseOpts.scales.y,min:0,max:2.2,ticks:{font:tf,callback:v=>v.toFixed(1)+'×'}}},plugins:{legend:{display:false}}},
+  plugins:[bePlugin('be1')]
+});
+new Chart(document.getElementById('ltv_cac_fm'),{type:'bar',
+  data:{labels:D.ltv_cac_fm.labels,datasets:[{data:D.ltv_cac_fm.vals,backgroundColor:D.ltv_cac_fm.vals.map(v=>v>=1?'#057A55':v>=0.7?'#B45309':'#9B1C1C'),borderRadius:5}]},
+  options:{...baseOpts,scales:{x:{grid:{display:false},ticks:{font:tf}},y:{...baseOpts.scales.y,min:0,max:2.2,ticks:{font:tf,callback:v=>v.toFixed(1)+'×'}}},plugins:{legend:{display:false}}},
+  plugins:[bePlugin('be2')]
 });
 
-// CHART 9: Win rate by OB cohort
-const wrOb_adj = [22.7,27.6,21.9,23.0,24.3];
-const wrOb_raw = [20.8,27.9,20.8,25.0,25.9];
-new Chart(document.getElementById('wr_ob'), {
-  type:'bar',
-  data:{labels:['Zero','Low','Med-Low','Med-High','High'], datasets:[
-    {label:'Raw', data:wrOb_raw, backgroundColor:'#93C5FD', borderRadius:3},
-    {label:'MRR-adjusted', data:wrOb_adj, backgroundColor:'#1D4ED8', borderRadius:3}
+/* CAC breakeven trend */
+new Chart(document.getElementById('be_trend'),{type:'line',
+  data:{labels:D.be_q.labels,datasets:[
+    {label:'Median months to break even',data:D.be_q.med_be,borderColor:'#1A56DB',backgroundColor:'rgba(26,86,219,0.07)',fill:true,tension:.35,borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#1A56DB',yAxisID:'y'},
+    {label:'Avg CAC',data:D.be_q.avg_cac,borderColor:'#9B1C1C',backgroundColor:'transparent',tension:.35,borderWidth:2,pointRadius:3,borderDash:[5,4],yAxisID:'y2'},
+    {label:'Avg MRR',data:D.be_q.avg_mrr,borderColor:'#057A55',backgroundColor:'transparent',tension:.35,borderWidth:2,pointRadius:3,borderDash:[3,3],yAxisID:'y2'}
   ]},
-  options:{...def, plugins:{legend:{display:false}},
-    scales:{x:{grid:{display:false},ticks:{font:tickFont}}, y:{...def.scales.y, min:15, max:35, ticks:{font:tickFont, callback:v=>v+'%'}}}}
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{font:tf}},y:{grid:gc,position:'left',min:0,ticks:{font:tf,callback:v=>v+'mo'},title:{display:true,text:'Months',font:tf}},y2:{position:'right',grid:{display:false},ticks:{font:tf,callback:v=>'$'+v.toLocaleString()},title:{display:true,text:'$',font:tf}}}}
 });
 
-// CHART 10: Win rate by FM bucket
-const wrFm_adj = [23.3,23.3,24.3,26.2,21.6];
-const wrFm_raw = [22.1,23.8,25.3,26.7,24.4];
-new Chart(document.getElementById('wr_fm'), {
-  type:'bar',
-  data:{labels:['0 mo','1 mo','2 mo','3 mo','4+'], datasets:[
-    {label:'Raw', data:wrFm_raw, backgroundColor:'#93C5FD', borderRadius:3},
-    {label:'MRR-adjusted', data:wrFm_adj, backgroundColor:'#1D4ED8', borderRadius:3}
+/* Breakeven cohort bars */
+const beColors=(vals,good,mid)=>vals.map(v=>v<=good?'#057A55':v<=mid?'#B45309':'#9B1C1C');
+new Chart(document.getElementById('be_ob'),{type:'bar',data:{labels:D.be_ob.labels,datasets:[{data:D.be_ob.med_be,backgroundColor:beColors(D.be_ob.med_be,5.5,8),borderRadius:5}]},options:{...baseOpts,scales:{x:{grid:{display:false},ticks:{font:tf}},y:{...baseOpts.scales.y,ticks:{font:tf,callback:v=>v+'mo'},title:{display:true,text:'Median months',font:tf}}},plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('be_fm'),{type:'bar',data:{labels:D.be_fm.labels,datasets:[{data:D.be_fm.med_be,backgroundColor:beColors(D.be_fm.med_be,5.5,8),borderRadius:5}]},options:{...baseOpts,scales:{x:{grid:{display:false},ticks:{font:tf}},y:{...baseOpts.scales.y,ticks:{font:tf,callback:v=>v+'mo'},title:{display:true,text:'Median months',font:tf}}},plugins:{legend:{display:false}}}});
+
+/* Win rate trend */
+new Chart(document.getElementById('wr_trend'),{type:'line',
+  data:{labels:D.wr_monthly.labels,datasets:[
+    {label:'Win rate',data:D.wr_monthly.win_rate,borderColor:'#1A56DB',backgroundColor:'rgba(26,86,219,0.07)',fill:true,tension:.35,borderWidth:2.5,pointRadius:4,yAxisID:'y'},
+    {label:'Avg CAC',data:D.wr_monthly.avg_cac,borderColor:'#9B1C1C',backgroundColor:'transparent',tension:.35,borderWidth:1.5,pointRadius:2,borderDash:[5,4],yAxisID:'y2'},
+    {label:'Avg MRR',data:D.wr_monthly.avg_mrr,borderColor:'#057A55',backgroundColor:'transparent',tension:.35,borderWidth:1.5,pointRadius:2,borderDash:[3,3],yAxisID:'y2'}
   ]},
-  options:{...def, plugins:{legend:{display:false}},
-    scales:{x:{grid:{display:false},ticks:{font:tickFont}}, y:{...def.scales.y, min:15, max:35, ticks:{font:tickFont, callback:v=>v+'%'}}}}
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{font:tf}},y:{grid:gc,position:'left',min:10,max:40,ticks:{font:tf,callback:v=>v+'%'},title:{display:true,text:'Win rate',font:tf}},y2:{position:'right',grid:{display:false},ticks:{font:tf,callback:v=>'$'+v.toLocaleString()},title:{display:true,text:'$ CAC / MRR',font:tf}}}}
 });
 
-// MARGINAL EFFECTS
-const me_ob_x = [0,50,100,150,200];
-const me_ltv_ob = [0.569, 0.216, -0.137, -0.491, -0.844];
-const me_churn_ob = [-0.055, -0.027, 0.0, 0.028, 0.055];
-const me_wr_ob = [0.0,0.1,0.2,0.3,0.4];
+/* Win rate bars */
+new Chart(document.getElementById('wr_ob'),{type:'bar',data:{labels:D.wr_ob.labels,datasets:[{label:'Raw',data:D.wr_ob.raw,backgroundColor:'#93C5FD',borderRadius:3},{label:'Adj',data:D.wr_ob.adj,backgroundColor:'#1A56DB',borderRadius:3}]},options:{...baseOpts,scales:{x:{grid:{display:false},ticks:{font:tf}},y:{...baseOpts.scales.y,min:15,max:35,ticks:{font:tf,callback:v=>v+'%'}}},plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('wr_fm'),{type:'bar',data:{labels:D.wr_fm.labels,datasets:[{label:'Raw',data:D.wr_fm.raw,backgroundColor:'#93C5FD',borderRadius:3},{label:'Adj',data:D.wr_fm.adj,backgroundColor:'#1A56DB',borderRadius:3}]},options:{...baseOpts,scales:{x:{grid:{display:false},ticks:{font:tf}},y:{...baseOpts.scales.y,min:15,max:35,ticks:{font:tf,callback:v=>v+'%'}}},plugins:{legend:{display:false}}}});
 
-new Chart(document.getElementById('me_ob'), {
-  type:'line',
-  data:{labels:me_ob_x.map(v=>v+'%'), datasets:[
-    {label:'LTV effect', data:me_ltv_ob, borderColor:'#10B981', tension:0.4, borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#10B981'},
-    {label:'Churn (log-odds)', data:me_churn_ob, borderColor:'#EF4444', tension:0.4, borderWidth:2, borderDash:[5,4], pointRadius:4, pointBackgroundColor:'#EF4444'},
-    {label:'Win rate', data:me_wr_ob, borderColor:'#3B82F6', tension:0.4, borderWidth:2, borderDash:[3,3], pointRadius:4, pointBackgroundColor:'#3B82F6'}
-  ]},
-  options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-    scales:{
-      x:{grid:{display:false},ticks:{font:tickFont},title:{display:true,text:'Onboarding % of MRR',font:{size:11}}},
-      y:{grid:gridOpts(),ticks:{font:tickFont},title:{display:true,text:'Marginal effect',font:{size:11}}}
-    },
-    plugins:{legend:{display:false},
-      annotation:{annotations:{zero:{type:'line',yMin:0,yMax:0,borderColor:'rgba(100,100,100,0.3)',borderWidth:1,borderDash:[4,4]}}}}
-  }
-});
+/* Marginal effects */
+const meOb_ltv=[0.437,0.141,-0.154,-0.449,-0.745];
+const meOb_churn6=[1.392,0.554,-0.283,-1.120,-1.957];
+new Chart(document.getElementById('me_ob'),{type:'line',data:{labels:['0%','50%','100%','150%','200%'],datasets:[
+  {label:'LTV',data:meOb_ltv,borderColor:'#057A55',tension:.4,borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#057A55'},
+  {label:'6-mo churn (log-odds)',data:meOb_churn6,borderColor:'#9B1C1C',tension:.4,borderWidth:2,pointRadius:4,pointBackgroundColor:'#9B1C1C',borderDash:[5,4]}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:tf},title:{display:true,text:'Onboarding % of MRR',font:tf}},y:{grid:gc,ticks:{font:tf},title:{display:true,text:'Marginal effect',font:tf}}}},plugins:[{id:'zero',afterDraw(c){const{ctx,chartArea,scales}=c;const y=scales.y.getPixelForValue(0);ctx.save();ctx.strokeStyle='rgba(0,0,0,0.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(chartArea.left,y);ctx.lineTo(chartArea.right,y);ctx.stroke();ctx.restore();}}]});
 
-const me_fm_x = [0,1,2,3,4];
-const me_ltv_fm = [-0.033,-0.029,-0.025,-0.021,-0.017];
-const me_churn_fm = [0.092,0.021,-0.049,-0.120,-0.190];
-const me_wr_fm = [0.0,0.67,1.33,2.0,2.67];
+const meFm_ltv=[-0.0446,-0.0393,-0.034,-0.029,-0.024];
+const meFm_churn12=[0.1038,0.028,-0.048,-0.124,-0.199];
+const meFm_cac=[0.78,0.657,0.534,0.411,0.288];
+new Chart(document.getElementById('me_fm'),{type:'line',data:{labels:['0','1','2','3','4'],datasets:[
+  {label:'LTV',data:meFm_ltv,borderColor:'#057A55',tension:.4,borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#057A55'},
+  {label:'12-mo churn',data:meFm_churn12,borderColor:'#9B1C1C',tension:.4,borderWidth:2,pointRadius:4,pointBackgroundColor:'#9B1C1C',borderDash:[5,4]},
+  {label:'CAC recovery',data:meFm_cac,borderColor:'#0E7490',tension:.4,borderWidth:2,pointRadius:4,pointBackgroundColor:'#0E7490',borderDash:[3,3]}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:tf},title:{display:true,text:'Free months',font:tf}},y:{grid:gc,ticks:{font:tf},title:{display:true,text:'Marginal effect',font:tf}}}},plugins:[{id:'zero2',afterDraw(c){const{ctx,chartArea,scales}=c;const y=scales.y.getPixelForValue(0);ctx.save();ctx.strokeStyle='rgba(0,0,0,0.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(chartArea.left,y);ctx.lineTo(chartArea.right,y);ctx.stroke();ctx.restore();}}]});
 
-new Chart(document.getElementById('me_fm'), {
-  type:'line',
-  data:{labels:me_fm_x, datasets:[
-    {label:'LTV effect', data:me_ltv_fm, borderColor:'#10B981', tension:0.4, borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#10B981'},
-    {label:'Churn (log-odds)', data:me_churn_fm, borderColor:'#EF4444', tension:0.4, borderWidth:2, borderDash:[5,4], pointRadius:4, pointBackgroundColor:'#EF4444'},
-    {label:'Win rate (pp)', data:me_wr_fm, borderColor:'#3B82F6', tension:0.4, borderWidth:2, borderDash:[3,3], pointRadius:4, pointBackgroundColor:'#3B82F6'}
-  ]},
-  options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-    scales:{
-      x:{grid:{display:false},ticks:{font:tickFont},title:{display:true,text:'Number of free months',font:{size:11}}},
-      y:{grid:gridOpts(),ticks:{font:tickFont},title:{display:true,text:'Marginal effect',font:{size:11}}}
-    }
-  }
-});
+/* ---- POLICY MATRIX ---- */
+const PM_OB_KEYS=['0_zero','1_low','2_med_low','3_med_high','4_high'];
+const PM_OB_SHORT=['Zero (0%)','Low (<57%)','Med-Low\n57–100%','Med-High\n100–154%','High (>154%)'];
+const PM_FM_KEYS=['0','1','2','3','4+'];
+const PM_FM_SHORT=['0 mo','1 mo','2 mo','3 mo','4+ mo'];
+function cellBg(cac){if(cac==null)return'#F5F4F1';if(cac>=1.3)return'#ECFDF5';if(cac>=1.0)return'#FEF3C7';if(cac>=0.7)return'#FEF9C3';return'#FEF2F2';}
+function cellTc(cac){if(cac==null)return'#aaa';if(cac>=1.3)return'#065F46';if(cac>=1.0)return'#92400E';if(cac>=0.7)return'#78350F';return'#991B1B';}
 
-// POLICY MATRIX
-const policyData = {
-  '0_zero':{'0':{n:460,ltv:12.0,churn:78.3,cac:0.46},'1':{n:1458,ltv:127.8,churn:45.2,cac:1.28},'2':{n:62,ltv:20.9,churn:74.2,cac:0.46},'3':{n:14,ltv:54.9,churn:64.3,cac:0.75},'4+':{n:65,ltv:39.8,churn:10.8,cac:0.05}},
-  '1_low':{'0':{n:47,ltv:4.2,churn:95.7,cac:0.33},'1':{n:163,ltv:23.6,churn:43.6,cac:1.94},'2':{n:10,ltv:27.6,churn:10.0,cac:2.60},'3':null,'4+':{n:6,ltv:21.1,churn:16.7,cac:1.98}},
-  '2_med_low':{'0':{n:91,ltv:10.0,churn:81.3,cac:0.88},'1':{n:129,ltv:19.0,churn:63.6,cac:1.25},'2':{n:14,ltv:11.8,churn:78.6,cac:0.69},'3':null,'4+':null},
-  '3_med_high':{'0':{n:103,ltv:16.2,churn:39.8,cac:1.65},'1':{n:240,ltv:15.2,churn:48.3,cac:1.61},'2':{n:17,ltv:17.1,churn:52.9,cac:1.38},'3':null,'4+':{n:5,ltv:20.8,churn:20.0,cac:null}},
-  '4_high':{'0':{n:27,ltv:4.3,churn:100.0,cac:0.37},'1':{n:21,ltv:11.3,churn:19.0,cac:1.41},'2':null,'3':null,'4+':null}
-};
-const obRowLabels = ['Zero (0%)','Low (<57%)','Med-Low (57–100%)','Med-High (100–154%)','High (>154%)'];
-const obRowKeys = ['0_zero','1_low','2_med_low','3_med_high','4_high'];
-const fmColKeys = ['0','1','2','3','4+'];
-const fmColLabels = ['0 mo','1 mo','2 mo','3 mo','4+ mo'];
-
-function cacColor(cac) {
-  if(cac==null) return '#F5F4F1';
-  if(cac>=1.5) return '#DCFCE7';
-  if(cac>=1.0) return '#FEF9C3';
-  return '#FEE2E2';
-}
-function cacTextColor(cac) {
-  if(cac==null) return '#999';
-  if(cac>=1.5) return '#166534';
-  if(cac>=1.0) return '#854D0E';
-  return '#991B1B';
-}
-
-const matrix = document.getElementById('policy-matrix');
-// Header row
-matrix.innerHTML = '<div></div>' + fmColLabels.map(l=>`<div class="pg-header">${l}</div>`).join('');
-// Data rows
-obRowKeys.forEach((obKey,ri) => {
-  matrix.innerHTML += `<div class="pg-row-label" style="font-size:10px">${obRowLabels[ri]}</div>`;
-  fmColKeys.forEach(fmKey => {
-    const cell = policyData[obKey][fmKey];
-    if(!cell) {
-      matrix.innerHTML += `<div class="pg-empty"><span>—</span></div>`;
-    } else {
-      const bg = cacColor(cell.cac);
-      const tc = cacTextColor(cell.cac);
-      const cacStr = cell.cac != null ? `${cell.cac.toFixed(2)}x` : 'n/a';
-      matrix.innerHTML += `
-        <div class="pg-cell" style="background:${bg}">
-          <div class="pg-n" style="color:${tc};opacity:0.7">n=${cell.n}</div>
-          <div class="pg-ltv" style="color:${tc}">LTV/MRR: ${cell.ltv}x</div>
-          <div class="pg-churn" style="color:${tc}">${cell.churn}% churn</div>
-          <div class="pg-cac" style="color:${tc}">CAC: ${cacStr}</div>
-        </div>`;
-    }
+const pm=document.getElementById('policy-matrix');
+pm.innerHTML='<div></div>'+PM_FM_SHORT.map(l=>`<div class="pm-head">${l}</div>`).join('');
+PM_OB_KEYS.forEach((ok,ri)=>{
+  pm.innerHTML+=`<div class="pm-lbl">${PM_OB_SHORT[ri].replace('\n','<br>')}</div>`;
+  PM_FM_KEYS.forEach(fk=>{
+    const cell=D.policy[ok][fk];
+    if(!cell){pm.innerHTML+='<div class="pm-empty"><span>—</span></div>';return;}
+    const bg=cellBg(cell.cac),tc=cellTc(cell.cac);
+    const cacStr=cell.cac!=null?cell.cac.toFixed(2)+'×':'n/a';
+    pm.innerHTML+=`<div class="pm-cell" style="background:${bg}">
+      <div class="pm-n" style="color:${tc}">n=${cell.n}</div>
+      <div class="pm-v" style="color:${tc}">${cell.ltv}× LTV</div>
+      <div class="pm-c" style="color:${tc}">${cell.churn!=null?cell.churn+'% churn':'—'}</div>
+      <div class="pm-r" style="color:${tc}">CAC: ${cacStr}</div>
+    </div>`;
   });
+});
+
+/* ---- TRADEOFF TABLE ---- */
+const rows=[
+  {
+    policy:'Zero onboarding + 0 free months',
+    ltv:{badge:'b-r',text:'Very low'},
+    churn:{badge:'b-r',text:'59.9% / 12mo'},
+    cac:{badge:'b-r',text:'0.64× — underwater'},
+    wr:{badge:'b-n',text:'No clear advantage'},
+    conf:{badge:'b-a',text:'High confidence'},
+    rec:{badge:'b-r',text:'Discontinue as standard'}
+  },
+  {
+    policy:'Zero onboarding + 1 free month',
+    ltv:{badge:'b-a',text:'Moderate (n=1,458)'},
+    churn:{badge:'b-a',text:'45.2% / 12mo'},
+    cac:{badge:'b-b',text:'1.28× — profitable'},
+    wr:{badge:'b-n',text:'No data'},
+    conf:{badge:'b-g',text:'High — largest cell'},
+    rec:{badge:'b-b',text:'Acceptable baseline; add onboarding'}
+  },
+  {
+    policy:'Low ob (50–57% MRR) + 1 free month',
+    ltv:{badge:'b-g',text:'Good (23.6× med LTV)'},
+    churn:{badge:'b-g',text:'43.6% / 12mo'},
+    cac:{badge:'b-g',text:'1.94× — strong'},
+    wr:{badge:'b-a',text:'Highest raw WR (27.9%)'},
+    conf:{badge:'b-g',text:'Moderate — n=163'},
+    rec:{badge:'b-g',text:'Recommended standard'}
+  },
+  {
+    policy:'Med-High ob (100–154% MRR) + 1 free month',
+    ltv:{badge:'b-g',text:'Good (14× med LTV)'},
+    churn:{badge:'b-g',text:'35.6% / 12mo (best)'},
+    cac:{badge:'b-g',text:'1.61× — strong'},
+    wr:{badge:'b-n',text:'No clear signal'},
+    conf:{badge:'b-g',text:'Good — n=240'},
+    rec:{badge:'b-g',text:'Recommended for larger deals'}
+  },
+  {
+    policy:'Any ob + 2 free months',
+    ltv:{badge:'b-a',text:'Mixed across cohorts'},
+    churn:{badge:'b-a',text:'Diminishing vs 1 mo'},
+    cac:{badge:'b-a',text:'1.4× avg — decent'},
+    wr:{badge:'b-n',text:'No significant effect'},
+    conf:{badge:'b-a',text:'Low — small n cells'},
+    rec:{badge:'b-a',text:'Use selectively for large MRR'}
+  },
+  {
+    policy:'Any ob + 3+ free months',
+    ltv:{badge:'b-r',text:'No clear LTV gain'},
+    churn:{badge:'b-n',text:'Mixed; small n'},
+    cac:{badge:'b-r',text:'8.5mo breakeven; delayed'},
+    wr:{badge:'b-r',text:'No benefit in monthly model'},
+    conf:{badge:'b-r',text:'Very low — n<10 many cells'},
+    rec:{badge:'b-r',text:'Do not standardize'}
+  },
+  {
+    policy:'High ob (>154% MRR) + 1 free month',
+    ltv:{badge:'b-a',text:'Moderate'},
+    churn:{badge:'b-g',text:'19.0% — low churn'},
+    cac:{badge:'b-b',text:'1.41× — ok'},
+    wr:{badge:'b-n',text:'No clear signal'},
+    conf:{badge:'b-r',text:'Low — n=21'},
+    rec:{badge:'b-a',text:'Test with larger sample before scaling'}
+  }
+];
+const tb=document.getElementById('tt-body');
+rows.forEach(r=>{
+  tb.innerHTML+=`<tr>
+    <td><strong>${r.policy}</strong></td>
+    <td><span class="badge ${r.ltv.badge}">${r.ltv.text}</span></td>
+    <td><span class="badge ${r.churn.badge}">${r.churn.text}</span></td>
+    <td><span class="badge ${r.cac.badge}">${r.cac.text}</span></td>
+    <td><span class="badge ${r.wr.badge}">${r.wr.text}</span></td>
+    <td><span class="badge ${r.conf.badge}">${r.conf.text}</span></td>
+    <td><span class="badge ${r.rec.badge}">${r.rec.text}</span></td>
+  </tr>`;
 });
 </script>
 </body>
