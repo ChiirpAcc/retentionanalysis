@@ -1125,7 +1125,7 @@ body::before{
       <div class="panel">
         <div class="panelKicker">LTV vs. onboarding</div>
         <div class="panelTitle">Normalised LTV multiple across onboarding fee levels</div>
-        <p class="panelDek">Curve = log-linear LTV model evaluated at population-mean MRR. Dots = winsorized historical mean LTV by onboarding bin, sized by n. Model peaks near 180% onboarding.</p>
+        <p class="panelDek">Three lines, all comparable. <b>Green (model):</b> the log-linear regression's prediction — what the model says LTV should be once billing span, leakage, and MRR are controlled. <b>Blue (geometric mean):</b> what the data directly shows for each onboarding bin. <b>Amber dashed (arithmetic mean):</b> the raw average per bin, pulled up by outliers. The gap at 0% onboarding reflects that those accounts have longer tenures; the model accounts for this, the raw averages don't.</p>
         <div class="chartBox tall"><canvas id="chartLtvOb"></canvas></div>
       </div>
 
@@ -1192,6 +1192,37 @@ body::before{
       <table class="dataTable" id="cacStressTable"></table>
 
       <p class="footnote" id="cacStressFootnote">CAC totals = fixed + variable.</p>
+    </div>
+
+    <!-- Pricing sensitivity section -->
+    <div class="section">
+      <div class="sectionHead">
+        <h2 class="sectionTitle">If you lower prices — what does the model predict?</h2>
+        <p class="sectionDek">Win rate has a statistically significant negative relationship with MRR (β = −0.106 on log MRR, p &lt; 0.001). Lower prices → higher win rate → mechanical CAC reduction.</p>
+      </div>
+
+      <div class="cols2 mb24">
+
+        <div class="panel">
+          <div class="panelKicker">Win-rate sensitivity to MRR</div>
+          <div class="panelTitle">Predicted win-rate gain from price reduction</div>
+          <p class="panelDek">The win-rate model (R²=0.69, 12 monthly observations) predicts how win rate changes with MRR. This is the model's estimate — real-world gain depends on customer mix, sales capacity, and demand elasticity.</p>
+          <div class="chartBox short"><canvas id="chartPricingSensitivity"></canvas></div>
+          <div class="keyInsight" id="pricingInsight">
+            <strong>Reading</strong>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panelKicker">The pricing tradeoff</div>
+          <div class="panelTitle">Lower MRR: what you gain vs. what you give up</div>
+          <p class="panelDek">Lower prices increase win rate and reduce CAC. But they also reduce per-account revenue and LTV. This table shows the net effect at each price point, holding all deal structure variables constant.</p>
+          <table class="dataTable" id="pricingTradeoffTable"></table>
+          <p class="footnote">CAC estimated as observed spend / (baseline held-demos × modeled win rate). LTV uses billing-span, churn, and MRR at current deal structure.</p>
+        </div>
+
+      </div>
+
     </div>
   </section>
 
@@ -1401,15 +1432,15 @@ const EMP = {
     {ob:2.00, n:91,  churn:0.560},
   ],
   obLtv: [
-    {ob:0.00, n:1688, mean:27.16},
-    {ob:0.25, n:34,   mean:12.48},
-    {ob:0.50, n:236,  mean:18.79},
-    {ob:0.75, n:202,  mean:10.33},
-    {ob:1.00, n:87,   mean:25.09},
-    {ob:1.25, n:99,   mean:21.70},
-    {ob:1.50, n:335,  mean:17.03},
-    {ob:1.75, n:64,   mean:28.04},
-    {ob:2.00, n:119,  mean:15.29},
+    {ob:0.00, n:1688, mean:27.16, geo:8.15},
+    {ob:0.25, n:34,   mean:12.48, geo:9.55},
+    {ob:0.50, n:236,  mean:18.79, geo:9.62},
+    {ob:0.75, n:202,  mean:10.33, geo:6.91},
+    {ob:1.00, n:87,   mean:25.09, geo:12.66},
+    {ob:1.25, n:99,   mean:21.70, geo:12.54},
+    {ob:1.50, n:335,  mean:17.03, geo:12.20},
+    {ob:1.75, n:64,   mean:28.04, geo:12.54},
+    {ob:2.00, n:119,  mean:15.29, geo:10.01},
   ],
 };
 
@@ -1769,7 +1800,9 @@ function colorForPayback(months, horizon){
 function buildHeatmap(p){
   const obs = [0, 0.50, 1.00, 1.50, 2.00];
   const fms = [0, 1, 2, 3];
-  $('heatCacRef').textContent = fmtUSD(p.cac);
+  // Heatmap always uses the $8k benchmark so it's consistent with cash-trajectory charts.
+  const heatCac = FIXED_CAC_BENCHMARK;
+  $('heatCacRef').textContent = fmtUSD(heatCac);
   $('heatMrrRef').textContent = fmtUSD(p.mrr);
   $('heatHorizonRef').textContent = p.horizon;
 
@@ -1777,7 +1810,7 @@ function buildHeatmap(p){
   let bestMonths = Infinity, bestKey = null;
   obs.forEach(ob => {
     fms.forEach(fm => {
-      const months = paybackForCAC({...p, ob, fm}, p.cac);
+      const months = paybackForCAC({...p, ob, fm}, heatCac);
       const months_clipped = (months !== null && months > p.horizon) ? null : months;
       grid.push({ob, fm, months: months_clipped});
       if(months_clipped !== null && months_clipped < bestMonths){
@@ -1822,8 +1855,8 @@ function buildHeatmap(p){
   const noPayback = grid.filter(c => c.months === null).length;
 
   $('heatInsight').innerHTML = `
-    <strong>Reading at ${fmtUSD(p.cac)} CAC</strong>
-    Fastest payback structure: <b>${(fastest.ob*100).toFixed(0)}% onboarding · ${fastest.fm} free month${fastest.fm==1?'':'s'}</b> (${fastest.months} mo). Slowest paying structure inside the window: ${(slowest.ob*100).toFixed(0)}% × ${slowest.fm} (${slowest.months} mo). ${noPayback > 0 ? `<b>${noPayback} of 20</b> structures fail to pay back within ${p.horizon} months at this CAC.` : 'Every structure recovers within the projection window.'}
+    <strong>Reading at ${fmtUSD(heatCac)} CAC benchmark</strong>
+    Fastest payback: <b>${(fastest.ob*100).toFixed(0)}% onboarding · ${fastest.fm} free month${fastest.fm==1?'':'s'}</b> (${fastest.months} mo). Slowest inside the window: ${(slowest.ob*100).toFixed(0)}% × ${slowest.fm} (${slowest.months} mo). ${noPayback > 0 ? `<b>${noPayback} of 20</b> structures fail to pay back within ${p.horizon} months at this CAC.` : 'Every structure recovers within the projection window at $8k CAC.'}
   `;
 }
 
@@ -1949,36 +1982,47 @@ function chartChurnOb(p){
 }
 
 function chartLtvOb(p){
-  // Curve evaluated at POPULATION-MEAN MRR for visual alignment with dots.
+  // Model curve: evaluated at POPULATION-MEAN MRR (~$640) and population-mean
+  // billing span / leakage so it's comparable to the raw historical averages.
   const POP_MEAN_MRR = 640;
   const xs = [];
   for(let ob=0; ob<=2.0001; ob+=0.05) xs.push(ob);
   const yModel = xs.map(ob => modelLtvMultiple({...p, ob, mrr: POP_MEAN_MRR}));
 
-  // Use winsorized arithmetic mean (capped at 99th percentile) — better visual
-  // match for the log-linear model than raw mean, while still being labeled "mean".
-  const empDots = EMP.obLtv.map(d => ({x:d.ob*100, y:d.mean, n:d.n}));
+  // Historical geometric mean — the correct match for a log-linear regression.
+  // These are exp(mean of log(LTV)) per onboarding bin.
+  // The gap between this line and the model curve at low onboarding is real:
+  // accounts with 0% onboarding have longer average billing spans and different
+  // composition that the model controls for but the raw average doesn't.
+  const geoData = EMP.obLtv.map(d => ({x: d.ob*100, y: d.geo}));
+  // Arithmetic mean for reference (connects to what analysts expect to see)
+  const arithData = EMP.obLtv.map(d => ({x: d.ob*100, y: d.mean}));
 
   makeChart('chartLtvOb', {
     type:'line',
     data:{
       datasets:[
         {
-          label:'Model curve',
+          label:'Model (controlled)',
           data: xs.map((ob,i)=>({x:ob*100, y:yModel[i]})),
           borderColor:'#047857', borderWidth:2.5, pointRadius:0, tension:0.25,
           parsing:false,
         },
         {
-          label:'Historical mean (n-sized dots)',
-          data: empDots,
-          backgroundColor:'rgba(3,105,161,0.6)',
-          borderColor:'#0369a1',
-          borderWidth:1.5,
-          pointRadius: empDots.map(d => Math.min(14, Math.max(4, Math.sqrt(d.n)*0.7))),
-          showLine:false,
-          parsing:false,
-          type:'scatter',
+          label:'Historical geometric mean',
+          data: geoData,
+          borderColor:'#0369a1', borderWidth:2, pointRadius:4,
+          pointBackgroundColor:'#0369a1',
+          tension:0.25, parsing:false,
+          borderDash:[],
+        },
+        {
+          label:'Historical arithmetic mean (winsorized)',
+          data: arithData,
+          borderColor:'#b45309', borderWidth:1.5, pointRadius:3,
+          pointBackgroundColor:'#b45309',
+          tension:0.25, parsing:false,
+          borderDash:[4,3],
         },
       ],
     },
@@ -1986,16 +2030,12 @@ function chartLtvOb(p){
       ...editorialOpts,
       scales:{
         x:{
-          type:'linear',
-          min:0, max:200,
+          type:'linear', min:0, max:200,
           title:{display:true, text:'Onboarding fee (% of MRR)', font:{family:"'Inter', sans-serif", size:11, weight:'500'}, color:'#737373'},
           ticks:{font:{family:"'JetBrains Mono', monospace", size:10}, color:'#525252', callback:v=>v+'%'},
           grid:{color:'rgba(229,229,228,0.6)'},
         },
-        y:{
-          ...commonScales('','Normalised LTV multiple').y,
-          min:0,
-        },
+        y:{...commonScales('','Normalised LTV multiple').y, min:0},
       },
       plugins:{
         ...editorialOpts.plugins,
@@ -2003,9 +2043,8 @@ function chartLtvOb(p){
           ...editorialOpts.plugins.tooltip,
           callbacks:{
             label: ctx => {
-              if(ctx.datasetIndex === 0) return `Model: ${ctx.parsed.y.toFixed(2)}× LTV`;
-              const d = empDots[ctx.dataIndex];
-              return `Historical mean: ${ctx.parsed.y.toFixed(2)}× (n=${d.n})`;
+              const labels = ['Model:', 'Geo mean:', 'Arith mean:'];
+              return `${labels[ctx.datasetIndex] || ''} ${ctx.parsed.y.toFixed(2)}×`;
             },
           },
         },
@@ -2351,6 +2390,143 @@ function fillCacStress(p){
 /* ═══════════════════════════════════════════════════════════
    ORCHESTRATOR
    ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   PRICING SENSITIVITY — CAC TAB
+   WR model coefficient on log_mrr: -0.106342 (p < 0.001)
+   ═══════════════════════════════════════════════════════════ */
+const WR_LOG_MRR_COEF = -0.106342;
+// Trailing average observed acquisition spend proxy:
+// 16-month average total CAC × 11.5% baseline win rate × 100 demos ≈ acquisition spend
+// We use observed total CAC and back-calculate spend from wins.
+// Simpler: show implied CAC = observed avg total CAC × (baseline WR / new WR)
+// since spend stays constant and wins increase.
+const OBS_AVG_TOTAL_CAC = CAC_DATA.reduce((s,d) => s + d.total, 0) / CAC_DATA.length;
+// ≈ $6,286 average total CAC over 16 months
+
+function impliedWrAtMrr(mrr){
+  // From the win-rate aggregate model, holding all else at pop means.
+  // We offset the intercept so baseline WR at $2,250 matches 11.5%.
+  const baseLogMrr = Math.log(2250);
+  const newLogMrr = Math.log(Math.max(mrr, 1));
+  const deltaWr = WR_LOG_MRR_COEF * (newLogMrr - baseLogMrr);
+  return clamp(FIXED_WIN_RATE + deltaWr, 0.02, 0.80);
+}
+
+function impliedCacAtMrr(mrr){
+  // If acquisition spend is fixed and win rate changes, CAC = spend / wins.
+  // spend ≈ OBS_AVG_TOTAL_CAC × baseline_wins
+  const baseWins = 100 * FIXED_WIN_RATE;
+  const spend = OBS_AVG_TOTAL_CAC * baseWins;
+  const newWins = 100 * impliedWrAtMrr(mrr);
+  return spend / newWins;
+}
+
+function chartPricingSensitivity(p){
+  const mrrs = [500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000];
+  const wrData = mrrs.map(m => (impliedWrAtMrr(m) * 100));
+  const cacData = mrrs.map(m => impliedCacAtMrr(m));
+
+  makeChart('chartPricingSensitivity', {
+    type:'line',
+    data:{
+      labels: mrrs.map(m => '$' + m.toLocaleString()),
+      datasets:[
+        {
+          label:'Predicted win rate',
+          data: wrData,
+          borderColor:'#047857', borderWidth:2.5, pointRadius:3.5,
+          pointBackgroundColor:'#047857',
+          tension:0.2, yAxisID:'y',
+        },
+        {
+          label:'Implied CAC (at avg spend)',
+          data: cacData,
+          borderColor:'#b91c1c', borderWidth:2, pointRadius:3,
+          pointBackgroundColor:'#b91c1c',
+          borderDash:[5,3],
+          tension:0.2, yAxisID:'y1',
+        },
+      ],
+    },
+    options:{
+      ...editorialOpts,
+      scales:{
+        x:{...commonScales('Contract MRR','').x},
+        y:{
+          ...commonScales('','Win rate (%)').y,
+          ticks:{...commonScales('','').y.ticks, callback: v => v.toFixed(1) + '%'},
+          min:0, max:40,
+        },
+        y1:{
+          position:'right',
+          title:{display:true, text:'Implied CAC ($)', font:{family:"'Inter', sans-serif", size:11, weight:'500'}, color:'#737373'},
+          ticks:{font:{family:"'JetBrains Mono', monospace", size:10}, color:'#525252', callback: v => '$' + Math.round(v).toLocaleString()},
+          grid:{drawOnChartArea:false},
+          min:0,
+        },
+      },
+    },
+  });
+
+  // Insight text
+  const currentWr = impliedWrAtMrr(p.mrr);
+  const currentCac = impliedCacAtMrr(p.mrr);
+  const lowWr = impliedWrAtMrr(1500);
+  const lowCac = impliedCacAtMrr(1500);
+  const wrGain = (lowWr - currentWr) * 100;
+  const cacDrop = (currentCac - lowCac);
+  const cacDropPct = (cacDrop / currentCac) * 100;
+  $('pricingInsight').innerHTML = `
+    <strong>At current MRR ${fmtUSD(p.mrr)}</strong>
+    The model predicts a win rate of <b>${fmtPct(currentWr)}</b> and an implied CAC of <b>${fmtUSD(currentCac)}</b>.
+    Reducing MRR to $1,500 (−33%) would increase win rate by ~<b>${wrGain.toFixed(1)} pp</b>
+    and reduce implied CAC to ~<b>${fmtUSD(lowCac)}</b> (−${cacDropPct.toFixed(0)}%) — assuming acquisition spend stays constant.
+    This doesn't account for whether lower-priced deals have different churn characteristics.
+  `;
+}
+
+function fillPricingTradeoffTable(p){
+  const mrrs = [750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 3000];
+
+  const rows = mrrs.map(mrr => {
+    const wr = impliedWrAtMrr(mrr);
+    const wins = 100 * wr;
+    const cac = impliedCacAtMrr(mrr);
+    const churn = modelChurn({...p, mrr});
+    const cohort = projectCohort({...p, mrr});
+    const cashPerWon = cohort.cashPerWon;
+    const ltvCac = cashPerWon / cac;
+    return {mrr, wr, wins, cac, churn, cashPerWon, ltvCac};
+  });
+
+  $('pricingTradeoffTable').innerHTML = `
+    <thead>
+      <tr>
+        <th>MRR</th>
+        <th class="num">Win rate</th>
+        <th class="num">Wins (of 100)</th>
+        <th class="num">Implied CAC</th>
+        <th class="num">12mo churn</th>
+        <th class="num">Cash/won</th>
+        <th class="num">LTV:CAC</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(r => `
+        <tr ${Math.abs(r.mrr - p.mrr) < 50 ? 'class="highlight"' : ''}>
+          <td><b>${fmtUSD(r.mrr)}</b></td>
+          <td class="num">${fmtPct(r.wr)}</td>
+          <td class="num">${r.wins.toFixed(1)}</td>
+          <td class="num">${fmtUSD(r.cac)}</td>
+          <td class="num" style="color:${r.churn < 0.45 ? 'var(--good)' : r.churn < 0.60 ? 'var(--warn)' : 'var(--bad)'}">${fmtPct(r.churn)}</td>
+          <td class="num">${fmtUSD(r.cashPerWon)}</td>
+          <td class="num" style="color:${r.ltvCac >= 3 ? 'var(--good)' : r.ltvCac >= 1 ? 'var(--warn)' : 'var(--bad)'}">${r.ltvCac.toFixed(2)}×</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  `;
+}
+
 function safe(fn, name){
   try { fn(); } catch(e){ console.error('[' + name + '] ' + e.message); }
 }
@@ -2365,6 +2541,7 @@ function updateAll(){
   safe(()=>fillObTable(p), 'fillObTable');
   safe(()=>buildHeatmap(p), 'buildHeatmap');
   safe(()=>fillCacStress(p), 'fillCacStress');
+  safe(()=>fillPricingTradeoffTable(p), 'fillPricingTradeoffTable');
   // Charts last — so a chart failure can't break the rest
   if(typeof Chart !== 'undefined'){
     safe(()=>chartChurnOb(p), 'chartChurnOb');
@@ -2372,6 +2549,7 @@ function updateAll(){
     safe(()=>chartCashByFm(p), 'chartCashByFm');
     safe(()=>chartCashByOnb(p), 'chartCashByOnb');
     safe(()=>chartReach(p), 'chartReach');
+    safe(()=>chartPricingSensitivity(p), 'chartPricingSensitivity');
   }
 }
 
