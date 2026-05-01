@@ -6,22 +6,106 @@
 <title>Deal Structure Calculator</title>
 <style>
 :root{
-  --bg:#0f1117;--panel:#171a23;--panel2:#1e2330;--line:#2c3242;--text:#f4f6fb;--text2:#aeb7c8;--text3:#737d91;
-  --green:#32d583;--amber:#fdb022;--red:#f97066;--blue:#7dd3fc;--purple:#c084fc;--shadow:0 18px 60px rgba(0,0,0,.32)
+  --bg:#0f1117;
+  --panel:#171a23;
+  --panel2:#1e2330;
+  --line:#2c3242;
+  --text:#f4f6fb;
+  --text2:#aeb7c8;
+  --text3:#737d91;
+  --green:#32d583;
+  --amber:#fdb022;
+  --red:#f97066;
+  --blue:#7dd3fc;
+  --purple:#c084fc;
+  --shadow:0 18px 60px rgba(0,0,0,.32);
 }
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top left,#1b2540 0,#0f1117 42%,#0b0d12 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{max-width:1180px;margin:0 auto;padding:28px}.hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}.hdr h1{margin:0;font-size:30px;letter-spacing:-.03em}.tag{font-size:12px;color:var(--text2);border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.04)}.opt-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}.opt-btn{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));color:var(--text);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;text-align:left;box-shadow:var(--shadow)}.opt-btn:hover,.active-opt{border-color:#5d6b88;transform:translateY(-1px)}.opt-icon{height:36px;width:36px;border-radius:12px;display:grid;place-items:center;font-size:21px;font-weight:800}.min-churn .opt-icon{background:rgba(50,213,131,.13);color:var(--green)}.max-ltv .opt-icon{background:rgba(192,132,252,.13);color:var(--purple)}.opt-sub{display:block;color:var(--text3);font-size:12px;margin-top:2px}.grid{display:grid;grid-template-columns:360px 1fr;gap:16px}.controls,.outputs{background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}.field{margin:0}.field-hdr,.field-val-row{display:flex;justify-content:space-between;align-items:center;gap:10px}.field-lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);font-weight:700}.field-val{font-size:28px;font-weight:800;letter-spacing:-.03em}.lock-btn{border:1px solid var(--line);background:#11151e;color:var(--text);height:32px;width:38px;border-radius:10px;cursor:pointer}.lock-btn.locked{background:rgba(253,176,34,.12);border-color:rgba(253,176,34,.45)}input[type=range]{width:100%;accent-color:var(--blue);margin-top:8px}.locked-slider{opacity:.45;pointer-events:none}.range-ends{display:flex;justify-content:space-between;color:var(--text3);font-size:11px;margin-top:2px}.divider{height:1px;background:var(--line);margin:18px 0}.fm-pills{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:10px}.fm-pill{border:1px solid var(--line);border-radius:12px;text-align:center;padding:9px 0;cursor:pointer;color:var(--text2);background:#11151e;font-weight:700}.fm-pill.active{background:rgba(125,211,252,.14);border-color:rgba(125,211,252,.62);color:var(--text)}.locked-pill{opacity:.48;cursor:not-allowed}.cac-lbl{color:var(--purple)}.cac-slider{accent-color:var(--purple)!important}.lock-note{margin-top:14px;padding:10px;border-radius:14px;border:1px solid rgba(253,176,34,.32);background:rgba(253,176,34,.08);color:#fedf89;font-size:12px;gap:8px}.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.metric-card{background:linear-gradient(180deg,var(--panel2),#141822);border:1px solid var(--line);border-radius:20px;padding:16px;min-height:118px}.metric-card.primary{border-color:rgba(125,211,252,.42)}.metric-lbl{color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}.metric-val{font-size:31px;letter-spacing:-.04em;font-weight:900;margin-top:10px}.metric-sub{color:var(--text3);font-size:12px;margin-top:4px}.good{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}.purple{color:var(--purple)}.churn-vis,.bk,.insight,.audit{margin-top:14px;border:1px solid var(--line);background:#121722;border-radius:20px;padding:16px}.bar-hdr{display:flex;justify-content:space-between;color:var(--text2);font-size:12px;font-weight:800;letter-spacing:.08em}.bar-track{height:14px;background:#0b0e14;border-radius:999px;overflow:hidden;margin-top:8px}.bar-fill{height:100%;border-radius:999px;transition:width .18s ease,background .18s ease}.bk-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}.bk-row:last-child{border-bottom:0}.bk-lbl{color:var(--text2)}.bk-val{font-variant-numeric:tabular-nums;font-weight:800}.pos{color:var(--green)}.neg{color:var(--red)}.insight{line-height:1.5;color:var(--text2)}code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radius:7px;color:var(--blue)}.audit-hdr{display:flex;justify-content:space-between;gap:12px;font-weight:800}.audit-section{margin-top:14px;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:900}.audit-row{display:grid;grid-template-columns:1.55fr .55fr .55fr;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.055);font-size:12px}.audit-var{color:var(--text2)}.audit-note{display:block;color:var(--text3);font-size:10px;margin-top:2px}.audit-live,.audit-coef{text-align:right;font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace}.dim{color:var(--text3)}@media(max-width:900px){.grid{grid-template-columns:1fr}.metrics-grid{grid-template-columns:1fr 1fr}.hdr,.opt-row{grid-template-columns:1fr;display:grid}.hdr{align-items:start}}@media(max-width:560px){.app{padding:14px}.metrics-grid{grid-template-columns:1fr}.audit-row{grid-template-columns:1fr .6fr .6fr}.metric-val{font-size:28px}}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:radial-gradient(circle at top left,#1b2540 0,#0f1117 42%,#0b0d12 100%);
+  color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.app{max-width:1180px;margin:0 auto;padding:28px}
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}
+.hdr h1{margin:0;font-size:30px;letter-spacing:-.03em}
+.tag{font-size:12px;color:var(--text2);border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.04)}
+.opt-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.opt-btn{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));color:var(--text);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;text-align:left;box-shadow:var(--shadow)}
+.opt-btn:hover,.active-opt{border-color:#5d6b88;transform:translateY(-1px)}
+.opt-icon{height:36px;width:36px;border-radius:12px;display:grid;place-items:center;font-size:21px;font-weight:800}
+.min-churn .opt-icon{background:rgba(50,213,131,.13);color:var(--green)}
+.max-ltv .opt-icon{background:rgba(192,132,252,.13);color:var(--purple)}
+.opt-sub{display:block;color:var(--text3);font-size:12px;margin-top:2px}
+.grid{display:grid;grid-template-columns:360px 1fr;gap:16px}
+.controls,.outputs{background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+.field{margin:0}
+.field-hdr,.field-val-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.field-lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);font-weight:700}
+.field-val{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.lock-btn{border:1px solid var(--line);background:#11151e;color:var(--text);height:32px;width:38px;border-radius:10px;cursor:pointer}
+.lock-btn.locked{background:rgba(253,176,34,.12);border-color:rgba(253,176,34,.45)}
+input[type=range]{width:100%;accent-color:var(--blue);margin-top:8px}
+.locked-slider{opacity:.45;pointer-events:none}
+.range-ends{display:flex;justify-content:space-between;color:var(--text3);font-size:11px;margin-top:2px}
+.divider{height:1px;background:var(--line);margin:18px 0}
+.fm-pills{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:10px}
+.fm-pill{border:1px solid var(--line);border-radius:12px;text-align:center;padding:9px 0;cursor:pointer;color:var(--text2);background:#11151e;font-weight:700}
+.fm-pill.active{background:rgba(125,211,252,.14);border-color:rgba(125,211,252,.62);color:var(--text)}
+.locked-pill{opacity:.48;cursor:not-allowed}
+.cac-lbl{color:var(--purple)}
+.cac-slider{accent-color:var(--purple)!important}
+.lock-note{margin-top:14px;padding:10px;border-radius:14px;border:1px solid rgba(253,176,34,.32);background:rgba(253,176,34,.08);color:#fedf89;font-size:12px;gap:8px}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.metric-card{background:linear-gradient(180deg,var(--panel2),#141822);border:1px solid var(--line);border-radius:20px;padding:16px;min-height:118px}
+.metric-card.primary{border-color:rgba(125,211,252,.42)}
+.metric-lbl{color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.metric-val{font-size:31px;letter-spacing:-.04em;font-weight:900;margin-top:10px}
+.metric-sub{color:var(--text3);font-size:12px;margin-top:4px}
+.good{color:var(--green)}
+.warn{color:var(--amber)}
+.bad{color:var(--red)}
+.purple{color:var(--purple)}
+.churn-vis,.bk,.insight,.audit{margin-top:14px;border:1px solid var(--line);background:#121722;border-radius:20px;padding:16px}
+.bar-hdr{display:flex;justify-content:space-between;color:var(--text2);font-size:12px;font-weight:800;letter-spacing:.08em}
+.bar-track{height:14px;background:#0b0e14;border-radius:999px;overflow:hidden;margin-top:8px}
+.bar-fill{height:100%;border-radius:999px;transition:width .18s ease,background .18s ease}
+.bk-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.bk-row:last-child{border-bottom:0}
+.bk-lbl{color:var(--text2)}
+.bk-val{font-variant-numeric:tabular-nums;font-weight:800}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+.insight{line-height:1.5;color:var(--text2)}
+code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radius:7px;color:var(--blue)}
+.audit-hdr{display:flex;justify-content:space-between;gap:12px;font-weight:800}
+.audit-section{margin-top:14px;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:900}
+.audit-row{display:grid;grid-template-columns:1.55fr .55fr .55fr .55fr;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.055);font-size:12px}
+.audit-var{color:var(--text2)}
+.audit-note{display:block;color:var(--text3);font-size:10px;margin-top:2px}
+.audit-live,.audit-coef,.audit-p{text-align:right;font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.dim{color:var(--text3)}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.metrics-grid{grid-template-columns:1fr 1fr}.hdr,.opt-row{grid-template-columns:1fr;display:grid}.hdr{align-items:start}}
+@media(max-width:560px){.app{padding:14px}.metrics-grid{grid-template-columns:1fr}.audit-row{grid-template-columns:1fr .6fr .6fr .6fr}.metric-val{font-size:28px}}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="hdr">
     <h1>Deal Structure Calculator</h1>
-    <span class="tag">2024+ no-era regression · calibrated analytical LTV</span>
+    <span class="tag">2024+ compact interaction model · calibrated analytical LTV</span>
   </div>
 
   <div class="opt-row">
-    <button class="opt-btn min-churn" id="btnMinChurn"><div class="opt-icon">↓</div><div><span style="font-weight:700">Minimize Churn</span><span class="opt-sub">Optimize unlocked inputs for lowest 12-mo churn</span></div></button>
-    <button class="opt-btn max-ltv" id="btnMaxLtv"><div class="opt-icon">↑</div><div><span style="font-weight:700">Maximize LTV</span><span class="opt-sub">Optimize unlocked inputs for highest calibrated LTV</span></div></button>
+    <button class="opt-btn min-churn" id="btnMinChurn">
+      <div class="opt-icon">↓</div>
+      <div><span style="font-weight:700">Minimize Churn</span><span class="opt-sub">Optimize unlocked inputs for lowest 12-mo churn</span></div>
+    </button>
+    <button class="opt-btn max-ltv" id="btnMaxLtv">
+      <div class="opt-icon">↑</div>
+      <div><span style="font-weight:700">Maximize LTV</span><span class="opt-sub">Optimize unlocked inputs for highest calibrated LTV</span></div>
+    </button>
   </div>
 
   <div class="grid">
@@ -32,7 +116,9 @@
         <input type="range" id="sliderMrr" min="99" max="3000" step="1" value="650">
         <div class="range-ends"><span>$99</span><span>$3,000</span></div>
       </div>
+
       <div class="divider"></div>
+
       <div class="field">
         <div class="field-hdr"><span class="field-lbl">Onboarding fee (% of MRR)</span></div>
         <div class="field-val-row"><span class="field-val" id="obVal">100%</span><button class="lock-btn" id="lockOb">🔓</button></div>
@@ -40,13 +126,25 @@
         <input type="range" id="sliderOb" min="0" max="200" step="5" value="100">
         <div class="range-ends"><span>0%</span><span>200%</span></div>
       </div>
+
       <div class="divider"></div>
+
       <div class="field">
         <div class="field-hdr"><span class="field-lbl">Free months waived</span><button class="lock-btn" id="lockFm">🔓</button></div>
-        <div class="fm-pills" id="fmPills"><div class="fm-pill active" data-fm="0">0</div><div class="fm-pill" data-fm="1">1</div><div class="fm-pill" data-fm="2">2</div><div class="fm-pill" data-fm="3">3</div><div class="fm-pill" data-fm="4">4</div><div class="fm-pill" data-fm="5">5</div><div class="fm-pill" data-fm="6">6</div></div>
+        <div class="fm-pills" id="fmPills">
+          <div class="fm-pill active" data-fm="0">0</div>
+          <div class="fm-pill" data-fm="1">1</div>
+          <div class="fm-pill" data-fm="2">2</div>
+          <div class="fm-pill" data-fm="3">3</div>
+          <div class="fm-pill" data-fm="4">4</div>
+          <div class="fm-pill" data-fm="5">5</div>
+          <div class="fm-pill" data-fm="6">6</div>
+        </div>
         <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-top:4px" id="fmHint">MRR billing starts month 1</div>
       </div>
+
       <div class="divider"></div>
+
       <div class="cac-section">
         <div class="field-hdr"><span class="field-lbl cac-lbl">CAC per won account</span></div>
         <div class="field-val-row"><span class="field-val" id="cacVal" style="color:var(--purple)">$5,000</span></div>
@@ -54,6 +152,7 @@
         <input type="range" id="sliderCac" class="cac-slider" min="500" max="12000" step="100" value="5000">
         <div class="range-ends"><span>$500</span><span>$12,000</span></div>
       </div>
+
       <div id="lockNote" style="display:none" class="lock-note"><span>🔒</span><span id="lockNoteText"></span></div>
     </div>
 
@@ -83,8 +182,8 @@
       <div class="insight" id="insight"></div>
 
       <div class="audit">
-        <div class="audit-hdr"><span>Variable audit — live inputs to churn model</span><span style="color:var(--text3);font-weight:400">value · coef</span></div>
-        <div class="audit-section">CHURN HAZARD — no era vars · pseudo R² = 0.0213 · N = 14,208</div>
+        <div class="audit-hdr"><span>Variable audit — compact churn model</span><span style="color:var(--text3);font-weight:400">value · coef · p</span></div>
+        <div class="audit-section">CHURN HAZARD — compact interaction model · pseudo R² = 0.0218 · N = 14,208</div>
         <div id="auditChurn"></div>
         <div class="audit-section">LTV COMPUTATION — analytical LTV × calibration factor 0.3854</div>
         <div id="auditLtv"></div>
@@ -94,137 +193,196 @@
 </div>
 
 <script>
-// Latest regression data supplied 2026-05-01.
-// Same sliders as prior version: MRR, onboarding %, free months, CAC.
-// No era variables. Coupon/discount variables are fixed at 0 because there are no matching controls.
+// Compact churn model from 2024+ confirmatory panel logit.
+// NaN SEs: 0/24. Pseudo R2: 0.0218. AIC: 5552.3.
+// Use as directional deal-structure calculator, not precise account-level forecasting.
 const CALIBRATION = 0.3854;
 const MAX_LTV_MONTHS = 120;
 const LOG_COH = Math.log(14);
 const LOG_COH2 = LOG_COH ** 2;
 
-function sig(x, thresh, width){ return 1 / (1 + Math.exp(-(x - thresh) / (width * 0.35))); }
-function smoothTiers(mrr){
-  const s100 = sig(mrr,100,40), s500 = sig(mrr,500,80), s1000 = sig(mrr,1000,120);
-  return { mrr_lt100:1-s100, mrr_100_499:s100*(1-s500), mrr_1000p:s1000, high_mrr:s500 };
+function sig(x, thresh, width){
+  return 1 / (1 + Math.exp(-(x - thresh) / (width * 0.35)));
 }
-function smoothObPaid(obPct){ return sig(obPct,7.5,7.5); }
-function free3Plus(fm){ return sig(fm,2.5,1.0); }
+
+function smoothTiers(mrr){
+  const s100 = sig(mrr, 100, 40);
+  const s500 = sig(mrr, 500, 80);
+  const s1000 = sig(mrr, 1000, 120);
+  return {
+    mrr_lt100: 1 - s100,
+    mrr_100_499: s100 * (1 - s500),
+    mrr_1000p: s1000,
+    high_mrr: s500,
+  };
+}
+
+function smoothObPaid(obPct){
+  return sig(obPct, 7.5, 7.5);
+}
 
 function features(mrr, obPct, fm, month=9){
-  const logMrr = Math.log(Math.max(mrr,1));
+  const logMrr = Math.log(Math.max(mrr, 1));
   const obRatio = obPct / 100;
   const obSq = obRatio ** 2;
   const obGap = Math.max(0, 1 - obRatio);
   const t = smoothTiers(mrr);
-  const logTen = Math.log(Math.max(month,1));
+  const logTen = Math.log(Math.max(month, 1));
+  const anyFree = fm > 0 ? 1 : 0;
+
   return {
-    log_mrr:logMrr,
-    ob_collected_pct_mrr_sq:obSq,
-    discount_length_mo:0,
-    coupon_100pct:0,
-    mrr_lt100:t.mrr_lt100,
-    mrr_100_499:t.mrr_100_499,
-    mrr_1000p:t.mrr_1000p,
-    high_mrr:t.high_mrr,
-    ob_actually_paid:smoothObPaid(obPct),
-    ob_waived_post_sign:0,
-    free_1mo_exact:fm===1?1:0,
-    free_2mo_exact:fm===2?1:0,
-    free_3plus:free3Plus(fm),
-    stacked_ob_coupon:0,
-    mrr_x_ob:logMrr * obRatio,
-    free_x_coupon:0,
-    age_x_free:LOG_COH * fm,
-    ob_gap_x_mrr:obGap * logMrr,
-    ob_gap_x_free:obGap * fm,
-    log_tenure:logTen,
-    log_tenure_sq:logTen ** 2,
-    log_cohort_age:LOG_COH,
-    log_cohort_age_sq:LOG_COH2,
+    log_mrr: logMrr,
+    mrr_lt100: t.mrr_lt100,
+    mrr_100_499: t.mrr_100_499,
+    mrr_1000p: t.mrr_1000p,
+    high_mrr: t.high_mrr,
+    ob_collected_pct_mrr_sq: obSq,
+    ob_actually_paid: smoothObPaid(obPct),
+    ob_waived_post_sign: obPct === 0 ? 1 : 0,
+    ob_gap_x_mrr: obGap * logMrr,
+    any_free: anyFree,
+    free_2mo_exact: fm === 2 ? 1 : 0,
+    free_3plus: fm >= 3 ? 1 : 0,
+    discount_length_mo: 0,
+    anyfree_x_log_mrr: anyFree * logMrr,
+    anyfree_x_high_mrr: anyFree * t.high_mrr,
+    anyfree_x_ob_collected_pct_mrr_sq: anyFree * obSq,
+    anyfree_x_ob_actually_paid: anyFree * smoothObPaid(obPct),
+    anyfree_x_ob_waived_post_sign: anyFree * (obPct === 0 ? 1 : 0),
+    anyfree_x_ob_gap_x_mrr: anyFree * obGap * logMrr,
+    log_cohort_age: LOG_COH,
+    log_cohort_age_sq: LOG_COH2,
+    log_tenure: logTen,
+    log_tenure_sq: logTen ** 2,
   };
 }
 
 const CHURN_C = {
-  intercept:-5.2035,
-  log_mrr:0.2903,
-  ob_collected_pct_mrr_sq:0.0650,
-  discount_length_mo:-0.1135,
-  coupon_100pct:0.1273,
-  mrr_lt100:1.1446,
-  mrr_100_499:0.4958,
-  mrr_1000p:-0.3719,
-  high_mrr:-0.4349,
-  ob_actually_paid:-0.4380,
-  ob_waived_post_sign:-0.5749,
-  free_1mo_exact:0.1274,
-  free_2mo_exact:0.6539,
-  free_3plus:1.1165,
-  stacked_ob_coupon:0.4640,
-  mrr_x_ob:0.0057,
-  free_x_coupon:0.1273,
-  age_x_free:-0.0740,
-  ob_gap_x_mrr:0.1268,
-  ob_gap_x_free:0.0174,
-  log_tenure:-0.3776,
-  log_tenure_sq:0.0917,
-  log_cohort_age:0.8825,
-  log_cohort_age_sq:-0.1864,
+  intercept: -5.7143,
+  log_mrr: 0.3500,
+  mrr_lt100: 1.2017,
+  mrr_100_499: 0.4969,
+  mrr_1000p: -0.3495,
+  high_mrr: -0.6365,
+  ob_collected_pct_mrr_sq: 0.1258,
+  ob_actually_paid: -0.3224,
+  ob_waived_post_sign: -0.8896,
+  ob_gap_x_mrr: 0.1383,
+  any_free: 0.2503,
+  free_2mo_exact: 0.3226,
+  free_3plus: 0.1575,
+  discount_length_mo: -0.0608,
+  anyfree_x_log_mrr: -0.0562,
+  anyfree_x_high_mrr: 0.2422,
+  anyfree_x_ob_collected_pct_mrr_sq: -0.0675,
+  anyfree_x_ob_actually_paid: -0.1208,
+  anyfree_x_ob_waived_post_sign: 0.5261,
+  anyfree_x_ob_gap_x_mrr: -0.0020,
+  log_cohort_age: 1.1622,
+  log_cohort_age_sq: -0.2617,
+  log_tenure: -0.3699,
+  log_tenure_sq: 0.0890,
+};
+
+const CHURN_P = {
+  log_mrr: 0.1148,
+  mrr_lt100: 0.0263,
+  mrr_100_499: 0.0003,
+  mrr_1000p: 0.0271,
+  high_mrr: 0.0084,
+  ob_collected_pct_mrr_sq: 0.0025,
+  ob_actually_paid: 0.3094,
+  ob_waived_post_sign: 0.0579,
+  ob_gap_x_mrr: 0.0177,
+  any_free: 0.8262,
+  free_2mo_exact: 0.0787,
+  free_3plus: 0.3863,
+  discount_length_mo: 0.1866,
+  anyfree_x_log_mrr: 0.7734,
+  anyfree_x_high_mrr: 0.3564,
+  anyfree_x_ob_collected_pct_mrr_sq: 0.1443,
+  anyfree_x_ob_actually_paid: 0.7297,
+  anyfree_x_ob_waived_post_sign: 0.3341,
+  anyfree_x_ob_gap_x_mrr: 0.9768,
+  log_cohort_age: 0.0994,
+  log_cohort_age_sq: 0.0675,
+  log_tenure: 0.0094,
+  log_tenure_sq: 0.0566,
 };
 
 function logitHazard(mrr, obPct, fm, month=9){
-  const f = features(mrr,obPct,fm,month);
+  const f = features(mrr, obPct, fm, month);
   return CHURN_C.intercept
     + CHURN_C.log_mrr * f.log_mrr
-    + CHURN_C.ob_collected_pct_mrr_sq * f.ob_collected_pct_mrr_sq
-    + CHURN_C.discount_length_mo * f.discount_length_mo
-    + CHURN_C.coupon_100pct * f.coupon_100pct
     + CHURN_C.mrr_lt100 * f.mrr_lt100
     + CHURN_C.mrr_100_499 * f.mrr_100_499
     + CHURN_C.mrr_1000p * f.mrr_1000p
     + CHURN_C.high_mrr * f.high_mrr
+    + CHURN_C.ob_collected_pct_mrr_sq * f.ob_collected_pct_mrr_sq
     + CHURN_C.ob_actually_paid * f.ob_actually_paid
     + CHURN_C.ob_waived_post_sign * f.ob_waived_post_sign
-    + CHURN_C.free_1mo_exact * f.free_1mo_exact
+    + CHURN_C.ob_gap_x_mrr * f.ob_gap_x_mrr
+    + CHURN_C.any_free * f.any_free
     + CHURN_C.free_2mo_exact * f.free_2mo_exact
     + CHURN_C.free_3plus * f.free_3plus
-    + CHURN_C.stacked_ob_coupon * f.stacked_ob_coupon
-    + CHURN_C.mrr_x_ob * f.mrr_x_ob
-    + CHURN_C.free_x_coupon * f.free_x_coupon
-    + CHURN_C.age_x_free * f.age_x_free
-    + CHURN_C.ob_gap_x_mrr * f.ob_gap_x_mrr
-    + CHURN_C.ob_gap_x_free * f.ob_gap_x_free
-    + CHURN_C.log_tenure * f.log_tenure
-    + CHURN_C.log_tenure_sq * f.log_tenure_sq
+    + CHURN_C.discount_length_mo * f.discount_length_mo
+    + CHURN_C.anyfree_x_log_mrr * f.anyfree_x_log_mrr
+    + CHURN_C.anyfree_x_high_mrr * f.anyfree_x_high_mrr
+    + CHURN_C.anyfree_x_ob_collected_pct_mrr_sq * f.anyfree_x_ob_collected_pct_mrr_sq
+    + CHURN_C.anyfree_x_ob_actually_paid * f.anyfree_x_ob_actually_paid
+    + CHURN_C.anyfree_x_ob_waived_post_sign * f.anyfree_x_ob_waived_post_sign
+    + CHURN_C.anyfree_x_ob_gap_x_mrr * f.anyfree_x_ob_gap_x_mrr
     + CHURN_C.log_cohort_age * f.log_cohort_age
-    + CHURN_C.log_cohort_age_sq * f.log_cohort_age_sq;
+    + CHURN_C.log_cohort_age_sq * f.log_cohort_age_sq
+    + CHURN_C.log_tenure * f.log_tenure
+    + CHURN_C.log_tenure_sq * f.log_tenure_sq;
 }
-function monthlyHazard(mrr,obPct,fm,month=9){ return 1 / (1 + Math.exp(-logitHazard(mrr,obPct,fm,month))); }
-function churnN(mrr,obPct,fm,n){ let surv=1; for(let t=1;t<=n;t++) surv *= (1 - monthlyHazard(mrr,obPct,fm,t)); return 1 - surv; }
-function churn12(mrr,obPct,fm){ return churnN(mrr,obPct,fm,12); }
 
-function ltvBreakdown(mrr,obPct,fm){
+function monthlyHazard(mrr, obPct, fm, month=9){
+  return 1 / (1 + Math.exp(-logitHazard(mrr, obPct, fm, month)));
+}
+
+function churnN(mrr, obPct, fm, n){
+  let survival = 1;
+  for(let t=1; t<=n; t++) survival *= (1 - monthlyHazard(mrr, obPct, fm, t));
+  return 1 - survival;
+}
+
+function churn12(mrr, obPct, fm){
+  return churnN(mrr, obPct, fm, 12);
+}
+
+function ltvBreakdown(mrr, obPct, fm){
   const upfront = mrr * (obPct / 100);
-  let survival = 1, mrrRev24 = 0, noChurn24 = 0, analytical = upfront;
-  const monthlyRows = [];
-  for(let t=1;t<=MAX_LTV_MONTHS;t++){
-    const h = monthlyHazard(mrr,obPct,fm,t);
+  let survival = 1;
+  let mrrRev24 = 0;
+  let noChurn24 = 0;
+  let analytical = upfront;
+
+  for(let t=1; t<=MAX_LTV_MONTHS; t++){
+    const h = monthlyHazard(mrr, obPct, fm, t);
     survival *= (1 - h);
     const billable = t > fm;
     const expectedMrr = billable ? mrr * survival : 0;
     analytical += expectedMrr;
-    if(t<=24){ mrrRev24 += expectedMrr; if(billable) noChurn24 += mrr; }
-    monthlyRows.push({month:t, expectedCash: expectedMrr, survival});
+
+    if(t <= 24){
+      mrrRev24 += expectedMrr;
+      if(billable) noChurn24 += mrr;
+    }
   }
+
   const calibrated = analytical * CALIBRATION;
-  return { upfront, mrrRev24, lost24:noChurn24-mrrRev24, analytical, calibrated, monthlyRows };
+  return {upfront, mrrRev24, lost24:noChurn24 - mrrRev24, analytical, calibrated};
 }
 
-function paybackMonth(mrr,obPct,fm,cac){
-  const upfront = mrr * (obPct / 100) * CALIBRATION;
-  let cum = upfront, survival = 1;
+function paybackMonth(mrr, obPct, fm, cac){
+  let cum = mrr * (obPct / 100) * CALIBRATION;
+  let survival = 1;
   if(cum >= cac) return 0;
-  for(let t=1;t<=60;t++){
-    survival *= (1 - monthlyHazard(mrr,obPct,fm,t));
+
+  for(let t=1; t<=60; t++){
+    survival *= (1 - monthlyHazard(mrr, obPct, fm, t));
     if(t > fm) cum += (mrr * survival) * CALIBRATION;
     if(cum >= cac) return t;
   }
@@ -233,126 +391,238 @@ function paybackMonth(mrr,obPct,fm,cac){
 
 const locks = {mrr:false, ob:false, fm:false};
 let fm = 0;
+
 function byId(id){ return document.getElementById(id); }
 function fmtUSD(v){ return '$' + Math.round(v).toLocaleString(); }
-function fmtPct(v){ return (v*100).toFixed(1) + '%'; }
+function fmtPct(v){ return (v * 100).toFixed(1) + '%'; }
 function fmtN4(v){ return typeof v === 'number' ? v.toFixed(4) : v; }
+function fmtP(v){ return v == null ? '—' : v.toFixed(4); }
 function riskClassChurn(c){ return c < .35 ? 'good' : c < .55 ? 'warn' : 'bad'; }
-function ltvClass(v,mrr){ return v > mrr*20 ? 'good' : v > mrr*10 ? 'warn' : 'bad'; }
+function ltvClass(v,mrr){ return v > mrr * 20 ? 'good' : v > mrr * 10 ? 'warn' : 'bad'; }
 
 function updateLockUI(){
   ['mrr','ob','fm'].forEach(k=>{
-    const btn=byId('lock'+k[0].toUpperCase()+k.slice(1));
-    btn.textContent=locks[k]?'🔒':'🔓'; btn.classList.toggle('locked',locks[k]);
+    const btn = byId('lock' + k[0].toUpperCase() + k.slice(1));
+    btn.textContent = locks[k] ? '🔒' : '🔓';
+    btn.classList.toggle('locked', locks[k]);
   });
-  byId('sliderMrr').classList.toggle('locked-slider',locks.mrr);
-  byId('sliderOb').classList.toggle('locked-slider',locks.ob);
-  document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('locked-pill',locks.fm));
-  const locked=Object.entries(locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
-  const note=byId('lockNote');
-  if(locked.length){ note.style.display='flex'; byId('lockNoteText').textContent=locked.join(', ')+' locked — optimizer skips these'; }
-  else note.style.display='none';
-}
-byId('lockMrr').addEventListener('click',()=>{locks.mrr=!locks.mrr;updateLockUI();});
-byId('lockOb').addEventListener('click',()=>{locks.ob=!locks.ob;updateLockUI();});
-byId('lockFm').addEventListener('click',()=>{locks.fm=!locks.fm;updateLockUI();});
 
-byId('fmPills').querySelectorAll('.fm-pill').forEach(p=>p.addEventListener('click',()=>{ if(locks.fm) return; fm=+p.dataset.fm; setFm(fm); clearOpt(); update(); }));
-function setFm(v){ fm=v; document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('active',+p.dataset.fm===v)); }
-byId('sliderMrr').addEventListener('input',()=>{clearOpt();update();});
-byId('sliderOb').addEventListener('input',()=>{clearOpt();update();});
+  byId('sliderMrr').classList.toggle('locked-slider', locks.mrr);
+  byId('sliderOb').classList.toggle('locked-slider', locks.ob);
+  document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('locked-pill', locks.fm));
+
+  const locked = Object.entries(locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
+  const note = byId('lockNote');
+  if(locked.length){
+    note.style.display = 'flex';
+    byId('lockNoteText').textContent = locked.join(', ') + ' locked — optimizer skips these';
+  } else {
+    note.style.display = 'none';
+  }
+}
+
+byId('lockMrr').addEventListener('click',()=>{locks.mrr = !locks.mrr; updateLockUI();});
+byId('lockOb').addEventListener('click',()=>{locks.ob = !locks.ob; updateLockUI();});
+byId('lockFm').addEventListener('click',()=>{locks.fm = !locks.fm; updateLockUI();});
+
+byId('fmPills').querySelectorAll('.fm-pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    if(locks.fm) return;
+    fm = +p.dataset.fm;
+    setFm(fm);
+    clearOpt();
+    update();
+  });
+});
+
+function setFm(v){
+  fm = v;
+  document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('active', +p.dataset.fm === v));
+}
+
+byId('sliderMrr').addEventListener('input',()=>{clearOpt(); update();});
+byId('sliderOb').addEventListener('input',()=>{clearOpt(); update();});
 byId('sliderCac').addEventListener('input',()=>update());
-function clearOpt(){ document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('active-opt')); }
+
+function clearOpt(){
+  document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('active-opt'));
+}
 
 function optimize(goal){
-  const MRR=[]; for(let m=99;m<=3000;m+=25) MRR.push(m);
-  const OB=[]; for(let o=0;o<=200;o+=5) OB.push(o);
-  const FM=[0,1,2,3,4,5,6];
-  const curMrr=+byId('sliderMrr').value, curOb=+byId('sliderOb').value;
-  const mrrRange=locks.mrr?[curMrr]:MRR, obRange=locks.ob?[curOb]:OB, fmRange=locks.fm?[fm]:FM;
-  let bestMrr=curMrr,bestOb=curOb,bestFm=fm,best=goal==='ltv'?-Infinity:Infinity;
-  for(const m of mrrRange) for(const o of obRange) for(const f of fmRange){
-    const s = goal==='ltv' ? ltvBreakdown(m,o,f).calibrated : churn12(m,o,f);
-    if((goal==='ltv' && s>best) || (goal==='churn' && s<best)){ best=s; bestMrr=m; bestOb=o; bestFm=f; }
+  const MRR = [];
+  for(let m=99; m<=3000; m+=25) MRR.push(m);
+
+  const OB = [];
+  for(let o=0; o<=200; o+=5) OB.push(o);
+
+  const FM = [0,1,2,3,4,5,6];
+
+  const curMrr = +byId('sliderMrr').value;
+  const curOb = +byId('sliderOb').value;
+
+  const mrrRange = locks.mrr ? [curMrr] : MRR;
+  const obRange = locks.ob ? [curOb] : OB;
+  const fmRange = locks.fm ? [fm] : FM;
+
+  let bestMrr = curMrr;
+  let bestOb = curOb;
+  let bestFm = fm;
+  let best = goal === 'ltv' ? -Infinity : Infinity;
+
+  for(const m of mrrRange){
+    for(const o of obRange){
+      for(const f of fmRange){
+        const s = goal === 'ltv' ? ltvBreakdown(m,o,f).calibrated : churn12(m,o,f);
+        if((goal === 'ltv' && s > best) || (goal === 'churn' && s < best)){
+          best = s;
+          bestMrr = m;
+          bestOb = o;
+          bestFm = f;
+        }
+      }
+    }
   }
-  if(!locks.mrr) byId('sliderMrr').value=bestMrr;
-  if(!locks.ob) byId('sliderOb').value=bestOb;
+
+  if(!locks.mrr) byId('sliderMrr').value = bestMrr;
+  if(!locks.ob) byId('sliderOb').value = bestOb;
   if(!locks.fm) setFm(bestFm);
   update();
 }
-byId('btnMinChurn').addEventListener('click',()=>{clearOpt();byId('btnMinChurn').classList.add('active-opt');optimize('churn');});
-byId('btnMaxLtv').addEventListener('click',()=>{clearOpt();byId('btnMaxLtv').classList.add('active-opt');optimize('ltv');});
+
+byId('btnMinChurn').addEventListener('click',()=>{
+  clearOpt();
+  byId('btnMinChurn').classList.add('active-opt');
+  optimize('churn');
+});
+
+byId('btnMaxLtv').addEventListener('click',()=>{
+  clearOpt();
+  byId('btnMaxLtv').classList.add('active-opt');
+  optimize('ltv');
+});
 
 function renderAudit(id, rows){
-  byId(id).innerHTML = rows.map(([name,val,coef,note])=>{
-    const cls = Math.abs(coef)<1e-6 ? 'dim' : coef>0 ? 'pos' : 'neg';
-    return `<div class="audit-row"><span class="audit-var">${name}<span class="audit-note">${note||''}</span></span><span class="audit-live">${fmtN4(val)}</span><span class="audit-coef ${cls}">${coef>0?'+':''}${coef.toFixed(4)}</span></div>`;
+  byId(id).innerHTML = rows.map(([name,val,coef,p,note])=>{
+    const cls = Math.abs(coef) < 1e-6 ? 'dim' : coef > 0 ? 'pos' : 'neg';
+    return `<div class="audit-row"><span class="audit-var">${name}<span class="audit-note">${note || ''}</span></span><span class="audit-live">${fmtN4(val)}</span><span class="audit-coef ${cls}">${coef>0?'+':''}${coef.toFixed(4)}</span><span class="audit-p">${fmtP(p)}</span></div>`;
   }).join('');
 }
 
 function update(){
-  const mrr=+byId('sliderMrr').value, obPct=+byId('sliderOb').value, cac=+byId('sliderCac').value;
-  const f=features(mrr,obPct,fm,9);
-  byId('mrrVal').textContent='$'+mrr.toLocaleString();
-  byId('obVal').textContent=obPct+'%';
-  byId('obDollar').textContent='= $'+Math.round(mrr*obPct/100).toLocaleString()+' upfront';
-  byId('cacVal').textContent='$'+cac.toLocaleString();
-  byId('fmHint').textContent=fm===0?'MRR billing starts month 1':`${fm} month${fm>1?'s':''} waived · billing starts month ${fm+1}`;
+  const mrr = +byId('sliderMrr').value;
+  const obPct = +byId('sliderOb').value;
+  const cac = +byId('sliderCac').value;
+  const f = features(mrr, obPct, fm, 9);
 
-  const h1=monthlyHazard(mrr,obPct,fm,1), c12=churn12(mrr,obPct,fm), bk=ltvBreakdown(mrr,obPct,fm), ltv=bk.calibrated;
-  const ltvCac=ltv/cac, net=ltv-cac, pb=paybackMonth(mrr,obPct,fm,cac);
+  byId('mrrVal').textContent = '$' + mrr.toLocaleString();
+  byId('obVal').textContent = obPct + '%';
+  byId('obDollar').textContent = '= $' + Math.round(mrr * obPct / 100).toLocaleString() + ' upfront';
+  byId('cacVal').textContent = '$' + cac.toLocaleString();
+  byId('fmHint').textContent = fm === 0 ? 'MRR billing starts month 1' : `${fm} month${fm>1?'s':''} waived · billing starts month ${fm+1}`;
 
-  const ltvEl=byId('oLtv'); ltvEl.textContent=fmtUSD(ltv); ltvEl.className='metric-val '+ltvClass(ltv,mrr);
-  byId('oLtvSub').textContent=`${fmtUSD(bk.analytical)} analytical × ${CALIBRATION}`;
-  const chEl=byId('oChurn'); chEl.textContent=fmtPct(c12); chEl.className='metric-val '+riskClassChurn(c12); byId('oChurnSub').textContent=c12<.35?'low risk':c12<.55?'moderate':'high risk';
-  const hz=byId('oHazard'); hz.textContent=fmtPct(h1); hz.className='metric-val '+(h1<.03?'good':h1<.05?'warn':'bad');
-  const ratio=byId('oLtvCac'); ratio.textContent=ltvCac.toFixed(2)+'×'; ratio.className='metric-val '+(ltvCac>=3?'good':ltvCac>=1.5?'warn':'bad'); byId('oLtvCacSub').textContent=ltvCac>=3?'healthy':ltvCac>=1?'pays back':'underwater';
-  const pbEl=byId('oPayback'); pbEl.textContent=pb===null?'>60 mo':pb===0?'0 mo':pb+' mo'; pbEl.className='metric-val '+(pb!==null&&pb<=12?'good':pb!==null&&pb<=24?'warn':'bad'); byId('oPaybackSub').textContent=pb===null?'not recovered in 5yr':pb===0?'upfront only':`month ${pb}`;
-  const netEl=byId('oNet'); netEl.textContent=(net>=0?'+':'')+fmtUSD(net); netEl.className='metric-val '+(net>=0?'good':'bad');
+  const h1 = monthlyHazard(mrr, obPct, fm, 1);
+  const c12 = churn12(mrr, obPct, fm);
+  const bk = ltvBreakdown(mrr, obPct, fm);
+  const ltv = bk.calibrated;
+  const ltvCac = ltv / cac;
+  const net = ltv - cac;
+  const pb = paybackMonth(mrr, obPct, fm, cac);
 
-  const fill=byId('barFill'); fill.style.width=Math.min(c12*100,100)+'%'; fill.style.background=c12<.35?'var(--green)':c12<.55?'var(--amber)':'var(--red)'; byId('barLbl').textContent=fmtPct(c12);
-  byId('bUpfront').textContent=fmtUSD(bk.upfront); byId('bMrrRev').textContent=fmtUSD(bk.mrrRev24); byId('bLost').textContent='−'+fmtUSD(bk.lost24); byId('bAnalytical').textContent=fmtUSD(bk.analytical); byId('bModel').textContent=fmtUSD(ltv); byId('bCac').textContent=fmtUSD(cac); byId('bRatio').textContent=ltvCac.toFixed(2)+'×'; const bNet=byId('bNet'); bNet.textContent=(net>=0?'+':'')+fmtUSD(net); bNet.className='bk-val '+(net>=0?'pos':'neg');
+  const ltvEl = byId('oLtv');
+  ltvEl.textContent = fmtUSD(ltv);
+  ltvEl.className = 'metric-val ' + ltvClass(ltv, mrr);
+  byId('oLtvSub').textContent = `${fmtUSD(bk.analytical)} analytical × ${CALIBRATION}`;
 
-  let ins='';
-  if(fm>=3) ins=`<strong>${fm} free months.</strong> The updated model treats 3+ free months as the strongest slider-driven churn penalty: <code>free_3plus</code> coefficient +1.1165, or roughly +205% monthly churn odds before interactions.`;
-  else if(mrr<500) ins=`<strong>Lower-MRR deal.</strong> The $100–$499 tier carries +64% monthly churn odds, while high-MRR accounts receive a protective high-MRR effect. This configuration depends heavily on CAC discipline.`;
-  else if(obPct===0) ins=`<strong>No onboarding collected.</strong> The calculator sets <code>ob_actually_paid</code> near 0 and applies the onboarding-gap interaction from the updated churn model.`;
-  else if(ltvCac<1) ins=`<strong>Underwater deal.</strong> At ${fmtUSD(cac)} CAC, calibrated LTV:CAC is ${ltvCac.toFixed(2)}×. Raise MRR, collect onboarding, reduce free months, or lower CAC.`;
-  else ins=`<strong>${fmtUSD(mrr)} MRR · ${obPct}% onboarding · ${fm} free months · ${fmtUSD(cac)} CAC.</strong> Calibrated LTV is <strong>${fmtUSD(ltv)}</strong>, 12-mo churn is <strong>${fmtPct(c12)}</strong>, and LTV:CAC is <strong>${ltvCac.toFixed(2)}×</strong>.`;
-  byId('insight').innerHTML=ins;
+  const chEl = byId('oChurn');
+  chEl.textContent = fmtPct(c12);
+  chEl.className = 'metric-val ' + riskClassChurn(c12);
+  byId('oChurnSub').textContent = c12 < .35 ? 'low risk' : c12 < .55 ? 'moderate' : 'high risk';
+
+  const hz = byId('oHazard');
+  hz.textContent = fmtPct(h1);
+  hz.className = 'metric-val ' + (h1 < .03 ? 'good' : h1 < .05 ? 'warn' : 'bad');
+
+  const ratio = byId('oLtvCac');
+  ratio.textContent = ltvCac.toFixed(2) + '×';
+  ratio.className = 'metric-val ' + (ltvCac >= 3 ? 'good' : ltvCac >= 1.5 ? 'warn' : 'bad');
+  byId('oLtvCacSub').textContent = ltvCac >= 3 ? 'healthy' : ltvCac >= 1 ? 'pays back' : 'underwater';
+
+  const pbEl = byId('oPayback');
+  pbEl.textContent = pb === null ? '>60 mo' : pb === 0 ? '0 mo' : pb + ' mo';
+  pbEl.className = 'metric-val ' + (pb !== null && pb <= 12 ? 'good' : pb !== null && pb <= 24 ? 'warn' : 'bad');
+  byId('oPaybackSub').textContent = pb === null ? 'not recovered in 5yr' : pb === 0 ? 'upfront only' : `month ${pb}`;
+
+  const netEl = byId('oNet');
+  netEl.textContent = (net >= 0 ? '+' : '') + fmtUSD(net);
+  netEl.className = 'metric-val ' + (net >= 0 ? 'good' : 'bad');
+
+  const fill = byId('barFill');
+  fill.style.width = Math.min(c12 * 100, 100) + '%';
+  fill.style.background = c12 < .35 ? 'var(--green)' : c12 < .55 ? 'var(--amber)' : 'var(--red)';
+  byId('barLbl').textContent = fmtPct(c12);
+
+  byId('bUpfront').textContent = fmtUSD(bk.upfront);
+  byId('bMrrRev').textContent = fmtUSD(bk.mrrRev24);
+  byId('bLost').textContent = '−' + fmtUSD(bk.lost24);
+  byId('bAnalytical').textContent = fmtUSD(bk.analytical);
+  byId('bModel').textContent = fmtUSD(ltv);
+  byId('bCac').textContent = fmtUSD(cac);
+  byId('bRatio').textContent = ltvCac.toFixed(2) + '×';
+
+  const bNet = byId('bNet');
+  bNet.textContent = (net >= 0 ? '+' : '') + fmtUSD(net);
+  bNet.className = 'bk-val ' + (net >= 0 ? 'pos' : 'neg');
+
+  let ins = '';
+  if(fm === 2){
+    ins = `<strong>Two free months is the clearest free-month risk signal.</strong> <code>free_2mo_exact</code> adds about +38% churn odds and is marginally significant in the compact model.`;
+  } else if(fm >= 3){
+    ins = `<strong>${fm} free months.</strong> The compact model estimates higher churn odds for 3+ free months, but the coefficient is weaker than the 2-month signal. Treat this as directional.`;
+  } else if(obPct === 0){
+    ins = `<strong>No onboarding collected.</strong> The model applies the onboarding waiver/gap terms. Under-collecting onboarding increases churn risk through <code>ob_gap_x_mrr</code>.`;
+  } else if(ltvCac < 1){
+    ins = `<strong>Underwater deal.</strong> At ${fmtUSD(cac)} CAC, calibrated LTV:CAC is ${ltvCac.toFixed(2)}×. Raise MRR, collect onboarding, reduce free months, or lower CAC.`;
+  } else {
+    ins = `<strong>${fmtUSD(mrr)} MRR · ${obPct}% onboarding · ${fm} free months · ${fmtUSD(cac)} CAC.</strong> Calibrated LTV is <strong>${fmtUSD(ltv)}</strong>, 12-mo churn is <strong>${fmtPct(c12)}</strong>, and LTV:CAC is <strong>${ltvCac.toFixed(2)}×</strong>.`;
+  }
+  byId('insight').innerHTML = ins;
 
   renderAudit('auditChurn', [
-    ['log_mrr', f.log_mrr, CHURN_C.log_mrr, 'log(mrr)'],
-    ['ob_collected_pct_mrr_sq', f.ob_collected_pct_mrr_sq, CHURN_C.ob_collected_pct_mrr_sq, 'ob_ratio²'],
-    ['discount_length_mo', f.discount_length_mo, CHURN_C.discount_length_mo, 'fixed at 0; no slider'],
-    ['mrr_lt100 (smooth)', f.mrr_lt100, CHURN_C.mrr_lt100, '~1 below $100'],
-    ['mrr_100_499 (smooth)', f.mrr_100_499, CHURN_C.mrr_100_499, '$100–$499'],
-    ['mrr_1000p (smooth)', f.mrr_1000p, CHURN_C.mrr_1000p, '~1 above $1k'],
-    ['high_mrr (smooth)', f.high_mrr, CHURN_C.high_mrr, '~1 above $500'],
-    ['ob_actually_paid (smooth)', f.ob_actually_paid, CHURN_C.ob_actually_paid, 'sigmoid 0→15%'],
-    ['ob_waived_post_sign', f.ob_waived_post_sign, CHURN_C.ob_waived_post_sign, 'fixed at 0; no slider'],
-    ['free_1mo_exact', f.free_1mo_exact, CHURN_C.free_1mo_exact, 'fm==1'],
-    ['free_2mo_exact', f.free_2mo_exact, CHURN_C.free_2mo_exact, 'fm==2'],
-    ['free_3plus (smooth)', f.free_3plus, CHURN_C.free_3plus, 'fm>=3'],
-    ['mrr_x_ob', f.mrr_x_ob, CHURN_C.mrr_x_ob, 'log(mrr)×ob_ratio'],
-    ['age_x_free', f.age_x_free, CHURN_C.age_x_free, 'log_coh×fm'],
-    ['ob_gap_x_mrr', f.ob_gap_x_mrr, CHURN_C.ob_gap_x_mrr, 'max(0,1−ob_ratio)×log(mrr)'],
-    ['ob_gap_x_free', f.ob_gap_x_free, CHURN_C.ob_gap_x_free, 'max(0,1−ob_ratio)×fm'],
-    ['log_tenure', f.log_tenure, CHURN_C.log_tenure, 'varies by month for LTV'],
-    ['log_tenure_sq', f.log_tenure_sq, CHURN_C.log_tenure_sq, 'varies by month for LTV'],
-    ['log_cohort_age', f.log_cohort_age, CHURN_C.log_cohort_age, 'held at 14 mo'],
-    ['log_cohort_age_sq', f.log_cohort_age_sq, CHURN_C.log_cohort_age_sq, 'held at 14 mo'],
+    ['log_mrr', f.log_mrr, CHURN_C.log_mrr, CHURN_P.log_mrr, 'p=0.1148; business-critical marginal'],
+    ['mrr_lt100', f.mrr_lt100, CHURN_C.mrr_lt100, CHURN_P.mrr_lt100, '~1 below $100'],
+    ['mrr_100_499', f.mrr_100_499, CHURN_C.mrr_100_499, CHURN_P.mrr_100_499, '$100–$499'],
+    ['mrr_1000p', f.mrr_1000p, CHURN_C.mrr_1000p, CHURN_P.mrr_1000p, '~1 above $1k'],
+    ['high_mrr', f.high_mrr, CHURN_C.high_mrr, CHURN_P.high_mrr, '~1 above $500'],
+    ['ob_collected_pct_mrr_sq', f.ob_collected_pct_mrr_sq, CHURN_C.ob_collected_pct_mrr_sq, CHURN_P.ob_collected_pct_mrr_sq, 'onboarding ratio squared'],
+    ['ob_actually_paid', f.ob_actually_paid, CHURN_C.ob_actually_paid, CHURN_P.ob_actually_paid, 'smooth 0→1'],
+    ['ob_waived_post_sign', f.ob_waived_post_sign, CHURN_C.ob_waived_post_sign, CHURN_P.ob_waived_post_sign, 'proxy when onboarding = 0'],
+    ['ob_gap_x_mrr', f.ob_gap_x_mrr, CHURN_C.ob_gap_x_mrr, CHURN_P.ob_gap_x_mrr, 'max(0,1−ob_ratio)×log(mrr)'],
+    ['any_free', f.any_free, CHURN_C.any_free, CHURN_P.any_free, 'fm > 0'],
+    ['free_2mo_exact', f.free_2mo_exact, CHURN_C.free_2mo_exact, CHURN_P.free_2mo_exact, 'fm == 2'],
+    ['free_3plus', f.free_3plus, CHURN_C.free_3plus, CHURN_P.free_3plus, 'fm >= 3'],
+    ['anyfree_x_log_mrr', f.anyfree_x_log_mrr, CHURN_C.anyfree_x_log_mrr, CHURN_P.anyfree_x_log_mrr, 'exploratory interaction'],
+    ['anyfree_x_high_mrr', f.anyfree_x_high_mrr, CHURN_C.anyfree_x_high_mrr, CHURN_P.anyfree_x_high_mrr, 'exploratory interaction'],
+    ['anyfree_x_ob_collected_pct_mrr_sq', f.anyfree_x_ob_collected_pct_mrr_sq, CHURN_C.anyfree_x_ob_collected_pct_mrr_sq, CHURN_P.anyfree_x_ob_collected_pct_mrr_sq, 'business-critical marginal p=0.1443'],
+    ['anyfree_x_ob_actually_paid', f.anyfree_x_ob_actually_paid, CHURN_C.anyfree_x_ob_actually_paid, CHURN_P.anyfree_x_ob_actually_paid, 'exploratory interaction'],
+    ['anyfree_x_ob_waived_post_sign', f.anyfree_x_ob_waived_post_sign, CHURN_C.anyfree_x_ob_waived_post_sign, CHURN_P.anyfree_x_ob_waived_post_sign, 'exploratory interaction'],
+    ['anyfree_x_ob_gap_x_mrr', f.anyfree_x_ob_gap_x_mrr, CHURN_C.anyfree_x_ob_gap_x_mrr, CHURN_P.anyfree_x_ob_gap_x_mrr, 'exploratory interaction'],
+    ['log_tenure', f.log_tenure, CHURN_C.log_tenure, CHURN_P.log_tenure, 'varies by month in LTV'],
+    ['log_tenure_sq', f.log_tenure_sq, CHURN_C.log_tenure_sq, CHURN_P.log_tenure_sq, 'varies by month in LTV'],
+    ['log_cohort_age', f.log_cohort_age, CHURN_C.log_cohort_age, CHURN_P.log_cohort_age, 'held at 14 mo'],
+    ['log_cohort_age_sq', f.log_cohort_age_sq, CHURN_C.log_cohort_age_sq, CHURN_P.log_cohort_age_sq, 'held at 14 mo'],
   ]);
+
   renderAudit('auditLtv', [
-    ['uncalibrated analytical LTV', bk.analytical, 1.0000, 'upfront + expected MRR through 120 mo'],
-    ['calibration factor', CALIBRATION, CALIBRATION, 'actual/analytical median'],
-    ['calibrated expected LTV', ltv, 1.0000, 'used for LTV:CAC and net value'],
-    ['mean monthly hazard benchmark', 0.049832, 0.049832, 'population mean from regression output'],
-    ['12-mo churn benchmark', 0.4585, 0.4585, 'population implied churn'],
-    ['24-mo churn benchmark', 0.7068, 0.7068, 'population implied churn'],
+    ['uncalibrated analytical LTV', bk.analytical, 1.0000, null, 'upfront + expected MRR through 120 mo'],
+    ['calibration factor', CALIBRATION, CALIBRATION, null, 'actual/analytical median'],
+    ['calibrated expected LTV', ltv, 1.0000, null, 'used for LTV:CAC and net value'],
+    ['mean monthly hazard benchmark', 0.049831, 0.049831, null, 'population mean from compact model'],
+    ['12-mo churn benchmark', 0.4585, 0.4585, null, 'population implied churn'],
+    ['24-mo churn benchmark', 0.7068, 0.7068, null, 'population implied churn'],
   ]);
 }
-updateLockUI(); update();
+
+updateLockUI();
+update();
 </script>
-</body>
-</html>
+</b
