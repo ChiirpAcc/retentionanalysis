@@ -225,10 +225,21 @@ function features(mrr, obPct, fm, month=9){
   const logMrr = Math.log(Math.max(mrr, 1));
   const obRatio = obPct / 100;
   const obSq = obRatio ** 2;
+
+  // Regression definition: ob_pct_gap = contracted onboarding pct - actual collected onboarding pct.
+  // The calculator has one onboarding slider, so we treat 100% of MRR as the reference contracted OB
+  // and the slider as collected OB. This makes under-collection visible through ob_gap_x_mrr.
   const obGap = Math.max(0, 1 - obRatio);
+
   const t = smoothTiers(mrr);
   const logTen = Math.log(Math.max(month, 1));
   const anyFree = fm > 0 ? 1 : 0;
+
+  // Regression definition: ob_waived_post_sign = contracted OB > 0 AND collected OB == 0.
+  // The current calculator has no separate contracted-vs-collected controls, so do not infer
+  // post-sign waiver from the onboarding slider. Hold it at 0 unless a future waiver toggle is added.
+  const obWaivedPostSign = 0;
+  const obActuallyPaid = smoothObPaid(obPct);
 
   return {
     log_mrr: logMrr,
@@ -237,8 +248,8 @@ function features(mrr, obPct, fm, month=9){
     mrr_1000p: t.mrr_1000p,
     high_mrr: t.high_mrr,
     ob_collected_pct_mrr_sq: obSq,
-    ob_actually_paid: smoothObPaid(obPct),
-    ob_waived_post_sign: obPct === 0 ? 1 : 0,
+    ob_actually_paid: obActuallyPaid,
+    ob_waived_post_sign: obWaivedPostSign,
     ob_gap_x_mrr: obGap * logMrr,
     any_free: anyFree,
     free_2mo_exact: fm === 2 ? 1 : 0,
@@ -247,8 +258,8 @@ function features(mrr, obPct, fm, month=9){
     anyfree_x_log_mrr: anyFree * logMrr,
     anyfree_x_high_mrr: anyFree * t.high_mrr,
     anyfree_x_ob_collected_pct_mrr_sq: anyFree * obSq,
-    anyfree_x_ob_actually_paid: anyFree * smoothObPaid(obPct),
-    anyfree_x_ob_waived_post_sign: anyFree * (obPct === 0 ? 1 : 0),
+    anyfree_x_ob_actually_paid: anyFree * obActuallyPaid,
+    anyfree_x_ob_waived_post_sign: anyFree * obWaivedPostSign,
     anyfree_x_ob_gap_x_mrr: anyFree * obGap * logMrr,
     log_cohort_age: LOG_COH,
     log_cohort_age_sq: LOG_COH2,
@@ -459,22 +470,27 @@ function optimize(goal){
 
   const curMrr = +byId('sliderMrr').value;
   const curOb = +byId('sliderOb').value;
+  const curFm = fm;
+  const cac = +byId('sliderCac').value;
 
+  // Locked variables are still used in scoring; they are just not changed.
+  // Example: if MRR is locked, every candidate is evaluated at the locked MRR.
   const mrrRange = locks.mrr ? [curMrr] : MRR;
   const obRange = locks.ob ? [curOb] : OB;
-  const fmRange = locks.fm ? [fm] : FM;
+  const fmRange = locks.fm ? [curFm] : FM;
 
   let bestMrr = curMrr;
   let bestOb = curOb;
-  let bestFm = fm;
+  let bestFm = curFm;
   let best = goal === 'ltv' ? -Infinity : Infinity;
 
   for(const m of mrrRange){
     for(const o of obRange){
       for(const f of fmRange){
-        const s = goal === 'ltv' ? ltvBreakdown(m,o,f).calibrated : churn12(m,o,f);
-        if((goal === 'ltv' && s > best) || (goal === 'churn' && s < best)){
-          best = s;
+        const ltv = ltvBreakdown(m,o,f).calibrated;
+        const score = goal === 'ltv' ? ltv : churn12(m,o,f);
+        if((goal === 'ltv' && score > best) || (goal === 'churn' && score < best)){
+          best = score;
           bestMrr = m;
           bestOb = o;
           bestFm = f;
@@ -486,7 +502,15 @@ function optimize(goal){
   if(!locks.mrr) byId('sliderMrr').value = bestMrr;
   if(!locks.ob) byId('sliderOb').value = bestOb;
   if(!locks.fm) setFm(bestFm);
+
   update();
+
+  const locked = Object.entries(locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
+  if(locked.length){
+    const metric = goal === 'ltv' ? fmtUSD(best) + ' calibrated LTV' : fmtPct(best) + ' 12-mo churn';
+    byId('lockNote').style.display = 'flex';
+    byId('lockNoteText').textContent = locked.join(', ') + ' locked and included in optimization score — best unlocked result: ' + metric + ' at ' + fmtUSD(bestMrr) + ' MRR, ' + bestOb + '% OB, ' + bestFm + ' free mo, ' + fmtUSD(cac) + ' CAC';
+  }
 }
 
 byId('btnMinChurn').addEventListener('click',()=>{
@@ -579,7 +603,7 @@ function update(){
   } else if(fm >= 3){
     ins = `<strong>${fm} free months.</strong> The compact model estimates higher churn odds for 3+ free months, but the coefficient is weaker than the 2-month signal. Treat this as directional.`;
   } else if(obPct === 0){
-    ins = `<strong>No onboarding collected.</strong> The model applies the onboarding waiver/gap terms. Under-collecting onboarding increases churn risk through <code>ob_gap_x_mrr</code>.`;
+    ins = `<strong>No onboarding collected.</strong> The model applies the onboarding paid and onboarding-gap terms. <code>ob_waived_post_sign</code> is held at 0 because the calculator does not have a separate post-sign waiver toggle.`;
   } else if(ltvCac < 1){
     ins = `<strong>Underwater deal.</strong> At ${fmtUSD(cac)} CAC, calibrated LTV:CAC is ${ltvCac.toFixed(2)}×. Raise MRR, collect onboarding, reduce free months, or lower CAC.`;
   } else {
@@ -595,7 +619,7 @@ function update(){
     ['high_mrr', f.high_mrr, CHURN_C.high_mrr, CHURN_P.high_mrr, '~1 above $500'],
     ['ob_collected_pct_mrr_sq', f.ob_collected_pct_mrr_sq, CHURN_C.ob_collected_pct_mrr_sq, CHURN_P.ob_collected_pct_mrr_sq, 'onboarding ratio squared'],
     ['ob_actually_paid', f.ob_actually_paid, CHURN_C.ob_actually_paid, CHURN_P.ob_actually_paid, 'smooth 0→1'],
-    ['ob_waived_post_sign', f.ob_waived_post_sign, CHURN_C.ob_waived_post_sign, CHURN_P.ob_waived_post_sign, 'proxy when onboarding = 0'],
+    ['ob_waived_post_sign', f.ob_waived_post_sign, CHURN_C.ob_waived_post_sign, CHURN_P.ob_waived_post_sign, 'held at 0; no waiver toggle'],
     ['ob_gap_x_mrr', f.ob_gap_x_mrr, CHURN_C.ob_gap_x_mrr, CHURN_P.ob_gap_x_mrr, 'max(0,1−ob_ratio)×log(mrr)'],
     ['any_free', f.any_free, CHURN_C.any_free, CHURN_P.any_free, 'fm > 0'],
     ['free_2mo_exact', f.free_2mo_exact, CHURN_C.free_2mo_exact, CHURN_P.free_2mo_exact, 'fm == 2'],
@@ -604,7 +628,7 @@ function update(){
     ['anyfree_x_high_mrr', f.anyfree_x_high_mrr, CHURN_C.anyfree_x_high_mrr, CHURN_P.anyfree_x_high_mrr, 'exploratory interaction'],
     ['anyfree_x_ob_collected_pct_mrr_sq', f.anyfree_x_ob_collected_pct_mrr_sq, CHURN_C.anyfree_x_ob_collected_pct_mrr_sq, CHURN_P.anyfree_x_ob_collected_pct_mrr_sq, 'business-critical marginal p=0.1443'],
     ['anyfree_x_ob_actually_paid', f.anyfree_x_ob_actually_paid, CHURN_C.anyfree_x_ob_actually_paid, CHURN_P.anyfree_x_ob_actually_paid, 'exploratory interaction'],
-    ['anyfree_x_ob_waived_post_sign', f.anyfree_x_ob_waived_post_sign, CHURN_C.anyfree_x_ob_waived_post_sign, CHURN_P.anyfree_x_ob_waived_post_sign, 'exploratory interaction'],
+    ['anyfree_x_ob_waived_post_sign', f.anyfree_x_ob_waived_post_sign, CHURN_C.anyfree_x_ob_waived_post_sign, CHURN_P.anyfree_x_ob_waived_post_sign, 'held at 0; no waiver toggle'],
     ['anyfree_x_ob_gap_x_mrr', f.anyfree_x_ob_gap_x_mrr, CHURN_C.anyfree_x_ob_gap_x_mrr, CHURN_P.anyfree_x_ob_gap_x_mrr, 'exploratory interaction'],
     ['log_tenure', f.log_tenure, CHURN_C.log_tenure, CHURN_P.log_tenure, 'varies by month in LTV'],
     ['log_tenure_sq', f.log_tenure_sq, CHURN_C.log_tenure_sq, CHURN_P.log_tenure_sq, 'varies by month in LTV'],
@@ -625,4 +649,5 @@ function update(){
 updateLockUI();
 update();
 </script>
-</b
+</body>
+</html>
