@@ -86,6 +86,14 @@ code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radi
 .audit-note{display:block;color:var(--text3);font-size:10px;margin-top:2px}
 .audit-live,.audit-coef,.audit-p{text-align:right;font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
 .dim{color:var(--text3)}
+.sensitivity{margin-top:14px;border:1px solid var(--line);background:#121722;border-radius:20px;padding:16px}
+.chart-hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.chart-title{font-weight:800;color:var(--text);font-size:14px}
+.chart-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chart-controls select{background:#0b0e14;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:12px}
+.chart-note{color:var(--text3);font-size:11px;margin-top:8px;line-height:1.35}
+.chart-wrap{position:relative;height:250px;background:#0b0e14;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:8px}
+#sensitivityCanvas{width:100%;height:100%;display:block}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.metrics-grid{grid-template-columns:1fr 1fr}.hdr,.opt-row{grid-template-columns:1fr;display:grid}.hdr{align-items:start}}
 @media(max-width:560px){.app{padding:14px}.metrics-grid{grid-template-columns:1fr}.audit-row{grid-template-columns:1fr .6fr .6fr .6fr}.metric-val{font-size:28px}}
 </style>
@@ -180,6 +188,32 @@ code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radi
       </div>
 
       <div class="insight" id="insight"></div>
+
+      <div class="sensitivity">
+        <div class="chart-hdr">
+          <div>
+            <div class="chart-title">Sensitivity chart</div>
+            <div class="chart-note">Sweep one input while the other current/locked inputs stay fixed.</div>
+          </div>
+          <div class="chart-controls">
+            <select id="chartX">
+              <option value="mrr">X: MRR</option>
+              <option value="ob">X: Onboarding %</option>
+              <option value="fm">X: Free months</option>
+              <option value="cac">X: CAC</option>
+            </select>
+            <select id="chartY">
+              <option value="ltv">Y: Calibrated LTV</option>
+              <option value="churn">Y: 12-mo churn</option>
+              <option value="ratio">Y: LTV:CAC</option>
+              <option value="net">Y: Net value</option>
+              <option value="payback">Y: CAC payback</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="sensitivityCanvas"></canvas></div>
+        <div class="chart-note" id="chartNote"></div>
+      </div>
 
       <div class="audit">
         <div class="audit-hdr"><span>Variable audit — compact churn model</span><span style="color:var(--text3);font-weight:400">value · coef · p</span></div>
@@ -454,6 +488,8 @@ function setFm(v){
 byId('sliderMrr').addEventListener('input',()=>{clearOpt(); update();});
 byId('sliderOb').addEventListener('input',()=>{clearOpt(); update();});
 byId('sliderCac').addEventListener('input',()=>update());
+byId('chartX').addEventListener('change',()=>update());
+byId('chartY').addEventListener('change',()=>update());
 
 function clearOpt(){
   document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('active-opt'));
@@ -532,7 +568,150 @@ function renderAudit(id, rows){
   }).join('');
 }
 
-function update(){
+function chartSeries(currentMrr, currentOb, currentFm, currentCac, xKey, yKey){
+  let xs = [];
+  if(xKey === 'mrr'){
+    for(let v=99; v<=3000; v+=50) xs.push(v);
+  } else if(xKey === 'ob'){
+    for(let v=0; v<=200; v+=5) xs.push(v);
+  } else if(xKey === 'fm'){
+    xs = [0,1,2,3,4,5,6];
+  } else if(xKey === 'cac'){
+    for(let v=500; v<=12000; v+=250) xs.push(v);
+  }
+
+  return xs.map(x=>{
+    const m = xKey === 'mrr' ? x : currentMrr;
+    const o = xKey === 'ob' ? x : currentOb;
+    const f = xKey === 'fm' ? x : currentFm;
+    const c = xKey === 'cac' ? x : currentCac;
+    const bk = ltvBreakdown(m,o,f);
+    const ltv = bk.calibrated;
+    const churn = churn12(m,o,f);
+    const ratio = ltv / c;
+    const net = ltv - c;
+    const pbRaw = paybackMonth(m,o,f,c);
+    const payback = pbRaw === null ? 61 : pbRaw;
+    let y;
+    if(yKey === 'ltv') y = ltv;
+    else if(yKey === 'churn') y = churn;
+    else if(yKey === 'ratio') y = ratio;
+    else if(yKey === 'net') y = net;
+    else y = payback;
+    return {x,y,m,o,f,c,ltv,churn,ratio,net,payback:pbRaw};
+  });
+}
+
+function fmtChartVal(yKey, v){
+  if(yKey === 'ltv' || yKey === 'net') return fmtUSD(v);
+  if(yKey === 'churn') return fmtPct(v);
+  if(yKey === 'ratio') return v.toFixed(2) + '×';
+  if(v >= 61) return '>60 mo';
+  return Math.round(v) + ' mo';
+}
+
+function fmtXVal(xKey, v){
+  if(xKey === 'mrr') return fmtUSD(v);
+  if(xKey === 'ob') return Math.round(v) + '%';
+  if(xKey === 'fm') return Math.round(v) + ' mo';
+  return fmtUSD(v);
+}
+
+function drawSensitivityChart(mrr, obPct, fmVal, cac){
+  const canvas = byId('sensitivityCanvas');
+  if(!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  const w = rect.width;
+  const h = rect.height;
+  ctx.clearRect(0,0,w,h);
+
+  const xKey = byId('chartX').value;
+  const yKey = byId('chartY').value;
+  const data = chartSeries(mrr, obPct, fmVal, cac, xKey, yKey);
+  if(!data.length) return;
+
+  const pad = {l:62,r:18,t:18,b:42};
+  const plotW = w - pad.l - pad.r;
+  const plotH = h - pad.t - pad.b;
+  const xs = data.map(d=>d.x);
+  const ys = data.map(d=>d.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  let minY = Math.min(...ys);
+  let maxY = Math.max(...ys);
+  if(yKey === 'churn') { minY = 0; maxY = Math.max(maxY, .05); }
+  if(yKey === 'ratio') { minY = 0; maxY = Math.max(maxY, 1); }
+  if(yKey === 'payback') { minY = 0; maxY = 61; }
+  if(minY === maxY){ minY -= 1; maxY += 1; }
+  const yPad = (maxY - minY) * .08;
+  if(yKey !== 'churn' && yKey !== 'ratio' && yKey !== 'payback') { minY -= yPad; maxY += yPad; }
+
+  const xToPx = x => pad.l + ((x - minX) / (maxX - minX || 1)) * plotW;
+  const yToPx = y => pad.t + (1 - ((y - minY) / (maxY - minY || 1))) * plotH;
+
+  ctx.strokeStyle = 'rgba(255,255,255,.12)';
+  ctx.lineWidth = 1;
+  ctx.font = '11px Inter, system-ui, sans-serif';
+  ctx.fillStyle = '#737d91';
+
+  for(let i=0; i<=4; i++){
+    const yy = pad.t + (plotH * i / 4);
+    const val = maxY - (maxY-minY) * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(w-pad.r, yy); ctx.stroke();
+    ctx.fillText(fmtChartVal(yKey, val), 8, yy+4);
+  }
+
+  for(let i=0; i<=4; i++){
+    const xx = pad.l + (plotW * i / 4);
+    const val = minX + (maxX-minX) * i / 4;
+    ctx.fillText(fmtXVal(xKey, val), xx-18, h-14);
+  }
+
+  ctx.strokeStyle = '#7dd3fc';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  data.forEach((d,i)=>{
+    const xx = xToPx(d.x);
+    const yy = yToPx(d.y);
+    if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+  });
+  ctx.stroke();
+
+  const currentX = xKey === 'mrr' ? mrr : xKey === 'ob' ? obPct : xKey === 'fm' ? fmVal : cac;
+  const nearest = data.reduce((best,d)=>Math.abs(d.x-currentX)<Math.abs(best.x-currentX)?d:best, data[0]);
+  const nx = xToPx(nearest.x);
+  const ny = yToPx(nearest.y);
+  ctx.fillStyle = '#f4f6fb';
+  ctx.beginPath(); ctx.arc(nx, ny, 4.5, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = 'rgba(244,246,251,.55)';
+  ctx.beginPath(); ctx.moveTo(nx, pad.t); ctx.lineTo(nx, pad.t+plotH); ctx.stroke();
+
+  const label = fmtXVal(xKey, nearest.x) + ' → ' + fmtChartVal(yKey, nearest.y);
+  ctx.fillStyle = 'rgba(11,14,20,.92)';
+  const labelW = Math.min(210, Math.max(120, label.length * 6.5 + 18));
+  const lx = Math.min(w - labelW - 8, Math.max(8, nx - labelW / 2));
+  const ly = Math.max(8, ny - 34);
+  ctx.fillRect(lx, ly, labelW, 24);
+  ctx.strokeStyle = 'rgba(255,255,255,.16)';
+  ctx.strokeRect(lx, ly, labelW, 24);
+  ctx.fillStyle = '#f4f6fb';
+  ctx.fillText(label, lx + 9, ly + 16);
+
+  const fixedParts = [];
+  if(xKey !== 'mrr') fixedParts.push('MRR ' + fmtUSD(mrr));
+  if(xKey !== 'ob') fixedParts.push('OB ' + obPct + '%');
+  if(xKey !== 'fm') fixedParts.push(fmVal + ' free mo');
+  if(xKey !== 'cac') fixedParts.push('CAC ' + fmtUSD(cac));
+  byId('chartNote').textContent = 'Curve holds ' + fixedParts.join(' · ') + ' constant. Locked variables stay fixed and still affect the curve/score.';
+}
+
+function update(){ 
   const mrr = +byId('sliderMrr').value;
   const obPct = +byId('sliderOb').value;
   const cac = +byId('sliderCac').value;
@@ -644,6 +823,8 @@ function update(){
     ['12-mo churn benchmark', 0.4585, 0.4585, null, 'population implied churn'],
     ['24-mo churn benchmark', 0.7068, 0.7068, null, 'population implied churn'],
   ]);
+
+  drawSensitivityChart(mrr, obPct, fm, cac);
 }
 
 updateLockUI();
