@@ -1,2702 +1,358 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>CHIIRP — Deal Structure Impact Analysis</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Deal Structure Calculator</title>
 <style>
 :root{
-  /* === Modern token values, mapped onto the original names === */
-  --ink:#0a0a0a;
-  --ink-soft:#525252;
-  --paper:#fafaf9;
-  --paper-warm:#f5f5f4;
-  --surface:#ffffff;
-  --surface-2:#f5f5f4;
-  --rule:#e5e5e4;
-  --rule-soft:#ebebe9;
-  --muted:#737373;
-  --accent:#047857;
-  --accent-2:#059669;
-  --accent-soft:#d1fae5;
-  --accent-tint:#ecfdf5;
-  --teal:#0369a1;
-  --teal-soft:#dbeafe;
-  --gold:#b45309;
-  --gold-soft:#fef3c7;
-  --good:#047857;
-  --good-soft:#d1fae5;
-  --bad:#b91c1c;
-  --bad-soft:#fee2e2;
-
-  /* New modern additions */
-  --shadow-sm:0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-lg:0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.04);
-  --radius:8px;
-  --radius-sm:4px;
+  --bg:#0f1117;--panel:#171a23;--panel2:#1e2330;--line:#2c3242;--text:#f4f6fb;--text2:#aeb7c8;--text3:#737d91;
+  --green:#32d583;--amber:#fdb022;--red:#f97066;--blue:#7dd3fc;--purple:#c084fc;--shadow:0 18px 60px rgba(0,0,0,.32)
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{
-  background:var(--paper);
-  color:var(--ink-soft);
-  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  font-size:14px;
-  line-height:1.55;
-  font-feature-settings:"cv11","ss01","kern";
-  -webkit-font-smoothing:antialiased;
-  letter-spacing:-0.003em;
-}
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:1;
-}
-.wrap{
-  max-width:1480px;
-  margin:0 auto;
-  padding:0 32px 80px;
-  position:relative;
-  z-index:2;
-}
-
-/* ───── Masthead ───── */
-.masthead{
-  border-bottom:1px solid var(--rule);
-  padding:32px 0 24px;
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  gap:32px;
-  align-items:center;
-  margin-bottom:0;
-}
-.brandmark{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-family:'Inter',sans-serif;
-  font-weight:600;
-  font-size:13px;
-  letter-spacing:-0.01em;
-  color:var(--ink);
-}
-.brandmark::before{
-  content:"";
-  display:inline-block;
-  width:8px;
-  height:8px;
-  background:var(--accent);
-  border-radius:2px;
-}
-.brandmark .meta{
-  color:var(--muted);
-  font-weight:500;
-  font-size:12px;
-  margin-left:4px;
-  padding-left:10px;
-  border-left:1px solid var(--rule);
-}
-.title{
-  font-family:'Fraunces',serif;
-  font-weight:500;
-  font-size:2rem;
-  line-height:1.1;
-  letter-spacing:-.025em;
-  color:var(--ink);
-  font-variation-settings:"opsz" 144;
-}
-.title em{
-  font-style:normal;
-  color:var(--accent);
-  font-weight:600;
-}
-.subtitle{
-  margin-top:6px;
-  font-size:13.5px;
-  color:var(--muted);
-  max-width:62ch;
-  line-height:1.5;
-}
-.dateline{
-  text-align:right;
-  font-family:'JetBrains Mono',monospace;
-  font-size:10.5px;
-  color:var(--muted);
-  letter-spacing:.02em;
-  line-height:1.7;
-}
-.dateline b{color:var(--ink);font-weight:600}
-
-/* ───── Tab navigation ───── */
-.tabnav{
-  display:flex;
-  gap:4px;
-  border-bottom:1px solid var(--rule);
-  margin:0 0 28px;
-  padding:18px 0 0;
-  background:transparent;
-  overflow-x:auto;
-  scrollbar-width:none;
-}
-.tabnav::-webkit-scrollbar{display:none}
-.tab{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 16px;
-  border:none;
-  background:transparent;
-  cursor:pointer;
-  font-family:'Inter',sans-serif;
-  font-size:13.5px;
-  font-weight:500;
-  color:var(--muted);
-  white-space:nowrap;
-  position:relative;
-  transition:color .12s;
-  border-radius:6px 6px 0 0;
-  margin-bottom:-1px;
-  border-bottom:2px solid transparent;
-}
-.tab .tabKicker{
-  display:none; /* removed in modern redesign */
-}
-.tab .tabLabel{
-  font-family:'Inter',sans-serif;
-  font-weight:500;
-  font-size:13.5px;
-  letter-spacing:-0.005em;
-}
-.tab:hover{color:var(--ink-soft)}
-.tab.active{
-  color:var(--ink);
-  border-bottom-color:var(--accent);
-}
-
-/* ───── Tab panes ───── */
-.pane{display:none}
-.pane.active{display:block; animation: fadeIn .2s ease-out}
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(4px)}
-  to{opacity:1; transform:translateY(0)}
-}
-
-/* ───── Section structure ───── */
-.section{
-  margin-bottom:32px;
-}
-.sectionHead{
-  display:flex;
-  align-items:baseline;
-  gap:14px;
-  padding-bottom:0;
-  margin-bottom:18px;
-}
-.sectionNumber{
-  display:none;  /* dropped in modern redesign */
-}
-.sectionTitle{
-  font-family:'Fraunces',serif;
-  font-weight:500;
-  font-size:1.5rem;
-  letter-spacing:-.022em;
-  color:var(--ink);
-  font-variation-settings:"opsz" 60;
-}
-.sectionDek{
-  margin-left:auto;
-  color:var(--muted);
-  font-size:13px;
-  max-width:52ch;
-  text-align:right;
-  line-height:1.5;
-}
-
-/* ───── Calculator layout ───── */
-.calcGrid{
-  display:grid;
-  grid-template-columns:340px 1fr;
-  gap:0;
-  border:1px solid var(--rule);
-  border-radius:var(--radius);
-  background:var(--surface);
-  box-shadow:var(--shadow-md);
-  overflow:hidden;
-}
-.controls{
-  background:var(--surface-2);
-  padding:22px 22px 24px;
-  border-right:1px solid var(--rule);
-}
-.controlsHead{
-  font-family:'Inter',sans-serif;
-  font-weight:600;
-  font-size:11px;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  color:var(--accent);
-  margin-bottom:4px;
-}
-.controlsSub{
-  font-size:12px;
-  color:var(--muted);
-  margin-bottom:16px;
-  padding-bottom:14px;
-  border-bottom:1px solid var(--rule);
-  line-height:1.45;
-}
-.field{margin-bottom:16px; position:relative}
-.field label{
-  display:flex;
-  justify-content:space-between;
-  align-items:baseline;
-  font-family:'Inter',sans-serif;
-  font-weight:500;
-  font-size:12px;
-  letter-spacing:0;
-  text-transform:none;
-  color:var(--ink);
-  margin-bottom:6px;
-}
-.field label .v{
-  font-family:'JetBrains Mono',monospace;
-  font-weight:500;
-  font-size:12px;
-  color:var(--ink-soft);
-  letter-spacing:0;
-}
-.field input[type=range]{
-  -webkit-appearance:none;
-  appearance:none;
-  width:100%;
-  background:transparent;
-  margin:6px 0;
-}
-.field input[type=range]::-webkit-slider-runnable-track{
-  background:linear-gradient(to right, var(--accent) var(--p,50%), var(--rule) var(--p,50%));
-  height:4px;
-  border-radius:2px;
-}
-.field input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  appearance:none;
-  width:16px;
-  height:16px;
-  border-radius:50%;
-  background:#ffffff;
-  border:2px solid var(--accent);
-  margin-top:-6px;
-  cursor:pointer;
-  box-shadow:0 1px 3px rgba(0,0,0,.12);
-  transition:transform .12s;
-}
-.field input[type=range]:hover::-webkit-slider-thumb{
-  transform:scale(1.15);
-}
-.field input[type=range]::-moz-range-track{
-  background:var(--rule);
-  height:4px;
-  border-radius:2px;
-}
-.field input[type=range]::-moz-range-thumb{
-  width:16px;
-  height:16px;
-  border-radius:50%;
-  background:#ffffff;
-  border:2px solid var(--accent);
-  cursor:pointer;
-}
-.field input[type=number],
-.field select{
-  width:100%;
-  border:1px solid var(--rule);
-  background:var(--surface);
-  border-radius:var(--radius-sm);
-  padding:8px 12px;
-  font-family:'Inter',sans-serif;
-  font-size:13px;
-  color:var(--ink);
-  transition:border-color .12s;
-}
-.field input[type=number]:focus,
-.field select:focus{
-  outline:none;
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px var(--accent-tint);
-}
-.field input[type=number]:focus,
-.field select:focus{
-  outline:none;
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px var(--accent-tint);
-}
-.fmRow{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:4px;
-  margin-top:4px;
-}
-.fmBtn{
-  border:1px solid var(--rule);
-  background:var(--surface);
-  color:var(--ink-soft);
-  padding:8px 0;
-  cursor:pointer;
-  font-family:'Inter',sans-serif;
-  font-size:13px;
-  font-weight:500;
-  border-radius:var(--radius-sm);
-  transition:all .12s;
-}
-.fmBtn:hover{border-color:var(--accent); color:var(--accent)}
-.fmBtn.active{
-  background:var(--accent);
-  color:#ffffff;
-  border-color:var(--accent);
-}
-.fieldHint{
-  font-size:11.5px;
-  color:var(--muted);
-  margin-top:5px;
-  line-height:1.45;
-}
-
-/* ───── Preset buttons ───── */
-.presetRow{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-  margin-bottom:18px;
-  padding-bottom:16px;
-  border-bottom:1px solid var(--rule);
-}
-.presetBtn{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:2px;
-  padding:8px 10px;
-  border:1px solid var(--rule);
-  background:var(--surface);
-  border-radius:var(--radius-sm);
-  cursor:pointer;
-  transition:all .12s;
-  text-align:left;
-}
-.presetBtn:hover{
-  border-color:var(--accent);
-  background:var(--accent-tint);
-}
-.presetBtn:active{transform:translateY(1px)}
-.presetBtn .pTitle{
-  font-family:'Inter',sans-serif;
-  font-weight:600;
-  font-size:12px;
-  color:var(--ink);
-  letter-spacing:0;
-}
-.presetBtn .pSub{
-  font-family:'Inter',sans-serif;
-  font-size:10.5px;
-  color:var(--muted);
-}
-.presetBtn.activePreset{
-  border-color:var(--accent);
-  background:var(--accent-tint);
-}
-.presetBtn.activePreset .pTitle{color:var(--accent)}
-
-/* ───── Info tooltip "ⓘ" ───── */
-.infoIcon{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  background:var(--surface-2);
-  color:var(--muted);
-  font-family:'Inter',sans-serif;
-  font-size:9px;
-  font-weight:700;
-  font-style:normal;
-  cursor:help;
-  margin-left:6px;
-  border:1px solid var(--rule);
-  vertical-align:middle;
-  position:relative;
-  transition:all .12s;
-}
-.infoIcon::before{content:"i"}
-.infoIcon:hover{
-  background:var(--accent);
-  color:#fff;
-  border-color:var(--accent);
-}
-.infoIcon:hover .tooltip,
-.infoIcon:focus .tooltip{
-  opacity:1;
-  visibility:visible;
-  transform:translate(-50%, -4px);
-}
-.tooltip{
-  position:absolute;
-  bottom:calc(100% + 8px);
-  left:50%;
-  transform:translate(-50%, 0);
-  width:240px;
-  padding:10px 12px;
-  background:var(--ink);
-  color:#fafaf9;
-  border-radius:var(--radius-sm);
-  font-family:'Inter',sans-serif;
-  font-size:11.5px;
-  font-weight:400;
-  line-height:1.5;
-  letter-spacing:0;
-  text-align:left;
-  opacity:0;
-  visibility:hidden;
-  transition:all .15s;
-  z-index:100;
-  pointer-events:none;
-  text-transform:none;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
-}
-.tooltip::after{
-  content:"";
-  position:absolute;
-  top:100%;
-  left:50%;
-  transform:translateX(-50%);
-  border:5px solid transparent;
-  border-top-color:var(--ink);
-}
-.tooltip b{color:#10b981; font-weight:600}
-
-/* ───── Output panel ───── */
-.outputs{
-  padding:24px 26px 22px;
-}
-.statRow{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  border-bottom:1px solid var(--rule);
-  padding-bottom:20px;
-  margin-bottom:18px;
-}
-.stat{
-  padding:0 20px;
-  border-left:1px solid var(--rule);
-}
-.stat:first-child{padding-left:0; border-left:none}
-.statLabel{
-  font-family:'Inter',sans-serif;
-  font-weight:500;
-  font-size:11.5px;
-  letter-spacing:0;
-  text-transform:none;
-  color:var(--muted);
-  margin-bottom:8px;
-}
-.statValue{
-  font-family:'Fraunces',serif;
-  font-weight:500;
-  font-size:1.85rem;
-  line-height:1;
-  letter-spacing:-.025em;
-  color:var(--ink);
-  font-variation-settings:"opsz" 144;
-}
-.statSub{
-  font-size:11.5px;
-  color:var(--muted);
-  margin-top:5px;
-  line-height:1.4;
-}
-.statValue.good{color:var(--good)}
-.statValue.bad{color:var(--bad)}
-.statValue.warn{color:var(--gold)}
-
-.detailGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:0;
-  border-top:1px solid var(--rule-soft);
-}
-.detailLine{
-  display:grid;
-  grid-template-columns:1fr auto;
-  padding:8px 14px;
-  border-bottom:1px solid var(--rule-soft);
-  font-size:12.5px;
-  align-items:baseline;
-}
-.detailLine:nth-child(odd){border-right:1px solid var(--rule-soft)}
-.detailLine .lbl{color:var(--ink-soft); font-style:italic}
-.detailLine .val{font-family:'JetBrains Mono',monospace; font-size:12.5px; font-weight:500}
-.detailLine .val.pos{color:var(--good)}
-.detailLine .val.neg{color:var(--bad)}
-
-/* ───── Cards / panels ───── */
-.panel{
-  background:var(--surface);
-  border:1px solid var(--rule);
-  border-radius:var(--radius);
-  padding:22px 22px 20px;
-  position:relative;
-  box-shadow:var(--shadow-sm);
-}
-.panelHead{
-  display:flex;
-  align-items:baseline;
-  gap:10px;
-  margin-bottom:6px;
-}
-.panelTitle{
-  font-family:'Inter',sans-serif;
-  font-weight:600;
-  font-size:15px;
-  letter-spacing:-.012em;
-  color:var(--ink);
-}
-.panelKicker{
-  font-family:'Inter',sans-serif;
-  font-weight:600;
-  font-size:11px;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-  color:var(--accent);
-  margin-bottom:6px;
-}
-.panelDek{
-  font-size:12.5px;
-  color:var(--muted);
-  margin-bottom:14px;
-  max-width:80ch;
-  line-height:1.5;
-}
-.cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
-.colSpan2{grid-column:span 2}
-.gap16{gap:16px}
-.mb24{margin-bottom:18px}
-
-/* ───── Tables ───── */
-.dataTable{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-  font-family:'Inter',sans-serif;
-}
-.dataTable th{
-  text-align:left;
-  font-family:'Inter',sans-serif;
-  font-weight:500;
-  font-size:11px;
-  letter-spacing:0;
-  text-transform:none;
-  color:var(--muted);
-  padding:10px 10px;
-  border-bottom:1px solid var(--rule-strong, var(--rule));
-  white-space:nowrap;
-}
-.dataTable th.num,.dataTable td.num{text-align:right;font-family:'JetBrains Mono',monospace;font-size:12.5px}
-.dataTable td{
-  padding:9px 10px;
-  border-bottom:1px solid var(--rule-soft);
-  vertical-align:middle;
-  color:var(--ink-soft);
-}
-.dataTable tr.highlight td{background:var(--accent-tint, var(--accent-soft))}
-.dataTable tr.subhead td{
-  background:var(--surface-2);
-  font-family:'Inter',sans-serif;
-  font-weight:600;
-  font-size:11px;
-  letter-spacing:0;
-  text-transform:none;
-  color:var(--ink-soft);
-}
-.dataTable tbody tr:hover{background:var(--surface-2)}
-
-/* ───── Tradeoff inline bar ───── */
-.tradeoffBar{
-  display:flex;
-  align-items:center;
-  gap:2px;
-  width:130px;
-  height:10px;
-  position:relative;
-}
-.tradeoffBar .churnBar,
-.tradeoffBar .ltvBar{
-  height:8px;
-  border-radius:1px;
-  transition:width .25s;
-}
-.tradeoffBar .churnBar{
-  background:var(--bad);
-  margin-right:auto;
-  align-self:center;
-}
-.tradeoffBar .ltvBar{
-  background:var(--accent);
-  margin-left:auto;
-  align-self:center;
-}
-.tradeoffBar .divider{
-  width:1px;
-  height:12px;
-  background:var(--rule-strong, var(--rule));
-  flex-shrink:0;
-}
-.tradeoffBarLabel{
-  display:flex;
-  justify-content:space-between;
-  font-family:'Inter',sans-serif;
-  font-size:9.5px;
-  color:var(--muted);
-  margin-top:2px;
-  width:130px;
-}
-
-/* ───── Heatmap ───── */
-.heatmap{
-  display:grid;
-  grid-template-columns:auto repeat(4,1fr);
-  gap:2px;
-  font-family:'JetBrains Mono',monospace;
-  font-size:11.5px;
-}
-.heatmap .hLbl{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:8px;
-  background:transparent;
-  font-family:'Inter',sans-serif;
-  font-weight:500;
-  font-size:11px;
-  letter-spacing:0;
-  text-transform:none;
-  color:var(--muted);
-}
-.heatmap .hRow{
-  display:flex;
-  align-items:center;
-  padding:8px 10px;
-  font-family:'Inter',sans-serif;
-  font-weight:500;
-  font-size:11px;
-  color:var(--ink-soft);
-  white-space:nowrap;
-}
-.heatmap .hCell{
-  padding:12px 8px;
-  text-align:center;
-  font-weight:500;
-  letter-spacing:0;
-  position:relative;
-  cursor:default;
-  border-radius:var(--radius-sm);
-  font-family:'JetBrains Mono',monospace;
-  font-size:12.5px;
-}
-.heatmap .hCell .sub{
-  display:block;
-  font-size:10px;
-  font-weight:400;
-  font-style:normal;
-  margin-top:2px;
-  opacity:.85;
-  font-family:'Inter',sans-serif;
-}
-.heatmap .hCell.optimal::after{
-  content:"★";
-  position:absolute;
-  top:2px;
-  right:5px;
-  font-size:10px;
-  color:#ffd700;
-}
-
-/* ───── Pills / tags ───── */
-.pill{
-  font-family:'Inter',sans-serif;
-  font-size:11px;
-  font-weight:500;
-  padding:2px 8px;
-  letter-spacing:0;
-  display:inline-block;
-  border:1px solid;
-  border-radius:99px;
-}
-.pill.good{background:var(--good-soft);color:var(--good);border-color:transparent}
-.pill.warn{background:var(--gold-soft);color:var(--gold);border-color:transparent}
-.pill.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
-.pill.neutral{background:var(--surface-2);color:var(--ink-soft);border-color:transparent}
-
-/* ───── Charts ───── */
-.chartBox{
-  position:relative;
-  height:300px;
-  margin-top:8px;
-}
-.chartBox.tall{height:360px}
-.chartBox.short{height:230px}
-
-/* ───── Footnote ───── */
-.footnote{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:12px;
-  padding:10px 14px;
-  background:var(--surface-2);
-  border-radius:var(--radius-sm);
-  border-left:none;
-  line-height:1.5;
-}
-.legend{
-  display:flex;
-  gap:16px;
-  flex-wrap:wrap;
-  margin-top:12px;
-  font-size:11.5px;
-  color:var(--ink-soft);
-}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend .swatch{width:14px;height:3px;display:inline-block;border-radius:2px}
-
-/* ───── Key insight callout ───── */
-.keyInsight{
-  background:var(--accent-tint, var(--accent-soft));
-  border:1px solid var(--accent-soft);
-  border-left:3px solid var(--accent);
-  border-radius:var(--radius-sm);
-  padding:12px 16px;
-  margin-top:14px;
-  font-size:13px;
-  color:var(--ink-soft);
-  line-height:1.55;
-}
-.keyInsight strong{
-  font-family:'Inter',sans-serif;
-  font-weight:600;
-  color:var(--accent);
-  font-size:11px;
-  letter-spacing:.02em;
-  text-transform:uppercase;
-  display:block;
-  margin-bottom:4px;
-}
-
-/* ───── Footer ───── */
-.footer{
-  margin-top:40px;
-  padding-top:20px;
-  border-top:1px solid var(--rule);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:12px;
-  color:var(--muted);
-  letter-spacing:0;
-}
-.footer .mark{
-  font-family:'Inter',sans-serif;
-  font-style:normal;
-  font-weight:600;
-  letter-spacing:0;
-  text-transform:none;
-  color:var(--ink-soft);
-}
-
-/* ───── Responsive ───── */
-@media(max-width:1100px){
-  .calcGrid{grid-template-columns:1fr}
-  .controls{border-right:none;border-bottom:1px solid var(--rule)}
-  .cols2,.cols3{grid-template-columns:1fr}
-  .colSpan2{grid-column:auto}
-  .statRow{grid-template-columns:repeat(2,1fr); gap:14px 0}
-  .stat{padding:8px 14px;border-left:1px solid var(--rule);border-bottom:1px solid var(--rule-soft)}
-  .detailGrid{grid-template-columns:1fr}
-  .detailLine:nth-child(odd){border-right:none}
-  .masthead{grid-template-columns:1fr;gap:12px}
-  .dateline{text-align:left}
-  .title{font-size:2.1rem}
-  .heatmap{font-size:10.5px}
-  .tab{padding:11px 16px 10px}
-  .tab .tabLabel{font-size:.92rem}
-}
-@media(max-width:640px){
-  .wrap{padding:0 16px 60px}
-  .statRow{grid-template-columns:1fr}
-  .heatmap{grid-template-columns:auto repeat(4,1fr); font-size:9.5px}
-  .heatmap .hCell{padding:8px 4px}
-  .tab{padding:10px 14px 9px}
-  .tab .tabKicker{font-size:8.5px}
-  .tab .tabLabel{font-size:.86rem}
-}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top left,#1b2540 0,#0f1117 42%,#0b0d12 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{max-width:1180px;margin:0 auto;padding:28px}.hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}.hdr h1{margin:0;font-size:30px;letter-spacing:-.03em}.tag{font-size:12px;color:var(--text2);border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.04)}.opt-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}.opt-btn{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));color:var(--text);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;text-align:left;box-shadow:var(--shadow)}.opt-btn:hover,.active-opt{border-color:#5d6b88;transform:translateY(-1px)}.opt-icon{height:36px;width:36px;border-radius:12px;display:grid;place-items:center;font-size:21px;font-weight:800}.min-churn .opt-icon{background:rgba(50,213,131,.13);color:var(--green)}.max-ltv .opt-icon{background:rgba(192,132,252,.13);color:var(--purple)}.opt-sub{display:block;color:var(--text3);font-size:12px;margin-top:2px}.grid{display:grid;grid-template-columns:360px 1fr;gap:16px}.controls,.outputs{background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}.field{margin:0}.field-hdr,.field-val-row{display:flex;justify-content:space-between;align-items:center;gap:10px}.field-lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);font-weight:700}.field-val{font-size:28px;font-weight:800;letter-spacing:-.03em}.lock-btn{border:1px solid var(--line);background:#11151e;color:var(--text);height:32px;width:38px;border-radius:10px;cursor:pointer}.lock-btn.locked{background:rgba(253,176,34,.12);border-color:rgba(253,176,34,.45)}input[type=range]{width:100%;accent-color:var(--blue);margin-top:8px}.locked-slider{opacity:.45;pointer-events:none}.range-ends{display:flex;justify-content:space-between;color:var(--text3);font-size:11px;margin-top:2px}.divider{height:1px;background:var(--line);margin:18px 0}.fm-pills{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:10px}.fm-pill{border:1px solid var(--line);border-radius:12px;text-align:center;padding:9px 0;cursor:pointer;color:var(--text2);background:#11151e;font-weight:700}.fm-pill.active{background:rgba(125,211,252,.14);border-color:rgba(125,211,252,.62);color:var(--text)}.locked-pill{opacity:.48;cursor:not-allowed}.cac-lbl{color:var(--purple)}.cac-slider{accent-color:var(--purple)!important}.lock-note{margin-top:14px;padding:10px;border-radius:14px;border:1px solid rgba(253,176,34,.32);background:rgba(253,176,34,.08);color:#fedf89;font-size:12px;gap:8px}.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.metric-card{background:linear-gradient(180deg,var(--panel2),#141822);border:1px solid var(--line);border-radius:20px;padding:16px;min-height:118px}.metric-card.primary{border-color:rgba(125,211,252,.42)}.metric-lbl{color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}.metric-val{font-size:31px;letter-spacing:-.04em;font-weight:900;margin-top:10px}.metric-sub{color:var(--text3);font-size:12px;margin-top:4px}.good{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}.purple{color:var(--purple)}.churn-vis,.bk,.insight,.audit{margin-top:14px;border:1px solid var(--line);background:#121722;border-radius:20px;padding:16px}.bar-hdr{display:flex;justify-content:space-between;color:var(--text2);font-size:12px;font-weight:800;letter-spacing:.08em}.bar-track{height:14px;background:#0b0e14;border-radius:999px;overflow:hidden;margin-top:8px}.bar-fill{height:100%;border-radius:999px;transition:width .18s ease,background .18s ease}.bk-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}.bk-row:last-child{border-bottom:0}.bk-lbl{color:var(--text2)}.bk-val{font-variant-numeric:tabular-nums;font-weight:800}.pos{color:var(--green)}.neg{color:var(--red)}.insight{line-height:1.5;color:var(--text2)}code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radius:7px;color:var(--blue)}.audit-hdr{display:flex;justify-content:space-between;gap:12px;font-weight:800}.audit-section{margin-top:14px;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:900}.audit-row{display:grid;grid-template-columns:1.55fr .55fr .55fr;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.055);font-size:12px}.audit-var{color:var(--text2)}.audit-note{display:block;color:var(--text3);font-size:10px;margin-top:2px}.audit-live,.audit-coef{text-align:right;font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace}.dim{color:var(--text3)}@media(max-width:900px){.grid{grid-template-columns:1fr}.metrics-grid{grid-template-columns:1fr 1fr}.hdr,.opt-row{grid-template-columns:1fr;display:grid}.hdr{align-items:start}}@media(max-width:560px){.app{padding:14px}.metrics-grid{grid-template-columns:1fr}.audit-row{grid-template-columns:1fr .6fr .6fr}.metric-val{font-size:28px}}
 </style>
 </head>
-
 <body>
-<div class="wrap">
-
-  <!-- ═══════════════ MASTHEAD ═══════════════ -->
-  <header class="masthead">
-    <div class="brandmark">CHIIRP<span class="meta">Q1 2026 Effects</span></div>
-    <div>
-      <h1 class="title">The price of a <em>free month</em></h1>
-      <p class="subtitle">An interactive analysis of how onboarding fees and free-month structure affect 12-month churn, customer lifetime value, and the path to CAC recovery — calibrated on 2,400&thinsp;+ historical accounts.</p>
-    </div>
-    <div class="dateline">
-      n = <b>2,864</b> LTV<br>
-      n = <b>2,404</b> churn<br>
-      r = <b>−0.54</b> CAC × WR
-    </div>
-  </header>
-
-  <!-- ═══════════════ TAB NAVIGATION ═══════════════ -->
-  <nav class="tabnav" role="tablist">
-    <button class="tab active" role="tab" data-pane="calc">
-      <span class="tabKicker">I · Tool</span>
-      <span class="tabLabel">Calculator</span>
-    </button>
-    <button class="tab" role="tab" data-pane="tradeoff">
-      <span class="tabKicker">II · Comparison</span>
-      <span class="tabLabel">Tradeoff tables</span>
-    </button>
-    <button class="tab" role="tab" data-pane="curves">
-      <span class="tabKicker">III · Evidence</span>
-      <span class="tabLabel">Model curves</span>
-    </button>
-    <button class="tab" role="tab" data-pane="cac">
-      <span class="tabKicker">IV · Stress test</span>
-      <span class="tabLabel">CAC scenarios</span>
-    </button>
-    <button class="tab" role="tab" data-pane="method">
-      <span class="tabKicker">V · Reference</span>
-      <span class="tabLabel">Methodology</span>
-    </button>
-  </nav>
-
-  <!-- ═══════════════ TAB I · CALCULATOR ═══════════════ -->
-  <div class="pane active" id="pane-calc">
-
-  <section class="section">
-    <div class="sectionHead">
-      <span class="sectionNumber">I</span>
-      <h2 class="sectionTitle">Deal-structure calculator</h2>
-      <p class="sectionDek">Move the controls. Each output recalculates from the filtered econometric models.</p>
-    </div>
-
-    <div class="calcGrid">
-
-      <!-- ──── CONTROLS ──── -->
-      <div class="controls">
-        <div class="controlsHead">Inputs</div>
-        <div class="controlsSub">Adjust deal levers, or use a preset to find an optimum across MRR, onboarding, and free months.</div>
-
-        <!-- Presets -->
-        <div class="presetRow">
-          <button class="presetBtn" id="presetMinChurn">
-            <span class="pTitle">Minimize churn</span>
-            <span class="pSub">Lowest 12-mo churn</span>
-          </button>
-          <button class="presetBtn" id="presetMaxLtv">
-            <span class="pTitle">Maximize LTV</span>
-            <span class="pSub">Highest cash per won</span>
-          </button>
-        </div>
-
-        <div class="field">
-          <label>
-            <span>Contract MRR
-              <span class="infoIcon" tabindex="0"><span class="tooltip">Monthly recurring revenue per contract. Affects revenue mechanically and now affects churn slightly (β = −0.013 on log MRR; higher MRR → modestly lower churn). Win rate is held fixed.</span></span>
-            </span>
-            <span class="v" id="mrrLabel">$2,250</span>
-          </label>
-          <input id="mrr" type="range" min="500" max="3000" step="50" value="2250">
-          <div class="fieldHint">Pricing range $500–$3,000.</div>
-        </div>
-
-        <div class="field">
-          <label>
-            <span>Onboarding fee
-              <span class="infoIcon" tabindex="0"><span class="tooltip">Upfront fee as % of MRR. The most asymmetric lever in the model. <b>Reduces churn</b> up to ~113% (quadratic minimum), then increases. <b>LTV peaks</b> near 182% before breaking down.</span></span>
-            </span>
-            <span class="v" id="obLabel">100% of MRR</span>
-          </label>
-          <input id="ob" type="range" min="0" max="200" step="5" value="100">
-          <div class="fieldHint">Upfront cash collected = <span id="obCashHint">$2,250</span> per won account.</div>
-        </div>
-
-        <div class="field">
-          <label>
-            <span>Free months
-              <span class="infoIcon" tabindex="0"><span class="tooltip">Number of months billed at $0 before MRR begins. <b>Trades current churn for delayed billing.</b> More free months → lower churn (β = −0.050) but later payback. The "1 free month" structure dominates historical data (n=1,613 / 2,404).</span></span>
-            </span>
-            <span class="v" id="fmLabel">1</span>
-          </label>
-          <div class="fmRow" id="fmRow">
-            <button class="fmBtn" data-fm="0">0</button>
-            <button class="fmBtn active" data-fm="1">1</button>
-            <button class="fmBtn" data-fm="2">2</button>
-            <button class="fmBtn" data-fm="3">3</button>
-          </div>
-          <div class="fieldHint">MRR billing begins month <span id="mrrStart">2</span>.</div>
-        </div>
-
-        <div class="field">
-          <label>
-            <span>CAC per won
-              <span class="infoIcon" tabindex="0"><span class="tooltip">Customer acquisition cost per won account. <b>Threshold only — does not affect churn or LTV.</b> Higher CAC moves the breakeven line upward, lengthening payback. Observed CAC has tripled since Jan 2025 ($3,502 → $9,264).</span></span>
-            </span>
-            <span class="v" id="cacLabel">$3,500</span>
-          </label>
-          <input id="cac" type="range" min="500" max="10000" step="100" value="3500">
-          <div class="fieldHint">Range covers 16-month observed CAC ($3,502 → $9,264 total).</div>
-        </div>
-
-        <div class="field">
-          <label>
-            <span>Projection window
-              <span class="infoIcon" tabindex="0"><span class="tooltip">How many months to project cohort cash. Longer windows show more LTV — and more cumulative churn. The model's billing-span coefficient (+0.073) means LTV scales nearly linearly with window length.</span></span>
-            </span>
-          </label>
-          <select id="horizon">
-            <option value="12">12 months</option>
-            <option value="24" selected>24 months</option>
-            <option value="36">36 months</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>
-            <span>Win rate
-              <span class="infoIcon" tabindex="0"><span class="tooltip">Held demo → close rate. <b>Fixed at 11.5% baseline.</b> Per product decision, win rate does not vary with deal levers — this prevents feedback loops in optimization. Observed monthly win rates ranged 17.6% – 33.7% in 2025.</span></span>
-            </span>
-            <span class="v">11.5% fixed</span>
-          </label>
-          <div class="fieldHint">Held constant. Won accounts = 100 demos × 11.5% = 11.5 expected wins.</div>
-        </div>
-      </div>
-
-      <!-- ──── OUTPUTS ──── -->
-      <div class="outputs">
-
-        <!-- The 4 headline stats -->
-        <div class="statRow">
-          <div class="stat">
-            <div class="statLabel">12-month churn</div>
-            <div class="statValue" id="oChurn">—</div>
-            <div class="statSub" id="oChurnSub">probability one customer churns</div>
-          </div>
-          <div class="stat">
-            <div class="statLabel">Cash per won account</div>
-            <div class="statValue" id="oCashWon">—</div>
-            <div class="statSub" id="oCashWonSub">over projection window, churn-adjusted</div>
-          </div>
-          <div class="stat">
-            <div class="statLabel">CAC payback</div>
-            <div class="statValue" id="oPayback">—</div>
-            <div class="statSub" id="oPaybackSub">months to recover CAC</div>
-          </div>
-          <div class="stat">
-            <div class="statLabel">LTV : CAC</div>
-            <div class="statValue" id="oLtvCac">—</div>
-            <div class="statSub" id="oLtvCacSub">target ≥ 3.0×</div>
-          </div>
-        </div>
-
-        <!-- The supporting detail grid -->
-        <div class="detailGrid">
-          <div class="detailLine"><span class="lbl">Predicted win rate (held demo → close)</span><span class="val" id="dWinRate">—</span></div>
-          <div class="detailLine"><span class="lbl">Expected wins from 100 held demos</span><span class="val" id="dWins">—</span></div>
-          <div class="detailLine"><span class="lbl">Implied monthly hazard rate</span><span class="val" id="dHazard">—</span></div>
-          <div class="detailLine"><span class="lbl">Upfront onboarding cash collected</span><span class="val" id="dUpfront">—</span></div>
-          <div class="detailLine"><span class="lbl">Cohort cash at horizon</span><span class="val" id="dCohortCash">—</span></div>
-          <div class="detailLine"><span class="lbl">Cohort CAC threshold</span><span class="val" id="dCohortCac">—</span></div>
-          <div class="detailLine"><span class="lbl">Revenue lost to churn</span><span class="val neg" id="dRevLost">—</span></div>
-          <div class="detailLine"><span class="lbl">Net cohort cash after CAC</span><span class="val pos" id="dNet">—</span></div>
-        </div>
-
-      </div>
-    </div>
-
-    <p class="footnote">
-      <b>How to read.</b> The calculator runs three filtered econometric models — churn (linear-probability, n=2,404), normalised LTV (log-linear, n=2,864), and win rate (monthly aggregate, R²=0.69) — at the chosen lever values, holding population means for unobserved deal traits (leakage 6.4%, mixed-risk 3.6%, billing-span 13.8mo). Numbers are <i>directional comparators</i>, not forecasts.
-    </p>
-  </section>
-
-  </div><!-- /pane-calc -->
-
-  <!-- ═══════════════ TAB II · TRADEOFF TABLES ═══════════════ -->
-  <div class="pane" id="pane-tradeoff">
-
-  <!-- ═══════════════ II · THE CORE QUESTION ═══════════════ -->
-  <section class="section">
-    <div class="sectionHead">
-      <span class="sectionNumber">II</span>
-      <h2 class="sectionTitle">Free months versus onboarding — the head-to-head</h2>
-      <p class="sectionDek">Holding MRR and CAC at the calculator values, the four free-month structures × six onboarding levels.</p>
-    </div>
-
-    <div class="cols2 mb24">
-
-      <!-- Free months impact -->
-      <div class="panel">
-        <div class="panelKicker">Free months — isolated effect</div>
-        <div class="panelTitle">What changes when you give months 0 → 3?</div>
-        <div class="panelDek">Onboarding held at the calculator value. Each row is a clean isolation of the free-month lever.</div>
-
-        <table class="dataTable" id="fmTable"></table>
-
-        <div class="keyInsight" id="fmInsight">
-          <strong>Reading</strong>
-        </div>
-      </div>
-
-      <!-- Onboarding impact -->
-      <div class="panel">
-        <div class="panelKicker">Onboarding fee — isolated effect</div>
-        <div class="panelTitle">What changes when you charge 0% → 200%?</div>
-        <div class="panelDek">Free months held at the calculator value. Onboarding is the most asymmetric lever in the model.</div>
-
-        <table class="dataTable" id="obTable"></table>
-
-        <div class="keyInsight" id="obInsight">
-          <strong>Reading</strong>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Heatmap: full 2D answer -->
-    <div class="panel">
-      <div class="panelKicker">Joint effect — payback heatmap</div>
-      <div class="panelHead">
-        <h3 class="panelTitle">Months to recover CAC, by structure</h3>
-      </div>
-      <p class="panelDek">Every cell is the cohort payback period in months at <span id="heatCacRef">$3,500</span> CAC and <span id="heatMrrRef">$2,250</span> MRR. Darker greens recover faster; reds do not recover within <span id="heatHorizonRef">24</span> months. The star marks the fastest-payback structure.</p>
-
-      <div class="heatmap" id="paybackHeatmap"></div>
-
-      <div class="legend" id="heatLegend"></div>
-
-      <div class="keyInsight" id="heatInsight">
-        <strong>Reading</strong>
-      </div>
-    </div>
-
-  </section>
-
-  </div><!-- /pane-tradeoff -->
-
-  <!-- ═══════════════ TAB III · MODEL CURVES ═══════════════ -->
-  <div class="pane" id="pane-curves">
-
-  <!-- ═══════════════ III · CHURN AND LTV CURVES ═══════════════ -->
-  <section class="section">
-    <div class="sectionHead">
-      <span class="sectionNumber">III</span>
-      <h2 class="sectionTitle">Curves with empirical anchors</h2>
-      <p class="sectionDek">Model curves overlaid on raw historical bin averages, so executives can see where theory tracks data.</p>
-    </div>
-
-    <div class="cols2 mb24">
-
-      <div class="panel">
-        <div class="panelKicker">Churn vs. onboarding</div>
-        <div class="panelTitle">12-month churn probability across onboarding fee levels</div>
-        <p class="panelDek">Curve = filtered churn model evaluated at population-mean MRR for visual alignment. Dots = actual historical churn rate by onboarding bin, sized by n. Population mean: 52.2%.</p>
-        <div class="chartBox tall"><canvas id="chartChurnOb"></canvas></div>
-      </div>
-
-      <div class="panel">
-        <div class="panelKicker">LTV vs. onboarding — what the data actually shows</div>
-        <div class="panelTitle">Normalised LTV multiple across onboarding fee levels</div>
-        <p class="panelDek">Bars = historical geometric mean LTV per bin (what the data directly shows). Green line = model prediction at each bin's actual average composition. The 0% onboarding group's apparent high LTV is a composition artifact — they have 16-month average billing spans vs 10.5 months for others. The genuine onboarding signal is the step up from ~8× at 50% to ~11–13× at 100–150%. Raw onboarding explains &lt;1% of LTV variance alone; after controlling for billing span, MRR, and leakage, R² = 57%.</p>
-        <div class="chartBox tall"><canvas id="chartLtvOb"></canvas></div>
-        <div class="keyInsight" id="ltvObInsight">
-          <strong>What the data shows</strong>
-          The raw effect of onboarding on LTV is nearly flat between 0% and 50% (both ~8×). It genuinely rises to 11–13× at 100–150%, then falls at 200%+. This step-up is real — not a model artifact. The model's advantage is explaining <em>why</em> the 0% group doesn't look worse: those accounts are older, lower-MRR, and longer-tenured. Once you hold those constant, the onboarding slope is steep.
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panelKicker">Single-customer cash trajectory by free months</div>
-        <div class="panelTitle">Cumulative churn-adjusted revenue: 0, 1, 2, 3 free months</div>
-        <p class="panelDek">Each line is one average customer at <b>$8,000 CAC</b> and <b>$2,250 MRR</b> with onboarding fixed at the calculator value. Line drops below the no-churn level as survivors decrease. Dashed horizontal = $8,000 CAC threshold per won account.</p>
-        <div class="chartBox tall"><canvas id="chartCashByFm"></canvas></div>
-      </div>
-
-      <div class="panel">
-        <div class="panelKicker">Single-customer cash trajectory by onboarding</div>
-        <div class="panelTitle">Cumulative churn-adjusted revenue: 50%, 100%, 150% onboarding</div>
-        <p class="panelDek">Each line is one average customer at <b>$8,000 CAC</b> and <b>$2,250 MRR</b> with free months fixed at the calculator value. Onboarding cash arrives in month 0; the rest accrues from MRR survivors. Dashed horizontal = $8,000 CAC threshold per won account.</p>
-        <div class="chartBox tall"><canvas id="chartCashByOnb"></canvas></div>
-      </div>
-
-    </div>
-  </section>
-
-  </div><!-- /pane-curves -->
-
-  <!-- ═══════════════ TAB IV · CAC SCENARIOS ═══════════════ -->
-  <div class="pane" id="pane-cac">
-
-  <!-- ═══════════════ IV · CAC ═══════════════ -->
-  <section class="section">
-    <div class="sectionHead">
-      <span class="sectionNumber">IV</span>
-      <h2 class="sectionTitle">Reaching CAC under realistic acquisition cost</h2>
-      <p class="sectionDek">CAC has been moving. Sixteen months of observed acquisition cost — and what that means for the deal you choose.</p>
-    </div>
-
-    <div class="cols2 mb24">
-
-      <div class="panel">
-        <div class="panelKicker">CAC time series · Jan 2025 – Apr 2026</div>
-        <div class="panelTitle">Fixed, variable, total CAC — and the win rate that fell while CAC rose</div>
-        <p class="panelDek">Stacked bars: fixed (blue) and variable (amber) CAC per won account. Dashed black: linear trend (+$371/mo). Green line on the right axis: monthly win rate, available for Jan–Dec 2025.</p>
-        <div class="chartBox tall"><canvas id="chartCac"></canvas></div>
-        <div class="keyInsight">
-          <strong>Hypothesis · CAC × win rate</strong>
-          Same-month Pearson correlation between total CAC and win rate over Jan–Dec 2025 is <b>−0.54</b>. As acquisition cost has risen, win rate has fallen — consistent with paid acquisition buying lower-quality leads. CAC trend: rising <b>+$371/mo</b>; win-rate trend: falling <b>−0.84 pts/mo</b>. If real, a unit of CAC is buying less revenue both directly (cost up) and indirectly (fewer closes).
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panelKicker">Reachability under historical CAC</div>
-        <div class="panelTitle">% of historical CAC months payback within window</div>
-        <p class="panelDek">For each free-month structure at the current onboarding level, what share of the 16 historical CAC months reach payback by the horizon. A robust structure clears 100% even at peak CAC.</p>
-        <div class="chartBox tall"><canvas id="chartReach"></canvas></div>
-      </div>
-
-    </div>
-
-    <!-- Reachability matrix -->
-    <div class="panel">
-      <div class="panelKicker">CAC stress test</div>
-      <div class="panelHead">
-        <h3 class="panelTitle">Payback at low, median, and high CAC</h3>
-      </div>
-      <p class="panelDek">Three CAC reference points drawn from the actual 16-month series — minimum total CAC ($3,502), median ($6,769), and maximum ($9,166) — applied to each free-month structure at the calculator's onboarding level.</p>
-
-      <table class="dataTable" id="cacStressTable"></table>
-
-      <p class="footnote" id="cacStressFootnote">CAC totals = fixed + variable.</p>
-    </div>
-
-    <!-- Pricing sensitivity section -->
-    <div class="section">
-      <div class="sectionHead">
-        <h2 class="sectionTitle">If you lower prices — what does the model predict?</h2>
-        <p class="sectionDek">Win rate has a statistically significant negative relationship with MRR (β = −0.106 on log MRR, p &lt; 0.001). Lower prices → higher win rate → mechanical CAC reduction.</p>
-      </div>
-
-      <div class="cols2 mb24">
-
-        <div class="panel">
-          <div class="panelKicker">Win-rate sensitivity to MRR</div>
-          <div class="panelTitle">Predicted win-rate gain from price reduction</div>
-          <p class="panelDek">The win-rate model (R²=0.69, 12 monthly observations) predicts how win rate changes with MRR. This is the model's estimate — real-world gain depends on customer mix, sales capacity, and demand elasticity.</p>
-          <div class="chartBox short"><canvas id="chartPricingSensitivity"></canvas></div>
-          <div class="keyInsight" id="pricingInsight">
-            <strong>Reading</strong>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panelKicker">The pricing tradeoff</div>
-          <div class="panelTitle">Lower MRR: what you gain vs. what you give up</div>
-          <p class="panelDek">Lower prices increase win rate and reduce CAC. But they also reduce per-account revenue and LTV. This table shows the net effect at each price point, holding all deal structure variables constant.</p>
-          <table class="dataTable" id="pricingTradeoffTable"></table>
-          <p class="footnote">CAC estimated as observed spend / (baseline held-demos × modeled win rate). LTV uses billing-span, churn, and MRR at current deal structure.</p>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  </div><!-- /pane-cac -->
-
-  <!-- ═══════════════ TAB V · METHODOLOGY ═══════════════ -->
-  <div class="pane" id="pane-method">
-
-  <!-- ═══════════════ V · METHOD CONDENSED ═══════════════ -->
-  <section class="section">
-    <div class="sectionHead">
-      <span class="sectionNumber">V</span>
-      <h2 class="sectionTitle">Coefficients and assumptions</h2>
-      <p class="sectionDek">The full coefficient set, the population means used for held-constant variables, and what the calculator does <em>not</em> claim.</p>
-    </div>
-
-    <div class="cols2 gap16">
-
-      <div class="panel">
-        <div class="panelKicker">Filtered model coefficients</div>
-        <div class="panelTitle">Calculator equations, p&lt;0.10</div>
-        <p class="panelDek">Three models: churn (linear probability), LTV (log normalised), win rate (monthly aggregate, R²=0.69). Quadratic pairs retained jointly.</p>
-
-        <table class="dataTable">
-          <thead>
-            <tr><th>Model</th><th>Term</th><th class="num">β</th><th class="num">p</th></tr>
-          </thead>
-          <tbody>
-            <tr class="subhead"><td colspan="4">Churn — 12mo</td></tr>
-            <tr><td>Intercept</td><td>—</td><td class="num">0.620</td><td class="num">2e-27</td></tr>
-            <tr><td>Onboarding %</td><td>linear</td><td class="num">−0.139</td><td class="num">3.7e-4</td></tr>
-            <tr><td>Onboarding %²</td><td>quadratic</td><td class="num">+0.061</td><td class="num">5.8e-4</td></tr>
-            <tr><td>Free months</td><td>linear</td><td class="num">−0.050</td><td class="num">2.3e-2</td></tr>
-            <tr><td>Free months²</td><td>quadratic</td><td class="num">+0.0036</td><td class="num">4.9e-2</td></tr>
-            <tr><td>log MRR</td><td>control</td><td class="num">−0.013</td><td class="num">2.2e-1</td></tr>
-            <tr><td>Leakage %</td><td>control</td><td class="num">+0.634</td><td class="num">7e-22</td></tr>
-            <tr><td>Mixed-risk flag</td><td>control</td><td class="num">−0.273</td><td class="num">3e-6</td></tr>
-
-            <tr class="subhead"><td colspan="4">LTV — log normalised</td></tr>
-            <tr><td>Intercept</td><td>—</td><td class="num">4.042</td><td class="num">9e-198</td></tr>
-            <tr><td>Onboarding %</td><td>linear</td><td class="num">+1.537</td><td class="num">5e-87</td></tr>
-            <tr><td>Onboarding %²</td><td>quadratic</td><td class="num">−0.423</td><td class="num">3e-32</td></tr>
-            <tr><td>Free months</td><td>linear</td><td class="num">+0.091</td><td class="num">2e-2</td></tr>
-            <tr><td>Free months²</td><td>quadratic</td><td class="num">−0.0042</td><td class="num">2e-1</td></tr>
-            <tr><td>log MRR</td><td>control</td><td class="num">−0.572</td><td class="num">4e-143</td></tr>
-            <tr><td>Leakage %</td><td>control</td><td class="num">−1.864</td><td class="num">4e-24</td></tr>
-            <tr><td>Discount length</td><td>control</td><td class="num">−0.040</td><td class="num">2e-2</td></tr>
-            <tr><td>Mixed-risk flag</td><td>control</td><td class="num">+0.272</td><td class="num">1e-2</td></tr>
-            <tr><td>Billing span</td><td>control</td><td class="num">+0.073</td><td class="num">~0</td></tr>
-
-            <tr class="subhead"><td colspan="4">Win rate — fixed baseline (not modeled in calculator)</td></tr>
-            <tr><td colspan="4" style="font-size:12px;color:var(--muted);padding:10px 12px">Win rate held constant at <b>11.5%</b> regardless of inputs, per product decision. The original 12-month aggregate model (R²=0.69) is retained for reference but not used in the calculator — modeling win-rate creates feedback loops in optimization (e.g. raising MRR could "buy" higher LTV by trading away wins).</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="panel">
-        <div class="panelKicker">Held-constant population means</div>
-        <div class="panelTitle">What the calculator assumes about everything else</div>
-        <p class="panelDek">When you move a lever, every other model variable is held at its calculator-eligible population mean. Otherwise the curves would fold in selection effects from the historical book.</p>
-
-        <table class="dataTable">
-          <thead>
-            <tr><th>Variable</th><th class="num">Pop mean</th><th>Source</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>MRR leakage %</td><td class="num">6.4%</td><td>Refunds + classification mismatch</td></tr>
-            <tr><td>Discount length</td><td class="num">0.25 mo</td><td>Average discount tail</td></tr>
-            <tr><td>Mixed-risk flag</td><td class="num">3.6%</td><td>Invoice/refund anomaly</td></tr>
-            <tr><td>Billing span</td><td class="num">13.8 mo</td><td>LTV-eligible cohort</td></tr>
-            <tr><td>Win rate (fixed)</td><td class="num">11.5%</td><td>Held constant — no feedback in optimization</td></tr>
-          </tbody>
-        </table>
-
-        <div class="panelKicker" style="margin-top:22px">What this is not</div>
-        <div class="panelTitle" style="font-size:.95rem">Limits worth stating</div>
-        <ul style="margin-top:10px;padding-left:18px;font-size:13px;color:var(--ink-soft)">
-          <li style="margin-bottom:6px"><b>Observational, not causal.</b> Selection between deal types is not random; the coefficients are best controlled estimates given the history.</li>
-          <li style="margin-bottom:6px"><b>Win rate is fixed by design.</b> Held at 11.5% baseline so optimization can't game the win-rate equation. Observed monthly win rates ranged 17.6% – 33.7% in 2025; the chosen baseline is conservative.</li>
-          <li style="margin-bottom:6px"><b>MRR's churn coefficient is not statistically significant</b> (p=0.22) but is included for product reasons — keeping MRR in churn enables proper optimization across all three levers.</li>
-          <li style="margin-bottom:6px"><b>The 1-free-month bin dominates the data.</b> 1,613 of 2,404 churn-eligible accounts. 0, 2, and 3 free-month bins are smaller.</li>
-          <li style="margin-bottom:6px"><b>CAC is a threshold, not a behavioural input.</b> Higher CAC moves the breakeven line upward; it does not change predicted churn or LTV.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  </div><!-- /pane-method -->
-
-  <div class="footer">
-    <span class="mark">CHIIRP · Effects Analysis · Q1 2026</span>
-    <span>Calibrated on Service Titan production data. Decision-support only.</span>
+<div class="app">
+  <div class="hdr">
+    <h1>Deal Structure Calculator</h1>
+    <span class="tag">2024+ no-era regression · calibrated analytical LTV</span>
   </div>
 
+  <div class="opt-row">
+    <button class="opt-btn min-churn" id="btnMinChurn"><div class="opt-icon">↓</div><div><span style="font-weight:700">Minimize Churn</span><span class="opt-sub">Optimize unlocked inputs for lowest 12-mo churn</span></div></button>
+    <button class="opt-btn max-ltv" id="btnMaxLtv"><div class="opt-icon">↑</div><div><span style="font-weight:700">Maximize LTV</span><span class="opt-sub">Optimize unlocked inputs for highest calibrated LTV</span></div></button>
+  </div>
+
+  <div class="grid">
+    <div class="controls">
+      <div class="field">
+        <div class="field-hdr"><span class="field-lbl">Contract MRR</span></div>
+        <div class="field-val-row"><span class="field-val" id="mrrVal">$650</span><button class="lock-btn" id="lockMrr">🔓</button></div>
+        <input type="range" id="sliderMrr" min="99" max="3000" step="1" value="650">
+        <div class="range-ends"><span>$99</span><span>$3,000</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="field">
+        <div class="field-hdr"><span class="field-lbl">Onboarding fee (% of MRR)</span></div>
+        <div class="field-val-row"><span class="field-val" id="obVal">100%</span><button class="lock-btn" id="lockOb">🔓</button></div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:4px" id="obDollar">= $650 upfront</div>
+        <input type="range" id="sliderOb" min="0" max="200" step="5" value="100">
+        <div class="range-ends"><span>0%</span><span>200%</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="field">
+        <div class="field-hdr"><span class="field-lbl">Free months waived</span><button class="lock-btn" id="lockFm">🔓</button></div>
+        <div class="fm-pills" id="fmPills"><div class="fm-pill active" data-fm="0">0</div><div class="fm-pill" data-fm="1">1</div><div class="fm-pill" data-fm="2">2</div><div class="fm-pill" data-fm="3">3</div><div class="fm-pill" data-fm="4">4</div><div class="fm-pill" data-fm="5">5</div><div class="fm-pill" data-fm="6">6</div></div>
+        <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-top:4px" id="fmHint">MRR billing starts month 1</div>
+      </div>
+      <div class="divider"></div>
+      <div class="cac-section">
+        <div class="field-hdr"><span class="field-lbl cac-lbl">CAC per won account</span></div>
+        <div class="field-val-row"><span class="field-val" id="cacVal" style="color:var(--purple)">$5,000</span></div>
+        <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-bottom:4px">not affected by optimizer buttons</div>
+        <input type="range" id="sliderCac" class="cac-slider" min="500" max="12000" step="100" value="5000">
+        <div class="range-ends"><span>$500</span><span>$12,000</span></div>
+      </div>
+      <div id="lockNote" style="display:none" class="lock-note"><span>🔒</span><span id="lockNoteText"></span></div>
+    </div>
+
+    <div class="outputs">
+      <div class="metrics-grid">
+        <div class="metric-card primary"><div class="metric-lbl">Calibrated LTV</div><div class="metric-val" id="oLtv">$0</div><div class="metric-sub" id="oLtvSub">analytical × 0.3854</div></div>
+        <div class="metric-card"><div class="metric-lbl">12-month churn</div><div class="metric-val" id="oChurn">0%</div><div class="metric-sub" id="oChurnSub">risk</div></div>
+        <div class="metric-card"><div class="metric-lbl">Monthly hazard</div><div class="metric-val" id="oHazard">0%</div><div class="metric-sub">month-1 hazard</div></div>
+        <div class="metric-card cac-card"><div class="metric-lbl">LTV : CAC</div><div class="metric-val" id="oLtvCac">0×</div><div class="metric-sub" id="oLtvCacSub">ratio</div></div>
+        <div class="metric-card cac-card"><div class="metric-lbl">CAC payback</div><div class="metric-val" id="oPayback">—</div><div class="metric-sub" id="oPaybackSub">calibrated cash curve</div></div>
+        <div class="metric-card cac-card"><div class="metric-lbl">Net (LTV − CAC)</div><div class="metric-val" id="oNet">$0</div><div class="metric-sub">after acquisition cost</div></div>
+      </div>
+
+      <div class="churn-vis"><div class="bar-hdr"><span>CHURN RISK</span><span id="barLbl">0%</span></div><div class="bar-track"><div class="bar-fill" id="barFill"></div></div></div>
+
+      <div class="bk">
+        <div class="bk-row"><span class="bk-lbl">Upfront onboarding cash</span><span class="bk-val pos" id="bUpfront">$0</span></div>
+        <div class="bk-row"><span class="bk-lbl">Expected MRR collected, 24 mo</span><span class="bk-val pos" id="bMrrRev">$0</span></div>
+        <div class="bk-row"><span class="bk-lbl">Revenue lost to churn, 24 mo</span><span class="bk-val neg" id="bLost">−$0</span></div>
+        <div class="bk-row"><span class="bk-lbl">Uncalibrated analytical LTV</span><span class="bk-val pos" id="bAnalytical">$0</span></div>
+        <div class="bk-row"><span class="bk-lbl">Calibrated expected LTV</span><span class="bk-val pos" id="bModel">$0</span></div>
+        <div class="bk-row cac-row"><span class="bk-lbl">CAC per won account</span><span class="bk-val purple" id="bCac">$5,000</span></div>
+        <div class="bk-row cac-row"><span class="bk-lbl">LTV : CAC ratio</span><span class="bk-val purple" id="bRatio">0×</span></div>
+        <div class="bk-row cac-row"><span class="bk-lbl">Net value (LTV − CAC)</span><span class="bk-val neg" id="bNet">$0</span></div>
+      </div>
+
+      <div class="insight" id="insight"></div>
+
+      <div class="audit">
+        <div class="audit-hdr"><span>Variable audit — live inputs to churn model</span><span style="color:var(--text3);font-weight:400">value · coef</span></div>
+        <div class="audit-section">CHURN HAZARD — no era vars · pseudo R² = 0.0213 · N = 14,208</div>
+        <div id="auditChurn"></div>
+        <div class="audit-section">LTV COMPUTATION — analytical LTV × calibration factor 0.3854</div>
+        <div id="auditLtv"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   MODEL COEFFICIENTS — from filtered Calculator_Coefficients
-   ═══════════════════════════════════════════════════════════ */
+// Latest regression data supplied 2026-05-01.
+// Same sliders as prior version: MRR, onboarding %, free months, CAC.
+// No era variables. Coupon/discount variables are fixed at 0 because there are no matching controls.
+const CALIBRATION = 0.3854;
+const MAX_LTV_MONTHS = 120;
+const LOG_COH = Math.log(14);
+const LOG_COH2 = LOG_COH ** 2;
 
-// Churn (12mo) — linear probability model, p<.10 filter, quadratic pairs jointly
-const CHURN_M = {
-  intercept: 0.620168,
-  onb: -0.138871, onb2: 0.061262,
-  fm: -0.049523, fm2: 0.003579,
-  logMrr: -0.012743,           // From full churn model (p=0.224, included by product decision for optimization)
-  leakage: 0.633735,
-  mixedRisk: -0.272953,
-};
-
-// LTV (log normalised) — p<.10 filter, quadratic pairs jointly
-const LTV_M = {
-  intercept: 4.042370,
-  onb: 1.537498, onb2: -0.422925,
-  fm: 0.090626, fm2: -0.004197,
-  logMrr: -0.572156,
-  leakage: -1.863938,
-  discLen: -0.039782,
-  mixedRisk: 0.271580,
-  billingSpan: 0.072675,
-};
-
-// Win rate is now FIXED at a baseline rate, NOT modelled (per product decision —
-// prevents win-rate feedback loops in optimization). Coefficients retained for reference.
-const WR_M = {
-  intercept: 1.036320,
-  onb: -0.029255, onb2: -0.011162,
-  fm: 0.001087, fm2: -0.005766,
-  logMrr: -0.106342,
-  leakage: -0.863271,
-  discPct: 1.048083,
-};
-const FIXED_WIN_RATE = 0.115;  // 11.5% baseline — held constant regardless of inputs
-
-// Population means for held-constant variables (from the LTV/churn-eligible populations)
-const POP = {
-  leakage: 0.0642,
-  discLen: 0.249,
-  mixedRisk: 0.0356,
-  billingSpan: 13.78,
-  discPct: 0.0,
-};
-
-// CAC time series (user-provided)
-const CAC_DATA = [
-  {month:'2025-01', fixed: 669,  variable: 2833},
-  {month:'2025-02', fixed: 1055, variable: 3410},
-  {month:'2025-03', fixed: 1386, variable: 2585},
-  {month:'2025-04', fixed: 1849, variable: 2969},
-  {month:'2025-05', fixed: 1813, variable: 2146},
-  {month:'2025-06', fixed: 2467, variable: 3721},
-  {month:'2025-07', fixed: 1473, variable: 2296},
-  {month:'2025-08', fixed: 1856, variable: 2786},
-  {month:'2025-09', fixed: 2666, variable: 5496},
-  {month:'2025-10', fixed: 2355, variable: 4878},
-  {month:'2025-11', fixed: 3119, variable: 5712},
-  {month:'2025-12', fixed: 3351, variable: 5385},
-  {month:'2026-01', fixed: 2012, variable: 5705},
-  {month:'2026-02', fixed: 2565, variable: 6699},
-  {month:'2026-03', fixed: 2077, variable: 4528},
-  {month:'2026-04', fixed: 2538, variable: 6248},
-];
-CAC_DATA.forEach(d => d.total = d.fixed + d.variable);
-
-// Monthly observed win rate from Effects_Win_Monthly (12 months, Jan–Dec 2025)
-// Pearson correlation with same-month CAC = -0.544
-const WIN_RATE_MONTHLY = [
-  {month:'2025-01', wr: 0.2778},
-  {month:'2025-02', wr: 0.3367},
-  {month:'2025-03', wr: 0.2357},
-  {month:'2025-04', wr: 0.2079},
-  {month:'2025-05', wr: 0.2273},
-  {month:'2025-06', wr: 0.2063},
-  {month:'2025-07', wr: 0.2840},
-  {month:'2025-08', wr: 0.1756},
-  {month:'2025-09', wr: 0.1907},
-  {month:'2025-10', wr: 0.2330},
-  {month:'2025-11', wr: 0.2139},
-  {month:'2025-12', wr: 0.1769},
-];
-
-// Empirical bins from historical data (n>=10)
-// LTV bins: arithmetic mean winsorized at 99th percentile ($338) so outliers
-// don't dominate the dot positions. Tracks the log-linear model better than raw mean.
-const EMP = {
-  fmChurn: [
-    {fm:0, n:361, churn:0.6233},
-    {fm:1, n:1613, churn:0.4606},
-    {fm:2, n:261, churn:0.6667},
-    {fm:3, n:169, churn:0.6746},
-  ],
-  fmLtv: [
-    {fm:0, n:581, mean:12.03},
-    {fm:1, n:1815, mean:26.78},
-    {fm:2, n:279, mean:21.50},
-    {fm:3, n:189, mean:25.65},
-  ],
-  obChurn: [
-    {ob:0.00, n:1637, churn:0.555},
-    {ob:0.50, n:152, churn:0.428},
-    {ob:0.75, n:57,  churn:0.509},
-    {ob:1.00, n:81,  churn:0.481},
-    {ob:1.25, n:98,  churn:0.418},
-    {ob:1.50, n:224, churn:0.469},
-    {ob:1.75, n:61,  churn:0.295},
-    {ob:2.00, n:91,  churn:0.560},
-  ],
-  obLtv: [
-    // geo = geometric mean of actual data per bin
-    // modelBinAvg = model prediction at each bin's own avg billing, MRR, leakage
-    // billing = avg billing span in months (key confounder for 0% group)
-    {ob:0,   label:'0%',    n:1686, geo:8.15,  modelBinAvg:6.65,  billing:16.0},
-    {ob:0.5, label:'50%',   n:389,  geo:8.06,  modelBinAvg:4.95,  billing:8.6},
-    {ob:1.0, label:'100%',  n:254,  geo:11.01, modelBinAvg:10.65, billing:12.1},
-    {ob:1.5, label:'150%',  n:374,  geo:13.20, modelBinAvg:13.58, billing:11.2},
-    {ob:2.0, label:'200%+', n:161,  geo:9.58,  modelBinAvg:13.28, billing:11.0},
-  ],
-};
-
-/* ═══════════════════════════════════════════════════════════
-   MODEL EVALUATION
-   ═══════════════════════════════════════════════════════════ */
-const $ = id => document.getElementById(id);
-const clamp = (x,lo,hi) => Math.max(lo, Math.min(hi, x));
-const fmtUSD = v => '$' + Math.round(v).toLocaleString();
-const fmtUSDshort = v => Math.abs(v) >= 1000 ? '$' + (v/1000).toFixed(v >= 10000 ? 0 : 1) + 'k' : '$' + Math.round(v);
-const fmtPct = v => (v*100).toFixed(1) + '%';
-const fmtPct0 = v => (v*100).toFixed(0) + '%';
-
-function modelChurn(p){
-  const x = CHURN_M.intercept
-    + CHURN_M.onb * p.ob
-    + CHURN_M.onb2 * p.ob * p.ob
-    + CHURN_M.fm * p.fm
-    + CHURN_M.fm2 * p.fm * p.fm
-    + CHURN_M.logMrr * Math.log(Math.max(p.mrr, 1))   // MRR now affects churn
-    + CHURN_M.leakage * POP.leakage
-    + CHURN_M.mixedRisk * POP.mixedRisk;
-  return clamp(x, 0.03, 0.95);
+function sig(x, thresh, width){ return 1 / (1 + Math.exp(-(x - thresh) / (width * 0.35))); }
+function smoothTiers(mrr){
+  const s100 = sig(mrr,100,40), s500 = sig(mrr,500,80), s1000 = sig(mrr,1000,120);
+  return { mrr_lt100:1-s100, mrr_100_499:s100*(1-s500), mrr_1000p:s1000, high_mrr:s500 };
 }
+function smoothObPaid(obPct){ return sig(obPct,7.5,7.5); }
+function free3Plus(fm){ return sig(fm,2.5,1.0); }
 
-function modelLnLtv(p){
-  return LTV_M.intercept
-    + LTV_M.onb * p.ob + LTV_M.onb2 * p.ob * p.ob
-    + LTV_M.fm * p.fm + LTV_M.fm2 * p.fm * p.fm
-    + LTV_M.logMrr * Math.log(Math.max(p.mrr, 1))
-    + LTV_M.leakage * POP.leakage
-    + LTV_M.discLen * POP.discLen
-    + LTV_M.mixedRisk * POP.mixedRisk
-    + LTV_M.billingSpan * p.horizon;
-}
-
-function modelLtvMultiple(p){
-  return Math.exp(modelLnLtv(p));
-}
-
-// Win rate is a FIXED baseline — does not change with inputs.
-// This prevents feedback loops in optimization (e.g. raising MRR can't
-// trade away win rate for higher LTV inside the optimizer).
-function activeWinRate(p){
-  return FIXED_WIN_RATE;
-}
-
-/* Cohort projection — 100 demos × win rate × monthly hazard cash flow */
-function projectCohort(p){
-  const churn12 = modelChurn(p);
-  const hazard = 1 - Math.pow(1 - churn12, 1/12);
-  const wr = activeWinRate(p);
-  const wins = 100 * wr;
-  const cohortCac = p.cac * wins;
-
-  const upfront = p.mrr * p.ob * wins;
-  let cum = upfront;
-  let noChurnCum = upfront;
-  const rows = [{m:0, cum, noChurnCum, monthly:0, survival:1}];
-
-  for(let t=1; t<=p.horizon; t++){
-    const survival = Math.pow(1 - hazard, t);
-    const paid = t > p.fm;
-    const monthly = paid ? p.mrr * survival * wins : 0;
-    const noChurnMonthly = paid ? p.mrr * wins : 0;
-    cum += monthly;
-    noChurnCum += noChurnMonthly;
-    rows.push({m:t, cum, noChurnCum, monthly, survival});
-  }
-  const breakeven = rows.find(r => r.cum >= cohortCac);
+function features(mrr, obPct, fm, month=9){
+  const logMrr = Math.log(Math.max(mrr,1));
+  const obRatio = obPct / 100;
+  const obSq = obRatio ** 2;
+  const obGap = Math.max(0, 1 - obRatio);
+  const t = smoothTiers(mrr);
+  const logTen = Math.log(Math.max(month,1));
   return {
-    rows,
-    churn12,
-    hazard,
-    wr,
-    wins,
-    cohortCac,
-    upfront,
-    finalCash: rows[rows.length-1].cum,
-    finalNoChurnCash: rows[rows.length-1].noChurnCum,
-    breakevenMonth: breakeven ? breakeven.m : null,
-    cashPerWon: rows[rows.length-1].cum / Math.max(wins, 0.001),
+    log_mrr:logMrr,
+    ob_collected_pct_mrr_sq:obSq,
+    discount_length_mo:0,
+    coupon_100pct:0,
+    mrr_lt100:t.mrr_lt100,
+    mrr_100_499:t.mrr_100_499,
+    mrr_1000p:t.mrr_1000p,
+    high_mrr:t.high_mrr,
+    ob_actually_paid:smoothObPaid(obPct),
+    ob_waived_post_sign:0,
+    free_1mo_exact:fm===1?1:0,
+    free_2mo_exact:fm===2?1:0,
+    free_3plus:free3Plus(fm),
+    stacked_ob_coupon:0,
+    mrr_x_ob:logMrr * obRatio,
+    free_x_coupon:0,
+    age_x_free:LOG_COH * fm,
+    ob_gap_x_mrr:obGap * logMrr,
+    ob_gap_x_free:obGap * fm,
+    log_tenure:logTen,
+    log_tenure_sq:logTen ** 2,
+    log_cohort_age:LOG_COH,
+    log_cohort_age_sq:LOG_COH2,
   };
 }
 
-function paybackForCAC(p, cacOverride){
-  const churn12 = modelChurn(p);
-  const hazard = 1 - Math.pow(1 - churn12, 1/12);
-  const wr = activeWinRate(p);
-  const wins = 100 * wr;
-  const cohortCac = cacOverride * wins;
-  let cum = p.mrr * p.ob * wins;
-  if(cum >= cohortCac) return 0;
-  for(let t=1; t<=120; t++){
-    const survival = Math.pow(1 - hazard, t);
-    const paid = t > p.fm;
-    if(paid) cum += p.mrr * survival * wins;
-    if(cum >= cohortCac) return t;
+const CHURN_C = {
+  intercept:-5.2035,
+  log_mrr:0.2903,
+  ob_collected_pct_mrr_sq:0.0650,
+  discount_length_mo:-0.1135,
+  coupon_100pct:0.1273,
+  mrr_lt100:1.1446,
+  mrr_100_499:0.4958,
+  mrr_1000p:-0.3719,
+  high_mrr:-0.4349,
+  ob_actually_paid:-0.4380,
+  ob_waived_post_sign:-0.5749,
+  free_1mo_exact:0.1274,
+  free_2mo_exact:0.6539,
+  free_3plus:1.1165,
+  stacked_ob_coupon:0.4640,
+  mrr_x_ob:0.0057,
+  free_x_coupon:0.1273,
+  age_x_free:-0.0740,
+  ob_gap_x_mrr:0.1268,
+  ob_gap_x_free:0.0174,
+  log_tenure:-0.3776,
+  log_tenure_sq:0.0917,
+  log_cohort_age:0.8825,
+  log_cohort_age_sq:-0.1864,
+};
+
+function logitHazard(mrr, obPct, fm, month=9){
+  const f = features(mrr,obPct,fm,month);
+  return CHURN_C.intercept
+    + CHURN_C.log_mrr * f.log_mrr
+    + CHURN_C.ob_collected_pct_mrr_sq * f.ob_collected_pct_mrr_sq
+    + CHURN_C.discount_length_mo * f.discount_length_mo
+    + CHURN_C.coupon_100pct * f.coupon_100pct
+    + CHURN_C.mrr_lt100 * f.mrr_lt100
+    + CHURN_C.mrr_100_499 * f.mrr_100_499
+    + CHURN_C.mrr_1000p * f.mrr_1000p
+    + CHURN_C.high_mrr * f.high_mrr
+    + CHURN_C.ob_actually_paid * f.ob_actually_paid
+    + CHURN_C.ob_waived_post_sign * f.ob_waived_post_sign
+    + CHURN_C.free_1mo_exact * f.free_1mo_exact
+    + CHURN_C.free_2mo_exact * f.free_2mo_exact
+    + CHURN_C.free_3plus * f.free_3plus
+    + CHURN_C.stacked_ob_coupon * f.stacked_ob_coupon
+    + CHURN_C.mrr_x_ob * f.mrr_x_ob
+    + CHURN_C.free_x_coupon * f.free_x_coupon
+    + CHURN_C.age_x_free * f.age_x_free
+    + CHURN_C.ob_gap_x_mrr * f.ob_gap_x_mrr
+    + CHURN_C.ob_gap_x_free * f.ob_gap_x_free
+    + CHURN_C.log_tenure * f.log_tenure
+    + CHURN_C.log_tenure_sq * f.log_tenure_sq
+    + CHURN_C.log_cohort_age * f.log_cohort_age
+    + CHURN_C.log_cohort_age_sq * f.log_cohort_age_sq;
+}
+function monthlyHazard(mrr,obPct,fm,month=9){ return 1 / (1 + Math.exp(-logitHazard(mrr,obPct,fm,month))); }
+function churnN(mrr,obPct,fm,n){ let surv=1; for(let t=1;t<=n;t++) surv *= (1 - monthlyHazard(mrr,obPct,fm,t)); return 1 - surv; }
+function churn12(mrr,obPct,fm){ return churnN(mrr,obPct,fm,12); }
+
+function ltvBreakdown(mrr,obPct,fm){
+  const upfront = mrr * (obPct / 100);
+  let survival = 1, mrrRev24 = 0, noChurn24 = 0, analytical = upfront;
+  const monthlyRows = [];
+  for(let t=1;t<=MAX_LTV_MONTHS;t++){
+    const h = monthlyHazard(mrr,obPct,fm,t);
+    survival *= (1 - h);
+    const billable = t > fm;
+    const expectedMrr = billable ? mrr * survival : 0;
+    analytical += expectedMrr;
+    if(t<=24){ mrrRev24 += expectedMrr; if(billable) noChurn24 += mrr; }
+    monthlyRows.push({month:t, expectedCash: expectedMrr, survival});
+  }
+  const calibrated = analytical * CALIBRATION;
+  return { upfront, mrrRev24, lost24:noChurn24-mrrRev24, analytical, calibrated, monthlyRows };
+}
+
+function paybackMonth(mrr,obPct,fm,cac){
+  const upfront = mrr * (obPct / 100) * CALIBRATION;
+  let cum = upfront, survival = 1;
+  if(cum >= cac) return 0;
+  for(let t=1;t<=60;t++){
+    survival *= (1 - monthlyHazard(mrr,obPct,fm,t));
+    if(t > fm) cum += (mrr * survival) * CALIBRATION;
+    if(cum >= cac) return t;
   }
   return null;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   STATE & I/O
-   ═══════════════════════════════════════════════════════════ */
-function getInputs(){
-  return {
-    mrr: +$('mrr').value,
-    ob: +$('ob').value / 100,
-    fm: +$('fmRow').querySelector('.fmBtn.active').dataset.fm,
-    cac: +$('cac').value,
-    horizon: +$('horizon').value,
-  };
+const locks = {mrr:false, ob:false, fm:false};
+let fm = 0;
+function byId(id){ return document.getElementById(id); }
+function fmtUSD(v){ return '$' + Math.round(v).toLocaleString(); }
+function fmtPct(v){ return (v*100).toFixed(1) + '%'; }
+function fmtN4(v){ return typeof v === 'number' ? v.toFixed(4) : v; }
+function riskClassChurn(c){ return c < .35 ? 'good' : c < .55 ? 'warn' : 'bad'; }
+function ltvClass(v,mrr){ return v > mrr*20 ? 'good' : v > mrr*10 ? 'warn' : 'bad'; }
+
+function updateLockUI(){
+  ['mrr','ob','fm'].forEach(k=>{
+    const btn=byId('lock'+k[0].toUpperCase()+k.slice(1));
+    btn.textContent=locks[k]?'🔒':'🔓'; btn.classList.toggle('locked',locks[k]);
+  });
+  byId('sliderMrr').classList.toggle('locked-slider',locks.mrr);
+  byId('sliderOb').classList.toggle('locked-slider',locks.ob);
+  document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('locked-pill',locks.fm));
+  const locked=Object.entries(locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
+  const note=byId('lockNote');
+  if(locked.length){ note.style.display='flex'; byId('lockNoteText').textContent=locked.join(', ')+' locked — optimizer skips these'; }
+  else note.style.display='none';
 }
+byId('lockMrr').addEventListener('click',()=>{locks.mrr=!locks.mrr;updateLockUI();});
+byId('lockOb').addEventListener('click',()=>{locks.ob=!locks.ob;updateLockUI();});
+byId('lockFm').addEventListener('click',()=>{locks.fm=!locks.fm;updateLockUI();});
 
-function setSliderFill(id, pct){
-  const el = $(id);
-  if(el) el.style.setProperty('--p', pct + '%');
-}
+byId('fmPills').querySelectorAll('.fm-pill').forEach(p=>p.addEventListener('click',()=>{ if(locks.fm) return; fm=+p.dataset.fm; setFm(fm); clearOpt(); update(); }));
+function setFm(v){ fm=v; document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('active',+p.dataset.fm===v)); }
+byId('sliderMrr').addEventListener('input',()=>{clearOpt();update();});
+byId('sliderOb').addEventListener('input',()=>{clearOpt();update();});
+byId('sliderCac').addEventListener('input',()=>update());
+function clearOpt(){ document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('active-opt')); }
 
-function updateLabels(p){
-  $('mrrLabel').textContent = '$' + p.mrr.toLocaleString();
-  $('obLabel').textContent = (p.ob*100).toFixed(0) + '% of MRR';
-  $('obCashHint').textContent = fmtUSD(p.mrr * p.ob);
-  $('fmLabel').textContent = p.fm;
-  $('mrrStart').textContent = p.fm + 1;
-  $('cacLabel').textContent = '$' + p.cac.toLocaleString();
-
-  setSliderFill('mrr', (p.mrr-500)/(3000-500)*100);
-  setSliderFill('ob', p.ob*100/2);
-  setSliderFill('cac', (p.cac-500)/(10000-500)*100);
-}
-
-/* ═══════════════════════════════════════════════════════════
-   STAT PANEL
-   ═══════════════════════════════════════════════════════════ */
-function fillStats(p, cohort){
-  // Churn
-  $('oChurn').textContent = fmtPct(cohort.churn12);
-  $('oChurn').className = 'statValue ' + (cohort.churn12 < 0.45 ? 'good' : cohort.churn12 < 0.60 ? 'warn' : 'bad');
-  $('oChurnSub').textContent = `monthly hazard ${(cohort.hazard*100).toFixed(2)}%`;
-
-  // Cash per won
-  $('oCashWon').textContent = fmtUSD(cohort.cashPerWon);
-  $('oCashWon').className = 'statValue good';
-  $('oCashWonSub').textContent = `over ${p.horizon} mo, churn-adjusted`;
-
-  // Payback
-  if(cohort.breakevenMonth === null){
-    $('oPayback').textContent = '> ' + p.horizon + ' mo';
-    $('oPayback').className = 'statValue bad';
-    $('oPaybackSub').textContent = 'CAC not recovered in window';
-  } else if(cohort.breakevenMonth === 0){
-    $('oPayback').textContent = '0 mo';
-    $('oPayback').className = 'statValue good';
-    $('oPaybackSub').textContent = 'recovered upfront';
-  } else {
-    $('oPayback').textContent = cohort.breakevenMonth + ' mo';
-    $('oPayback').className = 'statValue ' + (cohort.breakevenMonth <= 6 ? 'good' : cohort.breakevenMonth <= 12 ? 'warn' : 'bad');
-    $('oPaybackSub').textContent = 'cohort cash crosses CAC threshold';
+function optimize(goal){
+  const MRR=[]; for(let m=99;m<=3000;m+=25) MRR.push(m);
+  const OB=[]; for(let o=0;o<=200;o+=5) OB.push(o);
+  const FM=[0,1,2,3,4,5,6];
+  const curMrr=+byId('sliderMrr').value, curOb=+byId('sliderOb').value;
+  const mrrRange=locks.mrr?[curMrr]:MRR, obRange=locks.ob?[curOb]:OB, fmRange=locks.fm?[fm]:FM;
+  let bestMrr=curMrr,bestOb=curOb,bestFm=fm,best=goal==='ltv'?-Infinity:Infinity;
+  for(const m of mrrRange) for(const o of obRange) for(const f of fmRange){
+    const s = goal==='ltv' ? ltvBreakdown(m,o,f).calibrated : churn12(m,o,f);
+    if((goal==='ltv' && s>best) || (goal==='churn' && s<best)){ best=s; bestMrr=m; bestOb=o; bestFm=f; }
   }
+  if(!locks.mrr) byId('sliderMrr').value=bestMrr;
+  if(!locks.ob) byId('sliderOb').value=bestOb;
+  if(!locks.fm) setFm(bestFm);
+  update();
+}
+byId('btnMinChurn').addEventListener('click',()=>{clearOpt();byId('btnMinChurn').classList.add('active-opt');optimize('churn');});
+byId('btnMaxLtv').addEventListener('click',()=>{clearOpt();byId('btnMaxLtv').classList.add('active-opt');optimize('ltv');});
 
-  // LTV:CAC — use cohort cash / cohort CAC
-  const ltvCac = cohort.cohortCac > 0 ? cohort.finalCash / cohort.cohortCac : 0;
-  $('oLtvCac').textContent = ltvCac.toFixed(2) + '×';
-  $('oLtvCac').className = 'statValue ' + (ltvCac >= 3 ? 'good' : ltvCac >= 1.5 ? 'warn' : 'bad');
-  $('oLtvCacSub').textContent = ltvCac >= 3 ? 'healthy' : ltvCac >= 1 ? 'pays back' : 'under water';
-
-  // Detail grid
-  $('dWinRate').textContent = fmtPct(cohort.wr);
-  $('dWins').textContent = cohort.wins.toFixed(1);
-  $('dHazard').textContent = (cohort.hazard*100).toFixed(2) + '%';
-  $('dUpfront').textContent = fmtUSD(cohort.upfront);
-  $('dCohortCash').textContent = fmtUSD(cohort.finalCash);
-  $('dCohortCac').textContent = fmtUSD(cohort.cohortCac);
-  $('dRevLost').textContent = '−' + fmtUSD(cohort.finalNoChurnCash - cohort.finalCash);
-  const net = cohort.finalCash - cohort.cohortCac;
-  $('dNet').textContent = (net >= 0 ? '+' : '−') + fmtUSD(Math.abs(net));
-  $('dNet').className = 'val ' + (net >= 0 ? 'pos' : 'neg');
+function renderAudit(id, rows){
+  byId(id).innerHTML = rows.map(([name,val,coef,note])=>{
+    const cls = Math.abs(coef)<1e-6 ? 'dim' : coef>0 ? 'pos' : 'neg';
+    return `<div class="audit-row"><span class="audit-var">${name}<span class="audit-note">${note||''}</span></span><span class="audit-live">${fmtN4(val)}</span><span class="audit-coef ${cls}">${coef>0?'+':''}${coef.toFixed(4)}</span></div>`;
+  }).join('');
 }
 
-/* ═══════════════════════════════════════════════════════════
-   FREE-MONTH and ONBOARDING tables
-   ═══════════════════════════════════════════════════════════ */
-function fillFmTable(p){
-  const rows = [0,1,2,3].map(fm => {
-    const c = projectCohort({...p, fm});
-    const ltvMult = modelLtvMultiple({...p, fm});
-    return {fm, c, ltvMult};
-  });
+function update(){
+  const mrr=+byId('sliderMrr').value, obPct=+byId('sliderOb').value, cac=+byId('sliderCac').value;
+  const f=features(mrr,obPct,fm,9);
+  byId('mrrVal').textContent='$'+mrr.toLocaleString();
+  byId('obVal').textContent=obPct+'%';
+  byId('obDollar').textContent='= $'+Math.round(mrr*obPct/100).toLocaleString()+' upfront';
+  byId('cacVal').textContent='$'+cac.toLocaleString();
+  byId('fmHint').textContent=fm===0?'MRR billing starts month 1':`${fm} month${fm>1?'s':''} waived · billing starts month ${fm+1}`;
 
-  // Find best/worst churn for highlighting
-  const minChurn = Math.min(...rows.map(r => r.c.churn12));
-  const maxChurn = Math.max(...rows.map(r => r.c.churn12));
-  const minLtv = Math.min(...rows.map(r => r.ltvMult));
-  const maxLtv = Math.max(...rows.map(r => r.ltvMult));
-  const minPay = Math.min(...rows.filter(r=>r.c.breakevenMonth!==null).map(r => r.c.breakevenMonth));
+  const h1=monthlyHazard(mrr,obPct,fm,1), c12=churn12(mrr,obPct,fm), bk=ltvBreakdown(mrr,obPct,fm), ltv=bk.calibrated;
+  const ltvCac=ltv/cac, net=ltv-cac, pb=paybackMonth(mrr,obPct,fm,cac);
 
-  // Tradeoff bar helper: renders churn (left/red) and LTV (right/green) widths
-  // both normalised to 0-100% of the row range. Shows the actual tradeoff visually.
-  const tradeoffBar = (churn, ltv) => {
-    const churnPct = maxChurn > 0 ? (churn / maxChurn) * 100 : 0;
-    const ltvPct = maxLtv > 0 ? (ltv / maxLtv) * 100 : 0;
-    return `<div class="tradeoffBar" title="Churn ${(churn*100).toFixed(1)}% · LTV ${ltv.toFixed(1)}×">
-      <div class="churnBar" style="width:${churnPct*0.5}%"></div>
-      <div class="divider"></div>
-      <div class="ltvBar" style="width:${ltvPct*0.5}%"></div>
-    </div>`;
-  };
+  const ltvEl=byId('oLtv'); ltvEl.textContent=fmtUSD(ltv); ltvEl.className='metric-val '+ltvClass(ltv,mrr);
+  byId('oLtvSub').textContent=`${fmtUSD(bk.analytical)} analytical × ${CALIBRATION}`;
+  const chEl=byId('oChurn'); chEl.textContent=fmtPct(c12); chEl.className='metric-val '+riskClassChurn(c12); byId('oChurnSub').textContent=c12<.35?'low risk':c12<.55?'moderate':'high risk';
+  const hz=byId('oHazard'); hz.textContent=fmtPct(h1); hz.className='metric-val '+(h1<.03?'good':h1<.05?'warn':'bad');
+  const ratio=byId('oLtvCac'); ratio.textContent=ltvCac.toFixed(2)+'×'; ratio.className='metric-val '+(ltvCac>=3?'good':ltvCac>=1.5?'warn':'bad'); byId('oLtvCacSub').textContent=ltvCac>=3?'healthy':ltvCac>=1?'pays back':'underwater';
+  const pbEl=byId('oPayback'); pbEl.textContent=pb===null?'>60 mo':pb===0?'0 mo':pb+' mo'; pbEl.className='metric-val '+(pb!==null&&pb<=12?'good':pb!==null&&pb<=24?'warn':'bad'); byId('oPaybackSub').textContent=pb===null?'not recovered in 5yr':pb===0?'upfront only':`month ${pb}`;
+  const netEl=byId('oNet'); netEl.textContent=(net>=0?'+':'')+fmtUSD(net); netEl.className='metric-val '+(net>=0?'good':'bad');
 
-  const html = `
-    <thead>
-      <tr>
-        <th>Free mo</th>
-        <th class="num">Churn</th>
-        <th class="num">LTV mult</th>
-        <th style="text-align:center">← Churn · LTV →</th>
-        <th class="num">Payback</th>
-        <th>Verdict</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${rows.map(r => {
-        const isMinChurn = Math.abs(r.c.churn12 - minChurn) < 1e-6;
-        const isMinPay = r.c.breakevenMonth !== null && r.c.breakevenMonth === minPay;
-        const isMaxLtv = Math.abs(r.ltvMult - maxLtv) < 1e-6;
-        const verdict = isMinChurn && isMaxLtv
-          ? `<span class="pill good">best both</span>`
-          : isMinChurn ? `<span class="pill good">lowest churn</span>`
-          : isMaxLtv ? `<span class="pill good">highest LTV</span>`
-          : isMinPay ? `<span class="pill neutral">fastest payback</span>`
-          : `<span class="pill neutral">—</span>`;
-        return `
-          <tr ${r.fm == p.fm ? 'class="highlight"' : ''}>
-            <td><b>${r.fm}</b></td>
-            <td class="num">${fmtPct(r.c.churn12)}</td>
-            <td class="num">${r.ltvMult.toFixed(1)}×</td>
-            <td style="text-align:center">${tradeoffBar(r.c.churn12, r.ltvMult)}</td>
-            <td class="num">${r.c.breakevenMonth === null ? '> '+p.horizon : r.c.breakevenMonth + ' mo'}</td>
-            <td>${verdict}</td>
-          </tr>
-        `;
-      }).join('')}
-    </tbody>
-  `;
-  $('fmTable').innerHTML = html;
+  const fill=byId('barFill'); fill.style.width=Math.min(c12*100,100)+'%'; fill.style.background=c12<.35?'var(--green)':c12<.55?'var(--amber)':'var(--red)'; byId('barLbl').textContent=fmtPct(c12);
+  byId('bUpfront').textContent=fmtUSD(bk.upfront); byId('bMrrRev').textContent=fmtUSD(bk.mrrRev24); byId('bLost').textContent='−'+fmtUSD(bk.lost24); byId('bAnalytical').textContent=fmtUSD(bk.analytical); byId('bModel').textContent=fmtUSD(ltv); byId('bCac').textContent=fmtUSD(cac); byId('bRatio').textContent=ltvCac.toFixed(2)+'×'; const bNet=byId('bNet'); bNet.textContent=(net>=0?'+':'')+fmtUSD(net); bNet.className='bk-val '+(net>=0?'pos':'neg');
 
-  // Insight
-  const r0 = rows[0].c, r1 = rows[1].c, r2 = rows[2].c, r3 = rows[3].c;
-  const dChurn1 = ((r1.churn12 - r0.churn12) * 100).toFixed(1);
-  const dChurn3 = ((r3.churn12 - r0.churn12) * 100).toFixed(1);
-  const lowestChurn = rows.reduce((a,b) => b.c.churn12 < a.c.churn12 ? b : a).fm;
-  const highestLtv = rows.reduce((a,b) => b.ltvMult > a.ltvMult ? b : a).fm;
-  const fastestPayback = rows.filter(r=>r.c.breakevenMonth!==null).reduce((a,b) => b.c.breakevenMonth < a.c.breakevenMonth ? b : a, {c:{breakevenMonth:Infinity}});
+  let ins='';
+  if(fm>=3) ins=`<strong>${fm} free months.</strong> The updated model treats 3+ free months as the strongest slider-driven churn penalty: <code>free_3plus</code> coefficient +1.1165, or roughly +205% monthly churn odds before interactions.`;
+  else if(mrr<500) ins=`<strong>Lower-MRR deal.</strong> The $100–$499 tier carries +64% monthly churn odds, while high-MRR accounts receive a protective high-MRR effect. This configuration depends heavily on CAC discipline.`;
+  else if(obPct===0) ins=`<strong>No onboarding collected.</strong> The calculator sets <code>ob_actually_paid</code> near 0 and applies the onboarding-gap interaction from the updated churn model.`;
+  else if(ltvCac<1) ins=`<strong>Underwater deal.</strong> At ${fmtUSD(cac)} CAC, calibrated LTV:CAC is ${ltvCac.toFixed(2)}×. Raise MRR, collect onboarding, reduce free months, or lower CAC.`;
+  else ins=`<strong>${fmtUSD(mrr)} MRR · ${obPct}% onboarding · ${fm} free months · ${fmtUSD(cac)} CAC.</strong> Calibrated LTV is <strong>${fmtUSD(ltv)}</strong>, 12-mo churn is <strong>${fmtPct(c12)}</strong>, and LTV:CAC is <strong>${ltvCac.toFixed(2)}×</strong>.`;
+  byId('insight').innerHTML=ins;
 
-  $('fmInsight').innerHTML = `
-    <strong>The tradeoff at ${(p.ob*100).toFixed(0)}% onboarding · ${fmtUSD(p.mrr)} MRR</strong>
-    <b>0 free months</b> gives the highest LTV (${rows[0].ltvMult.toFixed(1)}×) but also the highest churn (${fmtPct(r0.churn12)}). <b>3 free months</b> reverses both — lowest churn (${fmtPct(r3.churn12)}) but the slowest billing start. The 0→3 churn movement is <b>${dChurn3 >= 0 ? '+' : ''}${dChurn3} pts</b>, and LTV trades down by <b>${((rows[3].ltvMult/rows[0].ltvMult - 1)*100).toFixed(0)}%</b>. Lowest churn: ${lowestChurn} mo. Highest LTV: ${highestLtv} mo. Fastest payback: ${fastestPayback.fm !== undefined ? fastestPayback.fm + ' mo' : 'n/a'}.
-  `;
+  renderAudit('auditChurn', [
+    ['log_mrr', f.log_mrr, CHURN_C.log_mrr, 'log(mrr)'],
+    ['ob_collected_pct_mrr_sq', f.ob_collected_pct_mrr_sq, CHURN_C.ob_collected_pct_mrr_sq, 'ob_ratio²'],
+    ['discount_length_mo', f.discount_length_mo, CHURN_C.discount_length_mo, 'fixed at 0; no slider'],
+    ['mrr_lt100 (smooth)', f.mrr_lt100, CHURN_C.mrr_lt100, '~1 below $100'],
+    ['mrr_100_499 (smooth)', f.mrr_100_499, CHURN_C.mrr_100_499, '$100–$499'],
+    ['mrr_1000p (smooth)', f.mrr_1000p, CHURN_C.mrr_1000p, '~1 above $1k'],
+    ['high_mrr (smooth)', f.high_mrr, CHURN_C.high_mrr, '~1 above $500'],
+    ['ob_actually_paid (smooth)', f.ob_actually_paid, CHURN_C.ob_actually_paid, 'sigmoid 0→15%'],
+    ['ob_waived_post_sign', f.ob_waived_post_sign, CHURN_C.ob_waived_post_sign, 'fixed at 0; no slider'],
+    ['free_1mo_exact', f.free_1mo_exact, CHURN_C.free_1mo_exact, 'fm==1'],
+    ['free_2mo_exact', f.free_2mo_exact, CHURN_C.free_2mo_exact, 'fm==2'],
+    ['free_3plus (smooth)', f.free_3plus, CHURN_C.free_3plus, 'fm>=3'],
+    ['mrr_x_ob', f.mrr_x_ob, CHURN_C.mrr_x_ob, 'log(mrr)×ob_ratio'],
+    ['age_x_free', f.age_x_free, CHURN_C.age_x_free, 'log_coh×fm'],
+    ['ob_gap_x_mrr', f.ob_gap_x_mrr, CHURN_C.ob_gap_x_mrr, 'max(0,1−ob_ratio)×log(mrr)'],
+    ['ob_gap_x_free', f.ob_gap_x_free, CHURN_C.ob_gap_x_free, 'max(0,1−ob_ratio)×fm'],
+    ['log_tenure', f.log_tenure, CHURN_C.log_tenure, 'varies by month for LTV'],
+    ['log_tenure_sq', f.log_tenure_sq, CHURN_C.log_tenure_sq, 'varies by month for LTV'],
+    ['log_cohort_age', f.log_cohort_age, CHURN_C.log_cohort_age, 'held at 14 mo'],
+    ['log_cohort_age_sq', f.log_cohort_age_sq, CHURN_C.log_cohort_age_sq, 'held at 14 mo'],
+  ]);
+  renderAudit('auditLtv', [
+    ['uncalibrated analytical LTV', bk.analytical, 1.0000, 'upfront + expected MRR through 120 mo'],
+    ['calibration factor', CALIBRATION, CALIBRATION, 'actual/analytical median'],
+    ['calibrated expected LTV', ltv, 1.0000, 'used for LTV:CAC and net value'],
+    ['mean monthly hazard benchmark', 0.049832, 0.049832, 'population mean from regression output'],
+    ['12-mo churn benchmark', 0.4585, 0.4585, 'population implied churn'],
+    ['24-mo churn benchmark', 0.7068, 0.7068, 'population implied churn'],
+  ]);
 }
-
-function fillObTable(p){
-  const obs = [0, 0.50, 1.00, 1.50, 2.00];
-  const rows = obs.map(ob => {
-    const c = projectCohort({...p, ob});
-    const ltvMult = modelLtvMultiple({...p, ob});
-    return {ob, c, ltvMult};
-  });
-  const minChurn = Math.min(...rows.map(r => r.c.churn12));
-  const maxChurn = Math.max(...rows.map(r => r.c.churn12));
-  const minLtv = Math.min(...rows.map(r => r.ltvMult));
-  const maxLtv = Math.max(...rows.map(r => r.ltvMult));
-  const minPay = Math.min(...rows.filter(r=>r.c.breakevenMonth!==null).map(r => r.c.breakevenMonth));
-
-  const tradeoffBar = (churn, ltv) => {
-    const churnPct = maxChurn > 0 ? (churn / maxChurn) * 100 : 0;
-    const ltvPct = maxLtv > 0 ? (ltv / maxLtv) * 100 : 0;
-    return `<div class="tradeoffBar" title="Churn ${(churn*100).toFixed(1)}% · LTV ${ltv.toFixed(1)}×">
-      <div class="churnBar" style="width:${churnPct*0.5}%"></div>
-      <div class="divider"></div>
-      <div class="ltvBar" style="width:${ltvPct*0.5}%"></div>
-    </div>`;
-  };
-
-  const html = `
-    <thead>
-      <tr>
-        <th>Onboarding</th>
-        <th class="num">Churn</th>
-        <th class="num">LTV mult</th>
-        <th style="text-align:center">← Churn · LTV →</th>
-        <th class="num">Payback</th>
-        <th>Verdict</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${rows.map(r => {
-        const isMinChurn = Math.abs(r.c.churn12 - minChurn) < 1e-6;
-        const isMinPay = r.c.breakevenMonth !== null && r.c.breakevenMonth === minPay;
-        const isMaxLtv = Math.abs(r.ltvMult - maxLtv) < 1e-6;
-        const verdict = isMinChurn && isMaxLtv
-          ? `<span class="pill good">best both</span>`
-          : isMinChurn ? `<span class="pill good">lowest churn</span>`
-          : isMaxLtv ? `<span class="pill good">highest LTV</span>`
-          : isMinPay ? `<span class="pill neutral">fastest payback</span>`
-          : `<span class="pill neutral">—</span>`;
-        return `
-          <tr ${Math.abs(r.ob - p.ob) < 0.01 ? 'class="highlight"' : ''}>
-            <td><b>${(r.ob*100).toFixed(0)}%</b></td>
-            <td class="num">${fmtPct(r.c.churn12)}</td>
-            <td class="num">${r.ltvMult.toFixed(1)}×</td>
-            <td style="text-align:center">${tradeoffBar(r.c.churn12, r.ltvMult)}</td>
-            <td class="num">${r.c.breakevenMonth === null ? '> '+p.horizon : r.c.breakevenMonth + ' mo'}</td>
-            <td>${verdict}</td>
-          </tr>
-        `;
-      }).join('')}
-    </tbody>
-  `;
-  $('obTable').innerHTML = html;
-
-  // Insight: turning point for churn = -b1/(2*b2)
-  const turnChurn = -CHURN_M.onb / (2 * CHURN_M.onb2);  // ≈ 1.13
-  const turnLtv = -LTV_M.onb / (2 * LTV_M.onb2);       // ≈ 1.82
-  const lowest = rows.reduce((a,b) => b.c.churn12 < a.c.churn12 ? b : a);
-  const highestLtv = rows.reduce((a,b) => b.ltvMult > a.ltvMult ? b : a);
-
-  $('obInsight').innerHTML = `
-    <strong>The tradeoff at ${p.fm} free month${p.fm==1?'':'s'} · ${fmtUSD(p.mrr)} MRR</strong>
-    The two curves do not have the same turning point. <b>Churn bottoms near ${(turnChurn*100).toFixed(0)}% onboarding</b> — but <b>LTV keeps rising to ~${(turnLtv*100).toFixed(0)}%</b> before it breaks down. The sweet spot for the joint optimum sits between them. Lowest churn in table: <b>${(lowest.ob*100).toFixed(0)}%</b>. Highest LTV: <b>${(highestLtv.ob*100).toFixed(0)}%</b>. Above 200%, both deteriorate.
-  `;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   PAYBACK HEATMAP — 5 onboarding × 4 free-month
-   ═══════════════════════════════════════════════════════════ */
-function colorForPayback(months, horizon){
-  if(months === null) return {bg:'#9c2c2c', fg:'#fff'};
-  if(months === 0)    return {bg:'#1e5e3e', fg:'#fff'};
-  // Scale from green to red across 1..horizon
-  const t = clamp(months / horizon, 0, 1);
-  // green (#2d6a4f) → gold (#9d7b1c) → red (#9c2c2c)
-  const stops = [
-    {p:0,  c:[45,106,79]},
-    {p:.5, c:[157,123,28]},
-    {p:1,  c:[156,44,44]},
-  ];
-  let c1, c2, lt;
-  if(t <= .5){ c1 = stops[0].c; c2 = stops[1].c; lt = t/.5; }
-  else { c1 = stops[1].c; c2 = stops[2].c; lt = (t-.5)/.5; }
-  const r = Math.round(c1[0] + (c2[0]-c1[0])*lt);
-  const g = Math.round(c1[1] + (c2[1]-c1[1])*lt);
-  const b = Math.round(c1[2] + (c2[2]-c1[2])*lt);
-  return {bg:`rgb(${r},${g},${b})`, fg:'#fff'};
-}
-
-function buildHeatmap(p){
-  const obs = [0, 0.50, 1.00, 1.50, 2.00];
-  const fms = [0, 1, 2, 3];
-  // Heatmap always uses the $8k benchmark so it's consistent with cash-trajectory charts.
-  const heatCac = FIXED_CAC_BENCHMARK;
-  $('heatCacRef').textContent = fmtUSD(heatCac);
-  $('heatMrrRef').textContent = fmtUSD(p.mrr);
-  $('heatHorizonRef').textContent = p.horizon;
-
-  const grid = [];
-  let bestMonths = Infinity, bestKey = null;
-  obs.forEach(ob => {
-    fms.forEach(fm => {
-      const months = paybackForCAC({...p, ob, fm}, heatCac);
-      const months_clipped = (months !== null && months > p.horizon) ? null : months;
-      grid.push({ob, fm, months: months_clipped});
-      if(months_clipped !== null && months_clipped < bestMonths){
-        bestMonths = months_clipped;
-        bestKey = `${ob}|${fm}`;
-      }
-    });
-  });
-
-  let html = '';
-  // Header row
-  html += '<div class="hLbl"></div>';
-  fms.forEach(fm => {
-    html += `<div class="hLbl">${fm} free mo</div>`;
-  });
-  // Body
-  obs.forEach(ob => {
-    html += `<div class="hRow">${(ob*100).toFixed(0)}% onb</div>`;
-    fms.forEach(fm => {
-      const cell = grid.find(c => c.ob === ob && c.fm === fm);
-      const col = colorForPayback(cell.months, p.horizon);
-      const isOpt = `${ob}|${fm}` === bestKey;
-      const display = cell.months === null ? '> ' + p.horizon : cell.months + ' mo';
-      const sub = cell.months === null ? 'no payback' : cell.months <= 6 ? 'fast' : cell.months <= 12 ? 'medium' : 'slow';
-      html += `<div class="hCell ${isOpt ? 'optimal' : ''}" style="background:${col.bg};color:${col.fg}">${display}<span class="sub">${sub}</span></div>`;
-    });
-  });
-  $('paybackHeatmap').innerHTML = html;
-
-  // Legend
-  $('heatLegend').innerHTML = `
-    <span><span class="swatch" style="background:#1e5e3e;height:10px;width:18px"></span>0 mo (upfront)</span>
-    <span><span class="swatch" style="background:#2d6a4f;height:10px;width:18px"></span>fast (≤ 6 mo)</span>
-    <span><span class="swatch" style="background:#9d7b1c;height:10px;width:18px"></span>medium (~ 12 mo)</span>
-    <span><span class="swatch" style="background:#9c2c2c;height:10px;width:18px"></span>slow / does not pay back</span>
-    <span style="margin-left:auto"><b style="color:var(--accent)">★</b> = fastest cell at current CAC</span>
-  `;
-
-  // Insight
-  const fastest = grid.filter(c => c.months !== null).sort((a,b)=>a.months-b.months)[0];
-  const slowest = grid.filter(c => c.months !== null).sort((a,b)=>b.months-a.months)[0];
-  const noPayback = grid.filter(c => c.months === null).length;
-
-  $('heatInsight').innerHTML = `
-    <strong>Reading at ${fmtUSD(heatCac)} CAC benchmark</strong>
-    Fastest payback: <b>${(fastest.ob*100).toFixed(0)}% onboarding · ${fastest.fm} free month${fastest.fm==1?'':'s'}</b> (${fastest.months} mo). Slowest inside the window: ${(slowest.ob*100).toFixed(0)}% × ${slowest.fm} (${slowest.months} mo). ${noPayback > 0 ? `<b>${noPayback} of 20</b> structures fail to pay back within ${p.horizon} months at this CAC.` : 'Every structure recovers within the projection window at $8k CAC.'}
-  `;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   CHARTS — Chart.js
-   ═══════════════════════════════════════════════════════════ */
-const charts = {};
-function makeChart(id, cfg){
-  if(charts[id]) charts[id].destroy();
-  charts[id] = new Chart($(id), cfg);
-}
-
-const editorialOpts = {
-  responsive:true,
-  maintainAspectRatio:false,
-  font:{family:"'Inter', sans-serif"},
-  plugins:{
-    legend:{
-      labels:{
-        font:{family:"'Inter', sans-serif", size:11, weight:'500'},
-        color:'#525252',
-        boxWidth:14,
-        boxHeight:3,
-        padding:14,
-        usePointStyle:false,
-      },
-    },
-    tooltip:{
-      backgroundColor:'#0a0a0a',
-      titleFont:{family:"'Inter', sans-serif", size:11, weight:'600'},
-      bodyFont:{family:"'JetBrains Mono', monospace", size:11},
-      padding:10,
-      borderColor:'#047857',
-      borderWidth:1,
-      cornerRadius:4,
-    },
-  },
-};
-
-function commonScales(xTitle, yTitle, yFmt){
-  return {
-    x:{
-      title:{display:true, text:xTitle, font:{family:"'Inter', sans-serif", size:11, weight:'500'}, color:'#737373'},
-      ticks:{font:{family:"'JetBrains Mono', monospace", size:10}, color:'#525252'},
-      grid:{color:'rgba(229,229,228,0.6)'},
-    },
-    y:{
-      title:{display:true, text:yTitle, font:{family:"'Inter', sans-serif", size:11, weight:'500'}, color:'#737373'},
-      ticks:{
-        font:{family:"'JetBrains Mono', monospace", size:10}, color:'#525252',
-        callback: yFmt || (v=>v),
-      },
-      grid:{color:'rgba(229,229,228,0.6)'},
-    },
-  };
-}
-
-function chartChurnOb(p){
-  // Curve: model churn vs onboarding from 0 to 200%, at user's fm but at
-  // POPULATION-MEAN MRR ($640) so the curve lines up with the historical dots.
-  // The dots are population averages; the curve at user-selected MRR could shift
-  // away from them and create the misleading impression of model misfit.
-  const POP_MEAN_MRR = 640;
-  const xs = [];
-  for(let ob=0; ob<=2.0001; ob+=0.05) xs.push(ob);
-  const yModel = xs.map(ob => modelChurn({...p, ob, mrr: POP_MEAN_MRR}) * 100);
-
-  // Empirical: dots
-  const empDots = EMP.obChurn.map(d => ({x:d.ob*100, y:d.churn*100, n:d.n}));
-
-  makeChart('chartChurnOb', {
-    type:'line',
-    data:{
-      datasets:[
-        {
-          label:'Model curve',
-          data: xs.map((ob,i)=>({x:ob*100, y:yModel[i]})),
-          borderColor:'#b91c1c', borderWidth:2.5, pointRadius:0, tension:0.25,
-          parsing:false,
-        },
-        {
-          label:'Historical bin avg (n-sized dots)',
-          data: empDots,
-          backgroundColor:'rgba(3,105,161,0.6)',
-          borderColor:'#0369a1',
-          borderWidth:1.5,
-          pointRadius: empDots.map(d => Math.min(14, Math.max(4, Math.sqrt(d.n)*0.7))),
-          showLine:false,
-          parsing:false,
-          type:'scatter',
-        },
-      ],
-    },
-    options:{
-      ...editorialOpts,
-      scales:{
-        x:{
-          type:'linear',
-          ...commonScales('Onboarding fee (% of MRR)', '12-month churn (%)', v=>v+'%').x,
-          min:0, max:200,
-          ticks:{...commonScales('','').x.ticks, callback:v=>v+'%'},
-        },
-        y:{
-          ...commonScales('','12-month churn (%)', v=>v+'%').y,
-          min:30, max:80,
-        },
-      },
-      plugins:{
-        ...editorialOpts.plugins,
-        tooltip:{
-          ...editorialOpts.plugins.tooltip,
-          callbacks:{
-            label: ctx => {
-              if(ctx.datasetIndex === 0) return `Model: ${ctx.parsed.y.toFixed(1)}% churn`;
-              const d = empDots[ctx.dataIndex];
-              return `Historical: ${ctx.parsed.y.toFixed(1)}% (n=${d.n})`;
-            },
-          },
-        },
-      },
-    },
-  });
-}
-
-function chartLtvOb(p){
-  // Show bars = historical geometric mean LTV per bin (what the data shows),
-  // line = model prediction at each bin's actual avg composition (tracks data well).
-  // Color the 0% bar differently to flag the composition artifact.
-
-  const labels = EMP.obLtv.map(d => d.label);
-  const geoMeans = EMP.obLtv.map(d => d.geo);
-  const modelPreds = EMP.obLtv.map(d => d.modelBinAvg);
-  const ns = EMP.obLtv.map(d => d.n);
-  const billings = EMP.obLtv.map(d => d.billing);
-
-  // Bar colors: 0% is flagged in amber (composition artifact), others in blue
-  const barColors = EMP.obLtv.map(d =>
-    d.ob === 0
-      ? 'rgba(180,83,9,0.5)'     // amber — flagged
-      : 'rgba(3,105,161,0.6)'    // blue — normal
-  );
-  const barBorders = EMP.obLtv.map(d =>
-    d.ob === 0 ? '#b45309' : '#0369a1'
-  );
-
-  makeChart('chartLtvOb', {
-    type:'bar',
-    data:{
-      labels,
-      datasets:[
-        {
-          type:'bar',
-          label:'Historical geo mean LTV (0% = composition artifact)',
-          data: geoMeans,
-          backgroundColor: barColors,
-          borderColor: barBorders,
-          borderWidth:1.5,
-          order:2,
-        },
-        {
-          type:'line',
-          label:'Model at bin avg billing/MRR',
-          data: modelPreds,
-          borderColor:'#047857',
-          borderWidth:2.5,
-          pointRadius:5,
-          pointBackgroundColor:'#047857',
-          tension:0.2,
-          fill:false,
-          order:1,
-        },
-      ],
-    },
-    options:{
-      ...editorialOpts,
-      scales:{
-        x:{
-          ...commonScales('Onboarding fee','').x,
-        },
-        y:{
-          ...commonScales('','Normalised LTV multiple').y,
-          min:0, max:18,
-        },
-      },
-      plugins:{
-        ...editorialOpts.plugins,
-        tooltip:{
-          ...editorialOpts.plugins.tooltip,
-          callbacks:{
-            title: ctx => `${ctx[0].label} onboarding (n=${ns[ctx[0].dataIndex]})`,
-            label: ctx => {
-              if(ctx.dataset.type === 'bar' || ctx.datasetIndex === 0){
-                const artifact = EMP.obLtv[ctx.dataIndex].ob === 0
-                  ? ' ⚠ composition artifact' : '';
-                return `Data geo mean: ${ctx.parsed.y.toFixed(2)}× · billing ${billings[ctx.dataIndex]}mo${artifact}`;
-              }
-              return `Model prediction: ${ctx.parsed.y.toFixed(2)}×`;
-            },
-          },
-        },
-      },
-    },
-  });
-
-  // Update the keyInsight dynamically
-  const el = $('ltvObInsight');
-  if(el){
-    const stepUp = ((EMP.obLtv[2].geo / EMP.obLtv[0].geo - 1)*100).toFixed(0);
-    const modelStepUp = ((EMP.obLtv[2].modelBinAvg / EMP.obLtv[1].modelBinAvg - 1)*100).toFixed(0);
-    el.innerHTML = `
-      <strong>Reading</strong>
-      Raw onboarding explains <b>&lt;1% of LTV variance</b> alone (R²=0.009). The model explains <b>57%</b> once billing span, MRR, and leakage are controlled. The amber bar (0% onboarding) looks deceptively high at ${EMP.obLtv[0].geo.toFixed(1)}× because those ${EMP.obLtv[0].n.toLocaleString()} accounts have <b>16.0mo billing spans</b> vs 10.5mo for others — they earn high LTV through tenure, not onboarding structure. The genuine signal: <b>100–150% onboarding outperforms 50% by ~+${stepUp}%</b> in the raw data, and the model confirms this with a similar slope. The 200%+ pullback is also real.
-    `;
-  }
-}
-
-// Project ONE average customer's cumulative cash over the horizon.
-// Returns an array of {m, cum} where cum is the cumulative $ collected
-// from this single customer with churn applied as survival probability.
-function projectSingleCustomer(p){
-  const churn12 = modelChurn(p);
-  const hazard = 1 - Math.pow(1 - churn12, 1/12);
-  const upfront = p.mrr * p.ob;  // onboarding cash on day 0
-  const rows = [{m:0, cum:upfront}];
-  let cum = upfront;
-  for(let t=1; t<=p.horizon; t++){
-    const survival = Math.pow(1 - hazard, t);
-    const paid = t > p.fm;
-    const monthly = paid ? p.mrr * survival : 0;
-    cum += monthly;
-    rows.push({m:t, cum});
-  }
-  return {rows, churn12, hazard};
-}
-
-const FIXED_CAC_BENCHMARK = 8000;
-
-function chartCashByFm(p){
-  const labels = [];
-  for(let m=0; m<=p.horizon; m++) labels.push(m);
-
-  // Use $2,250 (avg) as fixed MRR for this benchmark chart, and the user's onboarding
-  const benchMrr = 2250;
-  const benchOb = p.ob;
-
-  const colors = {0:'#0369a1', 1:'#047857', 2:'#b45309', 3:'#7c3aed'};
-
-  const datasets = [0,1,2,3].map(fm => {
-    const single = projectSingleCustomer({mrr:benchMrr, ob:benchOb, fm, horizon:p.horizon});
-    return {
-      label: `${fm} free mo (churn ${(single.churn12*100).toFixed(1)}%)`,
-      data: single.rows.map(r => r.cum),
-      borderColor: colors[fm],
-      borderWidth: fm == p.fm ? 2.8 : 2,
-      pointRadius: 0,
-      tension: 0.15,
-      borderDash: fm == p.fm ? [] : [],
-    };
-  });
-
-  // Fixed $8,000 CAC reference line
-  datasets.push({
-    label:'$8,000 CAC threshold',
-    data: labels.map(()=>FIXED_CAC_BENCHMARK),
-    borderColor:'#b91c1c',
-    borderWidth:1.5,
-    borderDash:[6,4],
-    pointRadius:0,
-  });
-
-  makeChart('chartCashByFm', {
-    type:'line',
-    data:{labels, datasets},
-    options:{
-      ...editorialOpts,
-      scales: commonScales('Months from contract start','Single-customer cash ($)', v=>'$'+v.toLocaleString()),
-    },
-  });
-}
-
-function chartCashByOnb(p){
-  const labels = [];
-  for(let m=0; m<=p.horizon; m++) labels.push(m);
-
-  const benchMrr = 2250;
-  const benchFm = p.fm;
-
-  const onbLevels = [0.5, 1.0, 1.5];
-  const colors = ['#0369a1', '#047857', '#b45309'];
-
-  const datasets = onbLevels.map((ob, i) => {
-    const single = projectSingleCustomer({mrr:benchMrr, ob, fm:benchFm, horizon:p.horizon});
-    return {
-      label: `${(ob*100).toFixed(0)}% onb (churn ${(single.churn12*100).toFixed(1)}%)`,
-      data: single.rows.map(r => r.cum),
-      borderColor: colors[i],
-      borderWidth: Math.abs(ob - p.ob) < 0.05 ? 2.8 : 2,
-      pointRadius: 0,
-      tension: 0.15,
-    };
-  });
-
-  datasets.push({
-    label:'$8,000 CAC threshold',
-    data: labels.map(()=>FIXED_CAC_BENCHMARK),
-    borderColor:'#b91c1c',
-    borderWidth:1.5,
-    borderDash:[6,4],
-    pointRadius:0,
-  });
-
-  makeChart('chartCashByOnb', {
-    type:'line',
-    data:{labels, datasets},
-    options:{
-      ...editorialOpts,
-      scales: commonScales('Months from contract start','Single-customer cash ($)', v=>'$'+v.toLocaleString()),
-    },
-  });
-}
-
-function chartCac(){
-  const labels = CAC_DATA.map(d => d.month.slice(2));
-  const fixed = CAC_DATA.map(d => d.fixed);
-  const variable = CAC_DATA.map(d => d.variable);
-  const total = CAC_DATA.map(d => d.total);
-
-  // Linear regression on total CAC for trend line
-  const n = total.length;
-  const xs = total.map((_, i) => i);
-  const xMean = xs.reduce((a,b) => a+b, 0) / n;
-  const yMean = total.reduce((a,b) => a+b, 0) / n;
-  const num = xs.reduce((s, x, i) => s + (x - xMean) * (total[i] - yMean), 0);
-  const den = xs.reduce((s, x) => s + (x - xMean) ** 2, 0);
-  const slope = num / den;
-  const intercept = yMean - slope * xMean;
-  const trend = xs.map(x => slope * x + intercept);
-
-  // Win rate aligned to CAC labels — only first 12 months have data
-  const wrAligned = CAC_DATA.map(d => {
-    const w = WIN_RATE_MONTHLY.find(x => x.month === d.month);
-    return w ? w.wr * 100 : null;
-  });
-
-  makeChart('chartCac', {
-    type:'bar',
-    data:{
-      labels,
-      datasets:[
-        {
-          label:'Variable CAC',
-          data: variable,
-          backgroundColor:'rgba(180,83,9,0.65)',
-          borderColor:'#b45309',
-          borderWidth:0,
-          stack:'cac',
-          order:3,
-          yAxisID:'y',
-        },
-        {
-          label:'Fixed CAC',
-          data: fixed,
-          backgroundColor:'rgba(3,105,161,0.65)',
-          borderColor:'#0369a1',
-          borderWidth:0,
-          stack:'cac',
-          order:3,
-          yAxisID:'y',
-        },
-        {
-          label:'Total CAC trend',
-          type:'line',
-          data: trend,
-          borderColor:'#0a0a0a',
-          borderWidth:1.5,
-          borderDash:[6,4],
-          pointRadius:0,
-          tension:0,
-          fill:false,
-          order:1,
-          yAxisID:'y',
-        },
-        {
-          label:'Win rate (right axis)',
-          type:'line',
-          data: wrAligned,
-          borderColor:'#047857',
-          backgroundColor:'#047857',
-          borderWidth:2.5,
-          pointRadius: wrAligned.map(v => v === null ? 0 : 3.5),
-          pointBackgroundColor:'#047857',
-          spanGaps:false,
-          tension:0.15,
-          fill:false,
-          order:0,
-          yAxisID:'y1',
-        },
-      ],
-    },
-    options:{
-      ...editorialOpts,
-      scales:{
-        x:{
-          stacked:true,
-          ...commonScales('Month','').x,
-        },
-        y:{
-          stacked:true,
-          ...commonScales('','CAC per won account ($)', v=>'$'+v.toLocaleString()).y,
-        },
-        y1:{
-          position:'right',
-          title:{display:true, text:'Win rate (%)', font:{family:"'Inter', sans-serif", size:11, weight:'500'}, color:'#047857'},
-          ticks:{font:{family:"'JetBrains Mono', monospace", size:10}, color:'#047857', callback:v=>v.toFixed(0)+'%'},
-          grid:{drawOnChartArea:false},
-          min:0,
-          max:40,
-        },
-      },
-    },
-  });
-}
-
-function chartReach(p){
-  // For each fm, compute the share of the 16 historical CAC totals where payback within horizon
-  const totals = CAC_DATA.map(d => d.total);
-  const fms = [0, 1, 2, 3];
-  const data = fms.map(fm => {
-    const within = totals.filter(t => {
-      const m = paybackForCAC({...p, fm}, t);
-      return m !== null && m <= p.horizon;
-    }).length;
-    return (within / totals.length) * 100;
-  });
-
-  // Also compute average payback across reachable months for context
-  const avgPay = fms.map(fm => {
-    const ms = totals.map(t => paybackForCAC({...p, fm}, t)).filter(m => m !== null && m <= p.horizon);
-    return ms.length === 0 ? null : ms.reduce((a,b)=>a+b,0) / ms.length;
-  });
-
-  makeChart('chartReach', {
-    type:'bar',
-    data:{
-      labels: fms.map(fm => `${fm} free mo`),
-      datasets:[
-        {
-          label:'% of CAC months reach payback within window',
-          data,
-          backgroundColor: fms.map(fm => fm == p.fm ? 'rgba(168,50,26,0.85)' : 'rgba(168,50,26,0.45)'),
-          borderColor:'#a8321a',
-          borderWidth:1.5,
-          yAxisID:'y',
-        },
-        {
-          label:'Avg months to payback (when reached)',
-          type:'line',
-          data: avgPay,
-          borderColor:'#1f4948',
-          borderWidth:2,
-          pointRadius:5,
-          pointBackgroundColor:'#1f4948',
-          yAxisID:'y1',
-        },
-      ],
-    },
-    options:{
-      ...editorialOpts,
-      scales:{
-        x:{
-          ...commonScales('Free-month structure','').x,
-        },
-        y:{
-          ...commonScales('','Reachability (%)', v=>v+'%').y,
-          min:0, max:100,
-        },
-        y1:{
-          position:'right',
-          title:{display:true, text:'Avg months to payback', font:{family:"'Fraunces', serif", size:11, weight:'600'}, color:'#8a8270'},
-          ticks:{font:{family:"'JetBrains Mono', monospace", size:10}, color:'#3a352d'},
-          grid:{drawOnChartArea:false},
-          min:0,
-        },
-      },
-    },
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════
-   CAC stress test table
-   ═══════════════════════════════════════════════════════════ */
-function fillCacStress(p){
-  const totals = CAC_DATA.map(d => d.total);
-  const minT = Math.min(...totals);
-  const maxT = Math.max(...totals);
-  const sortedT = [...totals].sort((a,b)=>a-b);
-  const medT = sortedT[Math.floor(sortedT.length/2)];
-
-  const fms = [0,1,2,3];
-  const refs = [
-    {label:'Low CAC', value:minT, sub:'min observed (' + CAC_DATA.find(d=>d.total===minT).month + ')'},
-    {label:'Median CAC', value:medT, sub:'median of 16 months'},
-    {label:'High CAC', value:maxT, sub:'max observed (' + CAC_DATA.find(d=>d.total===maxT).month + ')'},
-  ];
-
-  const html = `
-    <thead>
-      <tr>
-        <th rowspan="2">CAC scenario</th>
-        <th class="num" rowspan="2">CAC value</th>
-        <th colspan="4" style="text-align:center">Months to payback by free-month structure</th>
-        <th rowspan="2">Read</th>
-      </tr>
-      <tr>
-        <th class="num">0 free</th>
-        <th class="num">1 free</th>
-        <th class="num">2 free</th>
-        <th class="num">3 free</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${refs.map(ref => {
-        const cells = fms.map(fm => paybackForCAC({...p, fm}, ref.value));
-        const insideWindow = cells.filter(m => m !== null && m <= p.horizon);
-        const fastestFm = insideWindow.length > 0 ? fms[cells.findIndex(m => m === Math.min(...insideWindow))] : null;
-        const allReach = cells.every(m => m !== null && m <= p.horizon);
-        const noneReach = cells.every(m => m === null || m > p.horizon);
-        const read = noneReach
-          ? `<span class="pill bad">no structure pays back</span>`
-          : allReach
-          ? `<span class="pill good">all structures pay back</span>`
-          : `<span class="pill warn">structure matters</span>`;
-        return `
-          <tr>
-            <td><b>${ref.label}</b><div class="statSub" style="margin-top:0">${ref.sub}</div></td>
-            <td class="num">${fmtUSD(ref.value)}</td>
-            ${cells.map((m, i) => {
-              const display = m === null || m > p.horizon ? `<span style="color:var(--bad)">> ${p.horizon}</span>` : m + ' mo';
-              const bold = fastestFm === fms[i] ? 'font-weight:700;color:var(--good)' : '';
-              return `<td class="num" style="${bold}">${display}</td>`;
-            }).join('')}
-            <td>${read}</td>
-          </tr>
-        `;
-      }).join('')}
-    </tbody>
-  `;
-  $('cacStressTable').innerHTML = html;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   ORCHESTRATOR
-   ═══════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════════
-   PRICING SENSITIVITY — CAC TAB
-   WR model coefficient on log_mrr: -0.106342 (p < 0.001)
-   ═══════════════════════════════════════════════════════════ */
-const WR_LOG_MRR_COEF = -0.106342;
-// Trailing average observed acquisition spend proxy:
-// 16-month average total CAC × 11.5% baseline win rate × 100 demos ≈ acquisition spend
-// We use observed total CAC and back-calculate spend from wins.
-// Simpler: show implied CAC = observed avg total CAC × (baseline WR / new WR)
-// since spend stays constant and wins increase.
-const OBS_AVG_TOTAL_CAC = CAC_DATA.reduce((s,d) => s + d.total, 0) / CAC_DATA.length;
-// ≈ $6,286 average total CAC over 16 months
-
-function impliedWrAtMrr(mrr){
-  // From the win-rate aggregate model, holding all else at pop means.
-  // We offset the intercept so baseline WR at $2,250 matches 11.5%.
-  const baseLogMrr = Math.log(2250);
-  const newLogMrr = Math.log(Math.max(mrr, 1));
-  const deltaWr = WR_LOG_MRR_COEF * (newLogMrr - baseLogMrr);
-  return clamp(FIXED_WIN_RATE + deltaWr, 0.02, 0.80);
-}
-
-function impliedCacAtMrr(mrr){
-  // If acquisition spend is fixed and win rate changes, CAC = spend / wins.
-  // spend ≈ OBS_AVG_TOTAL_CAC × baseline_wins
-  const baseWins = 100 * FIXED_WIN_RATE;
-  const spend = OBS_AVG_TOTAL_CAC * baseWins;
-  const newWins = 100 * impliedWrAtMrr(mrr);
-  return spend / newWins;
-}
-
-function chartPricingSensitivity(p){
-  const mrrs = [500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000];
-  const wrData = mrrs.map(m => (impliedWrAtMrr(m) * 100));
-  const cacData = mrrs.map(m => impliedCacAtMrr(m));
-
-  makeChart('chartPricingSensitivity', {
-    type:'line',
-    data:{
-      labels: mrrs.map(m => '$' + m.toLocaleString()),
-      datasets:[
-        {
-          label:'Predicted win rate',
-          data: wrData,
-          borderColor:'#047857', borderWidth:2.5, pointRadius:3.5,
-          pointBackgroundColor:'#047857',
-          tension:0.2, yAxisID:'y',
-        },
-        {
-          label:'Implied CAC (at avg spend)',
-          data: cacData,
-          borderColor:'#b91c1c', borderWidth:2, pointRadius:3,
-          pointBackgroundColor:'#b91c1c',
-          borderDash:[5,3],
-          tension:0.2, yAxisID:'y1',
-        },
-      ],
-    },
-    options:{
-      ...editorialOpts,
-      scales:{
-        x:{...commonScales('Contract MRR','').x},
-        y:{
-          ...commonScales('','Win rate (%)').y,
-          ticks:{...commonScales('','').y.ticks, callback: v => v.toFixed(1) + '%'},
-          min:0, max:40,
-        },
-        y1:{
-          position:'right',
-          title:{display:true, text:'Implied CAC ($)', font:{family:"'Inter', sans-serif", size:11, weight:'500'}, color:'#737373'},
-          ticks:{font:{family:"'JetBrains Mono', monospace", size:10}, color:'#525252', callback: v => '$' + Math.round(v).toLocaleString()},
-          grid:{drawOnChartArea:false},
-          min:0,
-        },
-      },
-    },
-  });
-
-  // Insight text
-  const currentWr = impliedWrAtMrr(p.mrr);
-  const currentCac = impliedCacAtMrr(p.mrr);
-  const lowWr = impliedWrAtMrr(1500);
-  const lowCac = impliedCacAtMrr(1500);
-  const wrGain = (lowWr - currentWr) * 100;
-  const cacDrop = (currentCac - lowCac);
-  const cacDropPct = (cacDrop / currentCac) * 100;
-  $('pricingInsight').innerHTML = `
-    <strong>At current MRR ${fmtUSD(p.mrr)}</strong>
-    The model predicts a win rate of <b>${fmtPct(currentWr)}</b> and an implied CAC of <b>${fmtUSD(currentCac)}</b>.
-    Reducing MRR to $1,500 (−33%) would increase win rate by ~<b>${wrGain.toFixed(1)} pp</b>
-    and reduce implied CAC to ~<b>${fmtUSD(lowCac)}</b> (−${cacDropPct.toFixed(0)}%) — assuming acquisition spend stays constant.
-    This doesn't account for whether lower-priced deals have different churn characteristics.
-  `;
-}
-
-function fillPricingTradeoffTable(p){
-  const mrrs = [750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 3000];
-
-  const rows = mrrs.map(mrr => {
-    const wr = impliedWrAtMrr(mrr);
-    const wins = 100 * wr;
-    const cac = impliedCacAtMrr(mrr);
-    const churn = modelChurn({...p, mrr});
-    const cohort = projectCohort({...p, mrr});
-    const cashPerWon = cohort.cashPerWon;
-    const ltvCac = cashPerWon / cac;
-    return {mrr, wr, wins, cac, churn, cashPerWon, ltvCac};
-  });
-
-  $('pricingTradeoffTable').innerHTML = `
-    <thead>
-      <tr>
-        <th>MRR</th>
-        <th class="num">Win rate</th>
-        <th class="num">Wins (of 100)</th>
-        <th class="num">Implied CAC</th>
-        <th class="num">12mo churn</th>
-        <th class="num">Cash/won</th>
-        <th class="num">LTV:CAC</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${rows.map(r => `
-        <tr ${Math.abs(r.mrr - p.mrr) < 50 ? 'class="highlight"' : ''}>
-          <td><b>${fmtUSD(r.mrr)}</b></td>
-          <td class="num">${fmtPct(r.wr)}</td>
-          <td class="num">${r.wins.toFixed(1)}</td>
-          <td class="num">${fmtUSD(r.cac)}</td>
-          <td class="num" style="color:${r.churn < 0.45 ? 'var(--good)' : r.churn < 0.60 ? 'var(--warn)' : 'var(--bad)'}">${fmtPct(r.churn)}</td>
-          <td class="num">${fmtUSD(r.cashPerWon)}</td>
-          <td class="num" style="color:${r.ltvCac >= 3 ? 'var(--good)' : r.ltvCac >= 1 ? 'var(--warn)' : 'var(--bad)'}">${r.ltvCac.toFixed(2)}×</td>
-        </tr>
-      `).join('')}
-    </tbody>
-  `;
-}
-
-function safe(fn, name){
-  try { fn(); } catch(e){ console.error('[' + name + '] ' + e.message); }
-}
-
-function updateAll(){
-  const p = getInputs();
-  updateLabels(p);
-  const cohort = projectCohort(p);
-  // Non-chart UI first — these MUST render even if Chart.js fails to load
-  safe(()=>fillStats(p, cohort), 'fillStats');
-  safe(()=>fillFmTable(p), 'fillFmTable');
-  safe(()=>fillObTable(p), 'fillObTable');
-  safe(()=>buildHeatmap(p), 'buildHeatmap');
-  safe(()=>fillCacStress(p), 'fillCacStress');
-  safe(()=>fillPricingTradeoffTable(p), 'fillPricingTradeoffTable');
-  // Charts last — so a chart failure can't break the rest
-  if(typeof Chart !== 'undefined'){
-    safe(()=>chartChurnOb(p), 'chartChurnOb');
-    safe(()=>chartLtvOb(p), 'chartLtvOb');
-    safe(()=>chartCashByFm(p), 'chartCashByFm');
-    safe(()=>chartCashByOnb(p), 'chartCashByOnb');
-    safe(()=>chartReach(p), 'chartReach');
-    safe(()=>chartPricingSensitivity(p), 'chartPricingSensitivity');
-  }
-}
-
-// Static chart that doesn't depend on inputs
-function initStaticCharts(){
-  if(typeof Chart !== 'undefined') safe(()=>chartCac(), 'chartCac');
-}
-
-/* Wire events */
-['mrr','ob','cac','horizon'].forEach(id => {
-  $(id).addEventListener('input', updateAll);
-  $(id).addEventListener('change', updateAll);
-});
-$('fmRow').querySelectorAll('.fmBtn').forEach(b => {
-  b.addEventListener('click', () => {
-    $('fmRow').querySelectorAll('.fmBtn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    clearActivePreset();
-    updateAll();
-  });
-});
-// Clear preset highlight when any input changes
-['mrr','ob','cac','horizon'].forEach(id => {
-  $(id).addEventListener('input', clearActivePreset);
-});
-
-/* Preset buttons — scan grid for optimum */
-function clearActivePreset(){
-  document.querySelectorAll('.presetBtn').forEach(b => b.classList.remove('activePreset'));
-}
-
-function applyPreset(metric, btnEl){
-  const horizon = +$('horizon').value;
-  const cac = +$('cac').value;
-  let best = null;
-
-  // Grid scan: MRR 500-3000 step 100, onboarding 0-200% step 5, fm 0-3
-  for(let mrr=500; mrr<=3000; mrr+=100){
-    for(let obPct=0; obPct<=200; obPct+=5){
-      for(let fm=0; fm<=3; fm++){
-        const p = {mrr, ob:obPct/100, fm, cac, horizon};
-        let score;
-        if(metric === 'minChurn'){
-          score = -modelChurn(p); // higher score = lower churn
-        } else { // maxLtv: cash per won account
-          const cohort = projectCohort(p);
-          score = cohort.cashPerWon;
-        }
-        if(best === null || score > best.score){
-          best = {score, mrr, obPct, fm};
-        }
-      }
-    }
-  }
-
-  if(best){
-    $('mrr').value = best.mrr;
-    $('ob').value = best.obPct;
-    $('fmRow').querySelectorAll('.fmBtn').forEach(b => b.classList.toggle('active', +b.dataset.fm === best.fm));
-    clearActivePreset();
-    if(btnEl) btnEl.classList.add('activePreset');
-    updateAll();
-  }
-}
-
-$('presetMinChurn').addEventListener('click', e => applyPreset('minChurn', e.currentTarget));
-$('presetMaxLtv').addEventListener('click', e => applyPreset('maxLtv', e.currentTarget));
-
-/* Tab switching — preserves scroll position, resizes charts after reveal
-   so Chart.js doesn't render at 0×0 from a previously hidden pane.       */
-const activatedPanes = new Set(['calc']);  // calc is active on load
-
-function activateTab(paneId){
-  document.querySelectorAll('.tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.pane === paneId);
-  });
-  document.querySelectorAll('.pane').forEach(p => {
-    p.classList.toggle('active', p.id === 'pane-' + paneId);
-  });
-
-  const firstView = !activatedPanes.has(paneId);
-  activatedPanes.add(paneId);
-
-  // Two rAF frames so layout settles before Chart.js reads dimensions.
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    if(firstView){
-      // First time this pane is shown — (re)build charts so they size correctly.
-      // updateAll() handles dynamic charts; static CAC chart needs its own call.
-      try { updateAll(); } catch(e){ console.error(e); }
-      if(paneId === 'cac' && typeof Chart !== 'undefined'){
-        try { chartCac(); } catch(e){ console.error(e); }
-      }
-    } else {
-      // Already-built charts may have been created hidden; force a resize.
-      Object.values(charts).forEach(c => {
-        if(!c || !c.canvas) return;
-        const pane = c.canvas.closest('.pane');
-        if(pane && pane.classList.contains('active')){
-          try { c.resize(); } catch(e){}
-        }
-      });
-    }
-    window.scrollTo({top: 0, behavior: 'instant'});
-  }));
-}
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => activateTab(t.dataset.pane));
-});
-
-/* Keyboard navigation: ArrowLeft / ArrowRight while a tab is focused */
-document.querySelector('.tabnav').addEventListener('keydown', e => {
-  if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-  const tabs = Array.from(document.querySelectorAll('.tab'));
-  const i = tabs.indexOf(document.activeElement);
-  if(i < 0) return;
-  const next = e.key === 'ArrowRight'
-    ? tabs[(i+1) % tabs.length]
-    : tabs[(i-1+tabs.length) % tabs.length];
-  next.focus();
-  activateTab(next.dataset.pane);
-});
-
-initStaticCharts();
-updateAll();
+updateLockUI(); update();
 </script>
 </body>
 </html>
