@@ -3,378 +3,1208 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cohort LTV Explorer</title>
+<title>Deal Structure Suite</title>
 <style>
 :root{
   --bg:#0f1117;--panel:#171a23;--panel2:#1e2330;--line:#2c3242;--text:#f4f6fb;--text2:#aeb7c8;--text3:#737d91;
   --green:#32d583;--amber:#fdb022;--red:#f97066;--blue:#7dd3fc;--purple:#c084fc;--pink:#f0abfc;--shadow:0 18px 60px rgba(0,0,0,.32)
 }
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top left,#1b2540 0,#0f1117 42%,#0b0d12 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{max-width:1400px;margin:0 auto;padding:26px}.hdr{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:16px}.hdr h1{margin:0;font-size:30px;letter-spacing:-.03em}.tag{font-size:12px;color:var(--text2);border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.04)}.panel{background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow)}.controls{display:grid;grid-template-columns:1.2fr repeat(5, minmax(120px,.65fr));gap:12px;align-items:end;margin-bottom:16px}.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);font-weight:800;margin-bottom:6px}.field input,.field select{width:100%;background:#0b0e14;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:13px}.file input{padding:8px}.range-wrap{display:grid;grid-template-columns:1fr 86px;gap:8px}.range-wrap input[type=range]{accent-color:var(--purple);padding:0}.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.btn{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));color:var(--text);border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:800}.btn:hover{border-color:#5d6b88}.hint{color:var(--text3);font-size:12px;line-height:1.45;margin-top:8px}.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}.metric{background:linear-gradient(180deg,var(--panel2),#141822);border:1px solid var(--line);border-radius:18px;padding:14px}.metric-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);font-weight:900}.metric-val{font-size:25px;font-weight:900;letter-spacing:-.04em;margin-top:8px}.metric-sub{font-size:11px;color:var(--text3);margin-top:3px}.good{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}.purple{color:var(--purple)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.wide{grid-column:1/-1}.card{background:rgba(18,23,34,.95);border:1px solid var(--line);border-radius:22px;padding:16px;min-height:360px}.card-hdr{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}.card-title{font-size:15px;font-weight:900}.card-sub{font-size:12px;color:var(--text3);margin-top:3px;line-height:1.35}.chart-wrap{height:310px;background:#0b0e14;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:8px;position:relative}.chart-wrap.tall{height:390px}.chart{width:100%;height:100%;display:block}.toggles{display:flex;gap:8px;flex-wrap:wrap}.toggles label{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px}.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;color:var(--text2);font-size:11px}.legend-item{display:flex;gap:5px;align-items:center}.sw{height:9px;width:18px;border-radius:4px;background:var(--blue)}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid rgba(255,255,255,.06);padding:8px 7px;text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.06em}td{color:var(--text)}.pos{color:var(--green)}.neg{color:var(--red)}.empty{border:1px dashed var(--line);border-radius:20px;padding:28px;text-align:center;color:var(--text2);background:rgba(255,255,255,.025)}.pill{border:1px solid var(--line);border-radius:999px;padding:5px 8px;color:var(--text2);font-size:11px;background:#0b0e14}.error{color:#fecaca;background:rgba(249,112,102,.08);border:1px solid rgba(249,112,102,.25);border-radius:14px;padding:10px;margin-top:10px;display:none}.mono{font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:1050px){.controls{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}}@media(max-width:620px){.app{padding:14px}.controls,.metrics{grid-template-columns:1fr}.hdr{display:block}.tag{display:inline-block;margin-top:10px}.chart-wrap{height:260px}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at top left,#1b2540 0,#0f1117 42%,#0b0d12 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+
+/* ============ TOP-LEVEL SITE NAV ============ */
+.site-nav{position:sticky;top:0;z-index:50;background:rgba(11,13,18,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 26px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.site-brand{font-weight:900;letter-spacing:-.02em;font-size:18px}
+.site-brand span{color:var(--blue)}
+.site-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.site-tab{border:1px solid var(--line);background:#0b0e14;color:var(--text2);border-radius:999px;padding:9px 14px;font-size:13px;font-weight:800;cursor:pointer;text-decoration:none;transition:all .15s ease}
+.site-tab:hover{color:var(--text);border-color:#5d6b88}
+.site-tab.active{color:var(--text);background:rgba(125,211,252,.13);border-color:rgba(125,211,252,.55)}
+
+/* ============ SECTION HOST ============ */
+.section{display:none}
+.section.active{display:block}
+.app{max-width:1420px;margin:0 auto;padding:26px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:14px}
+.hdr h1{margin:0;font-size:30px;letter-spacing:-.03em}
+.tag{font-size:12px;color:var(--text2);border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.04)}
+
+/* ============ HOME / OVERVIEW SECTION ============ */
+.home-hero{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.home-card{background:linear-gradient(135deg,rgba(125,211,252,.11),rgba(192,132,252,.08));border:1px solid rgba(125,211,252,.2);border-radius:24px;padding:24px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s ease,border-color .15s ease}
+.home-card:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.45)}
+.home-card h2{margin:0 0 10px;font-size:22px;letter-spacing:-.02em}
+.home-card p{color:var(--text2);font-size:14px;line-height:1.55;margin:0 0 14px}
+.home-card .cta{display:inline-block;color:var(--blue);font-weight:800;font-size:13px}
+.home-feat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
+.home-feat .callout{border:1px solid var(--line);background:rgba(18,23,34,.95);border-radius:18px;padding:14px}
+.home-feat .callout-k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900}
+.home-feat .callout-v{margin-top:6px;color:var(--text2);font-size:12px;line-height:1.45}
+
+/* ============ SHARED EXPLORER STYLES ============ */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-bottom:16px}
+.hero-card{background:linear-gradient(135deg,rgba(125,211,252,.11),rgba(192,132,252,.08));border:1px solid rgba(125,211,252,.2);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+.hero-title{font-size:16px;font-weight:900;margin-bottom:8px}
+.hero-copy{font-size:13px;color:var(--text2);line-height:1.55}
+.hero-steps{display:grid;gap:8px}
+.step{display:grid;grid-template-columns:28px 1fr;gap:9px;align-items:start;color:var(--text2);font-size:12px}
+.step-num{height:24px;width:24px;border-radius:999px;background:rgba(125,211,252,.15);color:var(--blue);display:grid;place-items:center;font-weight:900}
+.step strong{color:var(--text)}
+.sticky-top{position:sticky;top:64px;z-index:20;background:linear-gradient(180deg,rgba(15,17,23,.99),rgba(15,17,23,.9));backdrop-filter:blur(10px);padding:10px 0 12px;margin:0 -6px 16px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.nav a{color:var(--text2);text-decoration:none;border:1px solid var(--line);background:#0b0e14;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}
+.nav a:hover{color:var(--text);border-color:#5d6b88}
+.section-anchor{scroll-margin-top:240px}
+.panel,.card{background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+.controls{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:12px;align-items:end}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);font-weight:800;margin-bottom:6px}
+.field input,.field select{width:100%;background:#0b0e14;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:13px}
+.field input:focus,.field select:focus{outline:none;border-color:rgba(125,211,252,.8);box-shadow:0 0 0 3px rgba(125,211,252,.12)}
+.range-wrap{display:grid;grid-template-columns:1fr 86px;gap:8px}
+.range-wrap input[type=range]{accent-color:var(--purple);padding:0}
+.hint{color:var(--text3);font-size:12px;line-height:1.45;margin-top:8px}
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.metrics.sticky-metrics{position:sticky;top:212px;z-index:15;background:rgba(15,17,23,.92);padding:10px;border:1px solid rgba(255,255,255,.06);border-radius:22px;backdrop-filter:blur(10px)}
+.metric{background:linear-gradient(180deg,var(--panel2),#141822);border:1px solid var(--line);border-radius:18px;padding:14px}
+.metric-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);font-weight:900}
+.metric-val{font-size:25px;font-weight:900;letter-spacing:-.04em;margin-top:8px}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.good{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}.purple{color:var(--purple)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.wide{grid-column:1/-1}
+.card{background:rgba(18,23,34,.95);min-height:360px}
+.card-hdr{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+.card-title{font-size:15px;font-weight:900}
+.card-sub{font-size:12px;color:var(--text3);margin-top:3px;line-height:1.35}
+.chart-wrap{height:330px;background:linear-gradient(180deg,#0b0e14,#0d111a);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:8px;position:relative}
+.chart-wrap::after{content:'Endpoint labels appear when labels are enabled';position:absolute;right:12px;bottom:8px;color:rgba(174,183,200,.45);font-size:10px;pointer-events:none}
+.chart-wrap.tall{height:430px}
+.chart{width:100%;height:100%;display:block}
+.toggles{display:flex;gap:8px;flex-wrap:wrap}
+.toggles label{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;color:var(--text2);font-size:11px;max-height:76px;overflow:auto;padding-right:4px}
+.legend::-webkit-scrollbar{height:8px;width:8px}
+.legend::-webkit-scrollbar-thumb{background:#2c3242;border-radius:999px}
+.legend-item{display:flex;gap:5px;align-items:center}
+.sw{height:9px;width:18px;border-radius:4px;background:var(--blue);flex:0 0 auto}
+.dimension-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.dim-box{border:1px solid var(--line);border-radius:16px;background:#0b0e14;padding:12px}
+.dim-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);font-weight:900;margin-bottom:8px}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:7px 9px;color:var(--text2);font-size:12px;display:flex;align-items:center;gap:6px;background:#11151e}
+.chip input{accent-color:var(--blue)}
+.chip:has(input:checked){border-color:rgba(125,211,252,.7);background:rgba(125,211,252,.11);color:var(--text)}
+.dim-actions{display:flex;gap:6px;margin-top:10px}
+.mini-btn{border:1px solid var(--line);background:#11151e;color:var(--text2);border-radius:999px;padding:5px 8px;font-size:11px;cursor:pointer}
+.mini-btn:hover{color:var(--text);border-color:#5d6b88}
+.scenario-alert{display:none;margin-top:10px;border:1px solid rgba(253,176,34,.35);background:rgba(253,176,34,.08);color:#fedf89;border-radius:14px;padding:10px;font-size:12px}
+.chart-audit{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.audit-pill{border:1px solid rgba(255,255,255,.08);background:#0b0e14;border-radius:12px;padding:8px 10px}
+.audit-k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900}
+.audit-v{font-size:12px;color:var(--text2);margin-top:3px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.preset-btn{border:1px solid var(--line);background:#0b0e14;color:var(--text2);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800;cursor:pointer}
+.preset-btn:hover{color:var(--text);border-color:#5d6b88}
+.preset-btn.active{color:var(--text);background:rgba(192,132,252,.13);border-color:rgba(192,132,252,.55)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{border-bottom:1px solid rgba(255,255,255,.06);padding:8px 7px;text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+td{color:var(--text)}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.rank-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rank-card{border:1px solid var(--line);border-radius:18px;background:#0b0e14;padding:13px}
+.rank-card h3{margin:0 0 10px;font-size:14px}
+.rank-row{display:grid;grid-template-columns:24px 1fr auto;gap:8px;border-bottom:1px solid rgba(255,255,255,.06);padding:8px 0;align-items:center}
+.rank-row:last-child{border-bottom:0}
+.rank-num{height:22px;width:22px;border-radius:999px;display:grid;place-items:center;background:rgba(125,211,252,.14);color:var(--blue);font-weight:900;font-size:11px}
+.rank-main{font-size:12px;color:var(--text)}
+.rank-sub{display:block;color:var(--text3);font-size:11px;margin-top:2px}
+.rank-val{font-weight:900;font-size:13px}
+.note{border:1px solid rgba(125,211,252,.18);background:rgba(125,211,252,.06);border-radius:16px;padding:12px;color:var(--text2);font-size:12px;line-height:1.5;margin-bottom:16px}
+.callout-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.callout{border:1px solid var(--line);background:rgba(18,23,34,.95);border-radius:18px;padding:13px}
+.callout-k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900}
+.callout-v{margin-top:6px;color:var(--text2);font-size:12px;line-height:1.45}
+
+/* ============ CALCULATOR-SPECIFIC STYLES ============ */
+.calc-app{max-width:1180px;margin:0 auto;padding:28px}
+.opt-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.opt-btn{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));color:var(--text);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;text-align:left;box-shadow:var(--shadow)}
+.opt-btn:hover,.active-opt{border-color:#5d6b88;transform:translateY(-1px)}
+.opt-icon{height:36px;width:36px;border-radius:12px;display:grid;place-items:center;font-size:21px;font-weight:800}
+.min-churn .opt-icon{background:rgba(50,213,131,.13);color:var(--green)}
+.max-ltv .opt-icon{background:rgba(192,132,252,.13);color:var(--purple)}
+.opt-sub{display:block;color:var(--text3);font-size:12px;margin-top:2px}
+.calc-grid{display:grid;grid-template-columns:360px 1fr;gap:16px}
+.controls-pane,.outputs-pane{background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+.field-hdr,.field-val-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.field-lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);font-weight:700}
+.field-val{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.lock-btn{border:1px solid var(--line);background:#11151e;color:var(--text);height:32px;width:38px;border-radius:10px;cursor:pointer}
+.lock-btn.locked{background:rgba(253,176,34,.12);border-color:rgba(253,176,34,.45)}
+input[type=range]{width:100%;accent-color:var(--blue);margin-top:8px}
+.locked-slider{opacity:.45;pointer-events:none}
+.range-ends{display:flex;justify-content:space-between;color:var(--text3);font-size:11px;margin-top:2px}
+.divider{height:1px;background:var(--line);margin:18px 0}
+.fm-pills{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:10px}
+.fm-pill{border:1px solid var(--line);border-radius:12px;text-align:center;padding:9px 0;cursor:pointer;color:var(--text2);background:#11151e;font-weight:700}
+.fm-pill.active{background:rgba(125,211,252,.14);border-color:rgba(125,211,252,.62);color:var(--text)}
+.locked-pill{opacity:.48;cursor:not-allowed}
+.cac-lbl{color:var(--purple)}
+.cac-slider{accent-color:var(--purple)!important}
+.lock-note{margin-top:14px;padding:10px;border-radius:14px;border:1px solid rgba(253,176,34,.32);background:rgba(253,176,34,.08);color:#fedf89;font-size:12px;gap:8px}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.metric-card{background:linear-gradient(180deg,var(--panel2),#141822);border:1px solid var(--line);border-radius:20px;padding:16px;min-height:118px}
+.metric-card.primary{border-color:rgba(125,211,252,.42)}
+.churn-vis,.bk,.insight,.audit-box{margin-top:14px;border:1px solid var(--line);background:#121722;border-radius:20px;padding:16px}
+.bar-hdr{display:flex;justify-content:space-between;color:var(--text2);font-size:12px;font-weight:800;letter-spacing:.08em}
+.bar-track{height:14px;background:#0b0e14;border-radius:999px;overflow:hidden;margin-top:8px}
+.bar-fill{height:100%;border-radius:999px;transition:width .18s ease,background .18s ease}
+.bk-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.bk-row:last-child{border-bottom:0}
+.bk-lbl{color:var(--text2)}
+.bk-val{font-variant-numeric:tabular-nums;font-weight:800}
+.insight{line-height:1.5;color:var(--text2)}
+code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radius:7px;color:var(--blue)}
+.audit-hdr{display:flex;justify-content:space-between;gap:12px;font-weight:800}
+.audit-section{margin-top:14px;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:900}
+.audit-row{display:grid;grid-template-columns:1.55fr .55fr .55fr .55fr;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.055);font-size:12px}
+.audit-var{color:var(--text2)}
+.audit-note{display:block;color:var(--text3);font-size:10px;margin-top:2px}
+.audit-live,.audit-coef,.audit-p{text-align:right;font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.dim{color:var(--text3)}
+.sensitivity{margin-top:14px;border:1px solid var(--line);background:#121722;border-radius:20px;padding:16px}
+.chart-hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.chart-title{font-weight:800;color:var(--text);font-size:14px}
+.chart-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chart-controls select{background:#0b0e14;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:12px}
+.chart-note{color:var(--text3);font-size:11px;margin-top:8px;line-height:1.35}
+.chart-wrap-calc{position:relative;height:250px;background:#0b0e14;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:8px}
+#sensitivityCanvas{width:100%;height:100%;display:block}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:1050px){
+  .controls{grid-template-columns:1fr 1fr}
+  .grid{grid-template-columns:1fr}
+  .metrics,.rank-grid,.callout-grid{grid-template-columns:1fr 1fr}
+  .metrics.sticky-metrics{position:static}
+  .hero,.home-hero{grid-template-columns:1fr}
+  .home-feat{grid-template-columns:1fr}
+}
+@media(max-width:900px){
+  .calc-grid{grid-template-columns:1fr}
+  .metrics-grid{grid-template-columns:1fr 1fr}
+  .opt-row{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .app,.calc-app{padding:14px}
+  .controls,.metrics,.rank-grid,.dimension-picker,.callout-grid,.chart-audit{grid-template-columns:1fr}
+  .hdr{display:block}
+  .tag{display:inline-block;margin-top:10px}
+  .chart-wrap{height:280px}
+  .metrics-grid{grid-template-columns:1fr}
+  .audit-row{grid-template-columns:1fr .6fr .6fr .6fr}
+  .metric-val{font-size:28px}
+}
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="hdr">
-    <div>
-      <h1>Cohort LTV Explorer</h1>
-      <div class="hint">Historical spaghetti charts for cumulative LTV, CAC payback, free months, onboarding, and MRR tiers.</div>
-    </div>
-    <span class="tag">Account-level CSV · approximate cumulative LTV</span>
-  </div>
 
-  <div class="panel">
-    <div class="controls">
-      <div class="field file">
-        <label>Upload account-level CSV</label>
-        <input type="file" id="csvFile" accept=".csv,text/csv" />
+<!-- ============ TOP-LEVEL SITE NAV ============ -->
+<nav class="site-nav">
+  <div class="site-brand">Deal Structure <span>Suite</span></div>
+  <div class="site-tabs">
+    <a href="#home" class="site-tab" data-tab="home">Overview</a>
+    <a href="#calculator" class="site-tab" data-tab="calculator">Calculator</a>
+    <a href="#explorer" class="site-tab" data-tab="explorer">Scenario Explorer</a>
+  </div>
+</nav>
+
+<!-- ============ HOME / OVERVIEW SECTION ============ -->
+<section class="section" id="sec-home">
+  <div class="app">
+    <div class="hdr">
+      <div>
+        <h1>Deal Structure Suite</h1>
+        <div class="hint">Two complementary tools for modeling SaaS deal structure under churn, onboarding, and free-month assumptions.</div>
       </div>
-      <div class="field">
-        <label>CAC threshold</label>
-        <div class="range-wrap">
-          <input type="range" id="cacRange" min="500" max="20000" step="100" value="5000" />
-          <input type="number" id="cacInput" min="0" step="100" value="5000" />
+      <span class="tag">Calibrated analytical LTV · compact churn model</span>
+    </div>
+
+    <div class="home-hero">
+      <div class="home-card" data-go="calculator">
+        <h2>🧮 Deal Structure Calculator</h2>
+        <p>Single-deal calculator with optimizer buttons (minimize churn or maximize LTV), a variable audit panel showing every churn-model coefficient, and a sensitivity chart for sweeping any input.</p>
+        <span class="cta">Open the calculator →</span>
+      </div>
+      <div class="home-card" data-go="explorer">
+        <h2>📊 Projected Deal Structure Explorer</h2>
+        <p>Scenario grid that builds every combination of MRR, onboarding %, and waived months. Includes ranking cards, an optimal heatmap, and a full summary table for executive review.</p>
+        <span class="cta">Open the explorer →</span>
+      </div>
+    </div>
+
+    <div class="home-feat">
+      <div class="callout"><div class="callout-k">When to use the calculator</div><div class="callout-v">You have a specific deal in front of you and want to see what changing one variable does. Lock the variables that are non-negotiable, then optimize the rest.</div></div>
+      <div class="callout"><div class="callout-k">When to use the explorer</div><div class="callout-v">You want to compare deal structures directionally across many configurations. Best for setting pricing policy or finding the best structure for a goal metric.</div></div>
+      <div class="callout"><div class="callout-k">Shared model</div><div class="callout-v">Both tools use the same compact churn model (pseudo R² = 0.0218, N = 14,208) and the 0.3854 calibration factor on analytical LTV. Use the rankings and relative differences, not absolute predictions.</div></div>
+    </div>
+
+    <div class="note">
+      <strong>Important:</strong> Neither tool reads a CSV or historical cohort. Both project from the same regression. Treat outputs as directional. The calculator is for one deal; the explorer is for grids of deals.
+    </div>
+  </div>
+</section>
+
+<!-- ============ CALCULATOR SECTION ============ -->
+<section class="section" id="sec-calculator">
+  <div class="calc-app">
+    <div class="hdr">
+      <h1>Deal Structure Calculator</h1>
+      <span class="tag">2024+ compact interaction model · calibrated analytical LTV</span>
+    </div>
+
+    <div class="opt-row">
+      <button class="opt-btn min-churn" id="btnMinChurn">
+        <div class="opt-icon">↓</div>
+        <div><span style="font-weight:700">Minimize Churn</span><span class="opt-sub">Optimize unlocked inputs for lowest 12-mo churn</span></div>
+      </button>
+      <button class="opt-btn max-ltv" id="btnMaxLtv">
+        <div class="opt-icon">↑</div>
+        <div><span style="font-weight:700">Maximize LTV</span><span class="opt-sub">Optimize unlocked inputs for highest calibrated LTV</span></div>
+      </button>
+    </div>
+
+    <div class="calc-grid">
+      <div class="controls-pane">
+        <div class="field">
+          <div class="field-hdr"><span class="field-lbl">Contract MRR</span></div>
+          <div class="field-val-row"><span class="field-val" id="mrrVal">$650</span><button class="lock-btn" id="lockMrr">🔓</button></div>
+          <input type="range" id="sliderMrr" min="99" max="3000" step="1" value="650">
+          <div class="range-ends"><span>$99</span><span>$3,000</span></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="field">
+          <div class="field-hdr"><span class="field-lbl">Onboarding fee (% of MRR)</span></div>
+          <div class="field-val-row"><span class="field-val" id="obVal">100%</span><button class="lock-btn" id="lockOb">🔓</button></div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:4px" id="obDollar">= $650 upfront</div>
+          <input type="range" id="sliderOb" min="0" max="200" step="5" value="100">
+          <div class="range-ends"><span>0%</span><span>200%</span></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="field">
+          <div class="field-hdr"><span class="field-lbl">Free months waived</span><button class="lock-btn" id="lockFm">🔓</button></div>
+          <div class="fm-pills" id="fmPills">
+            <div class="fm-pill active" data-fm="0">0</div>
+            <div class="fm-pill" data-fm="1">1</div>
+            <div class="fm-pill" data-fm="2">2</div>
+            <div class="fm-pill" data-fm="3">3</div>
+            <div class="fm-pill" data-fm="4">4</div>
+            <div class="fm-pill" data-fm="5">5</div>
+            <div class="fm-pill" data-fm="6">6</div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-top:4px" id="fmHint">MRR billing starts month 1</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="cac-section">
+          <div class="field-hdr"><span class="field-lbl cac-lbl">CAC per won account</span></div>
+          <div class="field-val-row"><span class="field-val" id="cacVal" style="color:var(--purple)">$5,000</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-bottom:4px">not affected by optimizer buttons</div>
+          <input type="range" id="sliderCac" class="cac-slider" min="500" max="12000" step="100" value="5000">
+          <div class="range-ends"><span>$500</span><span>$12,000</span></div>
+        </div>
+
+        <div id="lockNote" style="display:none" class="lock-note"><span>🔒</span><span id="lockNoteText"></span></div>
+      </div>
+
+      <div class="outputs-pane">
+        <div class="metrics-grid">
+          <div class="metric-card primary"><div class="metric-lbl">Calibrated LTV</div><div class="metric-val" id="oLtv">$0</div><div class="metric-sub" id="oLtvSub">analytical × 0.3854</div></div>
+          <div class="metric-card"><div class="metric-lbl">12-month churn</div><div class="metric-val" id="oChurn">0%</div><div class="metric-sub" id="oChurnSub">risk</div></div>
+          <div class="metric-card"><div class="metric-lbl">Monthly hazard</div><div class="metric-val" id="oHazard">0%</div><div class="metric-sub">month-1 hazard</div></div>
+          <div class="metric-card cac-card"><div class="metric-lbl">LTV : CAC</div><div class="metric-val" id="oLtvCac">0×</div><div class="metric-sub" id="oLtvCacSub">ratio</div></div>
+          <div class="metric-card cac-card"><div class="metric-lbl">CAC payback</div><div class="metric-val" id="oPayback">—</div><div class="metric-sub" id="oPaybackSub">calibrated cash curve</div></div>
+          <div class="metric-card cac-card"><div class="metric-lbl">Net (LTV − CAC)</div><div class="metric-val" id="oNet">$0</div><div class="metric-sub">after acquisition cost</div></div>
+        </div>
+
+        <div class="churn-vis"><div class="bar-hdr"><span>CHURN RISK</span><span id="barLbl">0%</span></div><div class="bar-track"><div class="bar-fill" id="barFill"></div></div></div>
+
+        <div class="bk">
+          <div class="bk-row"><span class="bk-lbl">Upfront onboarding cash</span><span class="bk-val pos" id="bUpfront">$0</span></div>
+          <div class="bk-row"><span class="bk-lbl">Expected MRR collected, 24 mo</span><span class="bk-val pos" id="bMrrRev">$0</span></div>
+          <div class="bk-row"><span class="bk-lbl">Revenue lost to churn, 24 mo</span><span class="bk-val neg" id="bLost">−$0</span></div>
+          <div class="bk-row"><span class="bk-lbl">Uncalibrated analytical LTV</span><span class="bk-val pos" id="bAnalytical">$0</span></div>
+          <div class="bk-row"><span class="bk-lbl">Calibrated expected LTV</span><span class="bk-val pos" id="bModel">$0</span></div>
+          <div class="bk-row cac-row"><span class="bk-lbl">CAC per won account</span><span class="bk-val purple" id="bCac">$5,000</span></div>
+          <div class="bk-row cac-row"><span class="bk-lbl">LTV : CAC ratio</span><span class="bk-val purple" id="bRatio">0×</span></div>
+          <div class="bk-row cac-row"><span class="bk-lbl">Net value (LTV − CAC)</span><span class="bk-val neg" id="bNet">$0</span></div>
+        </div>
+
+        <div class="insight" id="insight"></div>
+
+        <div class="sensitivity">
+          <div class="chart-hdr">
+            <div>
+              <div class="chart-title">Sensitivity chart</div>
+              <div class="chart-note">Sweep one input while the other current/locked inputs stay fixed.</div>
+            </div>
+            <div class="chart-controls">
+              <select id="chartX">
+                <option value="mrr">X: MRR</option>
+                <option value="ob">X: Onboarding %</option>
+                <option value="fm">X: Free months</option>
+                <option value="cac">X: CAC</option>
+              </select>
+              <select id="chartY">
+                <option value="ltv">Y: Calibrated LTV</option>
+                <option value="churn">Y: 12-mo churn</option>
+                <option value="ratio">Y: LTV:CAC</option>
+                <option value="net">Y: Net value</option>
+                <option value="payback">Y: CAC payback</option>
+              </select>
+            </div>
+          </div>
+          <div class="chart-wrap-calc"><canvas id="sensitivityCanvas"></canvas></div>
+          <div class="chart-note" id="chartNote"></div>
+        </div>
+
+        <div class="audit-box">
+          <div class="audit-hdr"><span>Variable audit — compact churn model</span><span style="color:var(--text3);font-weight:400">value · coef · p</span></div>
+          <div class="audit-section">CHURN HAZARD — compact interaction model · pseudo R² = 0.0218 · N = 14,208</div>
+          <div id="auditChurn"></div>
+          <div class="audit-section">LTV COMPUTATION — analytical LTV × calibration factor 0.3854</div>
+          <div id="auditLtv"></div>
         </div>
       </div>
-      <div class="field">
-        <label>Cohort grain</label>
-        <select id="cohortGrain"><option value="month">Monthly</option><option value="quarter">Quarterly</option></select>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPLORER SECTION ============ -->
+<section class="section" id="sec-explorer">
+  <div class="app">
+    <div class="hdr">
+      <div>
+        <h1>Projected Deal Structure Explorer</h1>
+        <div class="hint">Model-based scenario dashboard for free months, onboarding, MRR, churn, payback, and LTV:CAC.</div>
       </div>
-      <div class="field">
-        <label>Minimum accounts</label>
-        <select id="minN"><option value="1">1+</option><option value="5" selected>5+</option><option value="10">10+</option><option value="20">20+</option></select>
+      <span class="tag">No CSV · projected from churn regression</span>
+    </div>
+
+    <div class="hero">
+      <div class="hero-card">
+        <div class="hero-title">How to use this page</div>
+        <div class="hero-copy">Pick an MRR set, onboarding levels, and waived-month options. The dashboard builds every combination, projects LTV from the churn model, and ranks the structures by the selected business goal.</div>
       </div>
-      <div class="field">
-        <label>LTV basis</label>
-        <select id="ltvBasis"><option value="include_ob">Include onboarding</option><option value="mrr_only">MRR only</option></select>
-      </div>
-      <div class="field">
-        <label>Max months</label>
-        <select id="maxMonths"><option value="12">12</option><option value="18">18</option><option value="24" selected>24</option><option value="36">36</option><option value="48">48</option></select>
+      <div class="hero-card hero-steps">
+        <div class="step"><div class="step-num">1</div><div><strong>Choose dimensions.</strong> Use the chips under the main chart to control the scenario grid.</div></div>
+        <div class="step"><div class="step-num">2</div><div><strong>Choose the metric.</strong> Switch between LTV:CAC, projected churn, CAC recovery %, LTV, and net value.</div></div>
+        <div class="step"><div class="step-num">3</div><div><strong>Use the rankings.</strong> The Top 3 cards show the best deal structures for each goal.</div></div>
       </div>
     </div>
-    <div class="btn-row">
-      <button class="btn" id="loadSample">Load demo-shaped sample</button>
-      <span class="pill" id="statusPill">No data loaded</span>
+
+    <div class="sticky-top">
+      <div class="nav">
+        <a href="#overview">Overview</a><a href="#scenario">Scenario curves</a><a href="#segments">Dynamic segment</a><a href="#heatmap">Optimal heatmap</a><a href="#rankings">Top 3</a><a href="#summary">Summary</a>
+      </div>
+      <div class="panel">
+        <div class="controls">
+          <div class="field"><label>Custom MRR anchor</label><div class="range-wrap"><input type="range" id="mrrRange" min="99" max="3000" step="1" value="650"><input type="number" id="mrrInput" min="1" step="1" value="650"></div></div>
+          <div class="field"><label>CAC threshold</label><div class="range-wrap"><input type="range" id="cacRange" min="500" max="20000" step="100" value="5000"><input type="number" id="cacInput" min="0" step="100" value="5000"></div></div>
+          <div class="field"><label>Horizon</label><select id="horizon"><option value="12">12 months</option><option value="18">18 months</option><option value="24" selected>24 months</option><option value="36">36 months</option><option value="60">60 months</option></select></div>
+          <div class="field"><label>Chart metric</label><select id="metric"><option value="ltv">Calibrated LTV</option><option value="ratio" selected>LTV:CAC</option><option value="churn">Projected churn</option><option value="paybackProgress">CAC recovery %</option><option value="net">Net value</option></select></div>
+          <div class="field"><label>Dynamic segment</label><select id="segment"><option value="free">Waived months only</option><option value="ob">Onboarding % only</option><option value="mrr">MRR tiers only</option><option value="matrix" selected>Free × onboarding</option></select></div>
+          <div class="field"><label>Heatmap goal</label><select id="goal"><option value="churn">Minimize churn</option><option value="payback">Minimize CAC payback</option><option value="ratio" selected>Maximize LTV:CAC</option></select></div>
+        </div>
+        <div class="toolbar" style="margin-top:12px">
+          <button class="preset-btn" data-preset="focused">Focused</button>
+          <button class="preset-btn" data-preset="standard">Standard</button>
+          <button class="preset-btn" data-preset="wide">Wide search</button>
+        </div>
+        <div class="hint">This page intentionally uses projections only. LTV is derived from the compact churn model, then calibrated by 0.3854. No historical cohort CSV or observed CAC-by-month is used.</div>
+        <div class="scenario-alert" id="scenarioAlert"></div>
+      </div>
     </div>
-    <div class="hint">Expected columns are auto-detected from the regression dataset: <span class="mono">first_mrr_revenue_month</span>, <span class="mono">monthly_active_revenue_months</span>, <span class="mono">monthly_total_net_mrr</span>, <span class="mono">avg_gross_mrr_active_months</span>, <span class="mono">contract_mrr_TO_ADD</span>, <span class="mono">number_of_free_months_at_start_TO_ADD</span>, <span class="mono">calculated_onboarding_pct_of_stripe_avg_mrr</span>, <span class="mono">total_onboarding_net_collected</span>. If true monthly revenue panel data is available later, swap the curve builder to use actual month-level revenue instead of average revenue approximation.</div>
-    <div class="error" id="errorBox"></div>
-  </div>
 
-  <div id="emptyState" class="empty" style="margin-top:16px">
-    Upload the account-level CSV or load the demo-shaped sample to render the dashboard.
-  </div>
+    <div id="overview" class="section-anchor"></div>
+    <div class="note"><strong>Design intent:</strong> this is not a historical cohort dashboard. It is a scenario explorer. Lines represent modeled average scenarios, not real cohorts. Use it to compare deal structures under the same CAC/MRR assumptions.</div>
 
-  <div id="dashboard" style="display:none;margin-top:16px">
-    <div class="metrics">
-      <div class="metric"><div class="metric-lbl">Accounts</div><div class="metric-val" id="mAccounts">0</div><div class="metric-sub">after filters</div></div>
-      <div class="metric"><div class="metric-lbl">Avg MRR</div><div class="metric-val" id="mMrr">$0</div><div class="metric-sub">gross/contract fallback</div></div>
-      <div class="metric"><div class="metric-lbl">Avg LTV @ horizon</div><div class="metric-val" id="mLtv">$0</div><div class="metric-sub" id="mLtvSub">month 24</div></div>
-      <div class="metric"><div class="metric-lbl">% above CAC</div><div class="metric-val" id="mAbove">0%</div><div class="metric-sub" id="mAboveSub">at horizon</div></div>
-      <div class="metric"><div class="metric-lbl">Median payback</div><div class="metric-val" id="mPayback">—</div><div class="metric-sub">first month above CAC</div></div>
+    <div class="callout-grid">
+      <div class="callout"><div class="callout-k">Best for</div><div class="callout-v">Comparing deal structures directionally: which combinations improve LTV:CAC, pay back faster, or reduce modeled churn.</div></div>
+      <div class="callout"><div class="callout-k">Not for</div><div class="callout-v">Exact account-level forecasting. The churn model is stable, but model fit is modest, so use rankings and relative differences.</div></div>
+      <div class="callout"><div class="callout-k">Revenue rule</div><div class="callout-v">Waived months delay MRR. Onboarding cash can appear immediately, but MRR only starts after waived months end.</div></div>
+    </div>
+
+    <div class="metrics sticky-metrics">
+      <div class="metric"><div class="metric-lbl">Selected MRR</div><div class="metric-val" id="mMrr">$650</div><div class="metric-sub">custom anchor</div></div>
+      <div class="metric"><div class="metric-lbl">CAC threshold</div><div class="metric-val purple" id="mCac">$5,000</div><div class="metric-sub">payback target</div></div>
+      <div class="metric"><div class="metric-lbl">Best LTV:CAC</div><div class="metric-val" id="mBestRatio">0.00×</div><div class="metric-sub" id="mBestRatioSub">scenario</div></div>
+      <div class="metric"><div class="metric-lbl">Lowest horizon churn</div><div class="metric-val" id="mBestChurn">0%</div><div class="metric-sub" id="mBestChurnSub">scenario</div></div>
+      <div class="metric"><div class="metric-lbl">Fastest payback</div><div class="metric-val" id="mBestPayback">—</div><div class="metric-sub" id="mBestPaybackSub">scenario</div></div>
+      <div class="metric"><div class="metric-lbl">Scenarios</div><div class="metric-val" id="mScenarioCount">0</div><div class="metric-sub">grid searched</div></div>
     </div>
 
     <div class="grid">
+      <div id="scenario" class="section-anchor"></div>
       <div class="card wide">
         <div class="card-hdr">
-          <div><div class="card-title">Average cumulative LTV by cohort</div><div class="card-sub">Each line is a cohort. Horizontal line is the adjustable CAC threshold.</div></div>
-          <div class="toggles"><label><input type="checkbox" id="showAvg" checked> weighted avg</label><label><input type="checkbox" id="showLabels" checked> labels</label></div>
+          <div><div class="card-title">Three-dimensional scenario curves</div><div class="card-sub">Use the chips below the chart to choose which MRR, onboarding, and waived-month combinations are generated. Fewer selected chips make the chart easier to read.</div></div>
+          <div class="toggles"><label><input type="checkbox" id="showLabels"> labels</label><label><input type="checkbox" id="showCac" checked> CAC line</label><label><input type="checkbox" id="highlightBest" checked> emphasize best</label></div>
         </div>
-        <div class="chart-wrap tall"><canvas class="chart" id="cohortChart"></canvas></div>
-        <div class="legend" id="cohortLegend"></div>
+        <div class="chart-wrap tall"><canvas class="chart" id="matrixChart"></canvas></div>
+        <div class="dimension-picker" id="dimensionPicker"></div>
+        <div class="chart-audit">
+          <div class="audit-pill"><div class="audit-k">Lines shown</div><div class="audit-v" id="aLines">0</div></div>
+          <div class="audit-pill"><div class="audit-k">Best visible</div><div class="audit-v" id="aBestVisible">—</div></div>
+          <div class="audit-pill"><div class="audit-k">Metric</div><div class="audit-v" id="aMetric">—</div></div>
+          <div class="audit-pill"><div class="audit-k">Revenue rule</div><div class="audit-v">MRR starts after waived months</div></div>
+        </div>
+        <div class="legend" id="matrixLegend"></div>
       </div>
 
-      <div class="card">
-        <div class="card-hdr"><div><div class="card-title">Free-month buckets</div><div class="card-sub">0, 1, 2, and 3+ free months as cumulative LTV curves.</div></div></div>
-        <div class="chart-wrap"><canvas class="chart" id="freeChart"></canvas></div>
-        <div class="legend" id="freeLegend"></div>
+      <div id="segments" class="section-anchor"></div>
+      <div class="card wide">
+        <div class="card-hdr"><div><div class="card-title">Dynamic segment view</div><div class="card-sub">Aggregates the selected scenarios so you can isolate one dimension at a time without losing the selected assumptions.</div></div></div>
+        <div class="chart-wrap"><canvas class="chart" id="segmentChart"></canvas></div>
+        <div class="legend" id="segmentLegend"></div>
       </div>
 
+      <div id="heatmap" class="section-anchor"></div>
       <div class="card">
-        <div class="card-hdr"><div><div class="card-title">Onboarding collected buckets</div><div class="card-sub">Shows whether onboarding only shifts cash earlier or correlates with stronger LTV.</div></div></div>
-        <div class="chart-wrap"><canvas class="chart" id="obChart"></canvas></div>
-        <div class="legend" id="obLegend"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-hdr"><div><div class="card-title">MRR tiers</div><div class="card-sub">Uses the same tier logic as the regression: &lt;$100, $100–499, $500–999, $1k+.</div></div></div>
-        <div class="chart-wrap"><canvas class="chart" id="mrrChart"></canvas></div>
-        <div class="legend" id="mrrLegend"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-hdr"><div><div class="card-title">Payback heatmap</div><div class="card-sub">Rows are free-month buckets, columns are onboarding buckets. Cell is median month to clear CAC.</div></div></div>
+        <div class="card-hdr"><div><div class="card-title">Optimal heatmap</div><div class="card-sub">Rows are waived months, columns are onboarding %. Each cell chooses the best selected MRR for the chosen goal.</div></div></div>
         <div class="chart-wrap"><canvas class="chart" id="heatmapChart"></canvas></div>
       </div>
 
+      <div id="rankings" class="section-anchor"></div>
+      <div class="card">
+        <div class="card-hdr"><div><div class="card-title">Top 3 by goal metric</div><div class="card-sub">Fast executive readout across the scenario grid.</div></div></div>
+        <div class="rank-grid">
+          <div class="rank-card"><h3>Min horizon churn</h3><div id="rankChurn"></div></div>
+          <div class="rank-card"><h3>Fastest payback</h3><div id="rankPayback"></div></div>
+          <div class="rank-card"><h3>Max LTV:CAC</h3><div id="rankRatio"></div></div>
+        </div>
+      </div>
+
+      <div id="summary" class="section-anchor"></div>
       <div class="card wide">
-        <div class="card-hdr"><div><div class="card-title">Segment summary table</div><div class="card-sub">Auditable segment stats at the selected horizon.</div></div></div>
+        <div class="card-hdr"><div><div class="card-title">Scenario summary table</div><div class="card-sub">All modeled combinations at the selected MRR, CAC, and horizon. Churn is shown at the selected horizon and at month 12.</div></div></div>
         <div style="overflow:auto"><table id="summaryTable"></table></div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
+<!-- ============ TOP-LEVEL ROUTER ============ -->
 <script>
-let ACCOUNTS = [];
-let SERIES = {};
-const COLORS = ['#7dd3fc','#32d583','#fdb022','#f97066','#c084fc','#f0abfc','#a3e635','#93c5fd','#fb7185','#facc15','#5eead4','#d8b4fe'];
+(function(){
+  const tabs = document.querySelectorAll('.site-tab');
+  const sections = {
+    home: document.getElementById('sec-home'),
+    calculator: document.getElementById('sec-calculator'),
+    explorer: document.getElementById('sec-explorer'),
+  };
 
-const COL = {
-  cohort:['first_mrr_revenue_month','account_creation_month_TO_ADD','account_creation_month'],
-  activeMonths:['monthly_active_revenue_months','active_months','months_tenure'],
-  totalNetMrr:['monthly_total_net_mrr','total_net_mrr','ltv'],
-  avgMrr:['avg_gross_mrr_active_months','avg_gross_mrr','mrr'],
-  contractMrr:['contract_mrr_TO_ADD','contract_mrr'],
-  freeMonths:['number_of_free_months_at_start_TO_ADD','free_months','free_mo'],
-  obPct:['calculated_onboarding_pct_of_stripe_avg_mrr','contracted_onboarding_pct_of_mrr_TO_ADD','ob_pct_actual','ob_pct'],
-  obCollected:['total_onboarding_net_collected','ob_collected','onboarding_collected'],
-  churnMonths:['# of Months to churn','months_to_churn']
-};
+  function show(name){
+    if(!sections[name]) name = 'home';
+    Object.entries(sections).forEach(([k,el])=>el.classList.toggle('active', k===name));
+    tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+    // Trigger resize so canvas charts redraw at correct dimensions when becoming visible.
+    // Canvases drawn while display:none have a 0-px bounding rect, which produces blank charts.
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  tabs.forEach(t=>t.addEventListener('click', e=>{
+    e.preventDefault();
+    const name = t.dataset.tab;
+    history.replaceState(null,'','#'+name);
+    show(name);
+  }));
+
+  // Home cards also navigate
+  document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>{
+    const name = el.dataset.go;
+    history.replaceState(null,'','#'+name);
+    show(name);
+  }));
+
+  // Initial route from hash
+  const initialHash = (location.hash || '#home').replace('#','').split('-')[0];
+  // Strip explorer in-page anchors (overview, scenario, etc.) so they don't override the tab
+  const knownTabs = ['home','calculator','explorer'];
+  show(knownTabs.includes(initialHash) ? initialHash : 'home');
+})();
+</script>
+
+<!-- ============ CALCULATOR LOGIC (IIFE) ============ -->
+<script>
+(function(){
+const CALIBRATION = 0.3854;
+const MAX_LTV_MONTHS = 120;
+const LOG_COH = Math.log(14);
+const LOG_COH2 = LOG_COH ** 2;
+
+function sig(x, thresh, width){
+  return 1 / (1 + Math.exp(-(x - thresh) / (width * 0.35)));
+}
+
+function smoothTiers(mrr){
+  const s100 = sig(mrr, 100, 40);
+  const s500 = sig(mrr, 500, 80);
+  const s1000 = sig(mrr, 1000, 120);
+  return {
+    mrr_lt100: 1 - s100,
+    mrr_100_499: s100 * (1 - s500),
+    mrr_1000p: s1000,
+    high_mrr: s500,
+  };
+}
+
+function smoothObPaid(obPct){
+  return sig(obPct, 7.5, 7.5);
+}
+
+function features(mrr, obPct, fm, month=9){
+  const logMrr = Math.log(Math.max(mrr, 1));
+  const obRatio = obPct / 100;
+  const obSq = obRatio ** 2;
+  const obGap = Math.max(0, 1 - obRatio);
+  const t = smoothTiers(mrr);
+  const logTen = Math.log(Math.max(month, 1));
+  const anyFree = fm > 0 ? 1 : 0;
+  const obWaivedPostSign = 0;
+  const obActuallyPaid = smoothObPaid(obPct);
+
+  return {
+    log_mrr: logMrr, mrr_lt100: t.mrr_lt100, mrr_100_499: t.mrr_100_499,
+    mrr_1000p: t.mrr_1000p, high_mrr: t.high_mrr,
+    ob_collected_pct_mrr_sq: obSq, ob_actually_paid: obActuallyPaid,
+    ob_waived_post_sign: obWaivedPostSign, ob_gap_x_mrr: obGap * logMrr,
+    any_free: anyFree, free_2mo_exact: fm === 2 ? 1 : 0, free_3plus: fm >= 3 ? 1 : 0,
+    discount_length_mo: 0,
+    anyfree_x_log_mrr: anyFree * logMrr,
+    anyfree_x_high_mrr: anyFree * t.high_mrr,
+    anyfree_x_ob_collected_pct_mrr_sq: anyFree * obSq,
+    anyfree_x_ob_actually_paid: anyFree * obActuallyPaid,
+    anyfree_x_ob_waived_post_sign: anyFree * obWaivedPostSign,
+    anyfree_x_ob_gap_x_mrr: anyFree * obGap * logMrr,
+    log_cohort_age: LOG_COH, log_cohort_age_sq: LOG_COH2,
+    log_tenure: logTen, log_tenure_sq: logTen ** 2,
+  };
+}
+
+const CHURN_C = {intercept:-5.7143,log_mrr:0.3500,mrr_lt100:1.2017,mrr_100_499:0.4969,mrr_1000p:-0.3495,high_mrr:-0.6365,ob_collected_pct_mrr_sq:0.1258,ob_actually_paid:-0.3224,ob_waived_post_sign:-0.8896,ob_gap_x_mrr:0.1383,any_free:0.2503,free_2mo_exact:0.3226,free_3plus:0.1575,discount_length_mo:-0.0608,anyfree_x_log_mrr:-0.0562,anyfree_x_high_mrr:0.2422,anyfree_x_ob_collected_pct_mrr_sq:-0.0675,anyfree_x_ob_actually_paid:-0.1208,anyfree_x_ob_waived_post_sign:0.5261,anyfree_x_ob_gap_x_mrr:-0.0020,log_cohort_age:1.1622,log_cohort_age_sq:-0.2617,log_tenure:-0.3699,log_tenure_sq:0.0890};
+const CHURN_P = {log_mrr:0.1148,mrr_lt100:0.0263,mrr_100_499:0.0003,mrr_1000p:0.0271,high_mrr:0.0084,ob_collected_pct_mrr_sq:0.0025,ob_actually_paid:0.3094,ob_waived_post_sign:0.0579,ob_gap_x_mrr:0.0177,any_free:0.8262,free_2mo_exact:0.0787,free_3plus:0.3863,discount_length_mo:0.1866,anyfree_x_log_mrr:0.7734,anyfree_x_high_mrr:0.3564,anyfree_x_ob_collected_pct_mrr_sq:0.1443,anyfree_x_ob_actually_paid:0.7297,anyfree_x_ob_waived_post_sign:0.3341,anyfree_x_ob_gap_x_mrr:0.9768,log_cohort_age:0.0994,log_cohort_age_sq:0.0675,log_tenure:0.0094,log_tenure_sq:0.0566};
+
+function logitHazard(mrr, obPct, fm, month=9){
+  const f = features(mrr, obPct, fm, month);
+  return CHURN_C.intercept
+    + CHURN_C.log_mrr * f.log_mrr + CHURN_C.mrr_lt100 * f.mrr_lt100
+    + CHURN_C.mrr_100_499 * f.mrr_100_499 + CHURN_C.mrr_1000p * f.mrr_1000p
+    + CHURN_C.high_mrr * f.high_mrr + CHURN_C.ob_collected_pct_mrr_sq * f.ob_collected_pct_mrr_sq
+    + CHURN_C.ob_actually_paid * f.ob_actually_paid + CHURN_C.ob_waived_post_sign * f.ob_waived_post_sign
+    + CHURN_C.ob_gap_x_mrr * f.ob_gap_x_mrr + CHURN_C.any_free * f.any_free
+    + CHURN_C.free_2mo_exact * f.free_2mo_exact + CHURN_C.free_3plus * f.free_3plus
+    + CHURN_C.discount_length_mo * f.discount_length_mo
+    + CHURN_C.anyfree_x_log_mrr * f.anyfree_x_log_mrr
+    + CHURN_C.anyfree_x_high_mrr * f.anyfree_x_high_mrr
+    + CHURN_C.anyfree_x_ob_collected_pct_mrr_sq * f.anyfree_x_ob_collected_pct_mrr_sq
+    + CHURN_C.anyfree_x_ob_actually_paid * f.anyfree_x_ob_actually_paid
+    + CHURN_C.anyfree_x_ob_waived_post_sign * f.anyfree_x_ob_waived_post_sign
+    + CHURN_C.anyfree_x_ob_gap_x_mrr * f.anyfree_x_ob_gap_x_mrr
+    + CHURN_C.log_cohort_age * f.log_cohort_age
+    + CHURN_C.log_cohort_age_sq * f.log_cohort_age_sq
+    + CHURN_C.log_tenure * f.log_tenure
+    + CHURN_C.log_tenure_sq * f.log_tenure_sq;
+}
+
+function monthlyHazard(mrr, obPct, fm, month=9){ return 1 / (1 + Math.exp(-logitHazard(mrr, obPct, fm, month))); }
+function churnN(mrr, obPct, fm, n){ let s=1; for(let t=1;t<=n;t++) s *= (1 - monthlyHazard(mrr,obPct,fm,t)); return 1-s; }
+function churn12(mrr, obPct, fm){ return churnN(mrr, obPct, fm, 12); }
+
+function ltvBreakdown(mrr, obPct, fm){
+  const upfront = mrr * (obPct / 100);
+  let survival = 1, mrrRev24 = 0, noChurn24 = 0, analytical = upfront;
+  for(let t=1; t<=MAX_LTV_MONTHS; t++){
+    const h = monthlyHazard(mrr, obPct, fm, t);
+    survival *= (1 - h);
+    const billable = t > fm;
+    const expectedMrr = billable ? mrr * survival : 0;
+    analytical += expectedMrr;
+    if(t <= 24){ mrrRev24 += expectedMrr; if(billable) noChurn24 += mrr; }
+  }
+  return {upfront, mrrRev24, lost24:noChurn24 - mrrRev24, analytical, calibrated: analytical * CALIBRATION};
+}
+
+function paybackMonth(mrr, obPct, fm, cac){
+  let cum = mrr * (obPct / 100) * CALIBRATION;
+  let survival = 1;
+  if(cum >= cac) return 0;
+  for(let t=1; t<=60; t++){
+    survival *= (1 - monthlyHazard(mrr, obPct, fm, t));
+    if(t > fm) cum += (mrr * survival) * CALIBRATION;
+    if(cum >= cac) return t;
+  }
+  return null;
+}
+
+const locks = {mrr:false, ob:false, fm:false};
+let fm = 0;
+
+function byId(id){ return document.getElementById(id); }
+function fmtUSD(v){ return '$' + Math.round(v).toLocaleString(); }
+function fmtPct(v){ return (v * 100).toFixed(1) + '%'; }
+function fmtN4(v){ return typeof v === 'number' ? v.toFixed(4) : v; }
+function fmtP(v){ return v == null ? '—' : v.toFixed(4); }
+function riskClassChurn(c){ return c < .35 ? 'good' : c < .55 ? 'warn' : 'bad'; }
+function ltvClass(v,mrr){ return v > mrr * 20 ? 'good' : v > mrr * 10 ? 'warn' : 'bad'; }
+
+function updateLockUI(){
+  ['mrr','ob','fm'].forEach(k=>{
+    const btn = byId('lock' + k[0].toUpperCase() + k.slice(1));
+    btn.textContent = locks[k] ? '🔒' : '🔓';
+    btn.classList.toggle('locked', locks[k]);
+  });
+  byId('sliderMrr').classList.toggle('locked-slider', locks.mrr);
+  byId('sliderOb').classList.toggle('locked-slider', locks.ob);
+  document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('locked-pill', locks.fm));
+  const locked = Object.entries(locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
+  const note = byId('lockNote');
+  if(locked.length){ note.style.display = 'flex'; byId('lockNoteText').textContent = locked.join(', ') + ' locked — optimizer skips these'; }
+  else { note.style.display = 'none'; }
+}
+
+byId('lockMrr').addEventListener('click',()=>{locks.mrr = !locks.mrr; updateLockUI();});
+byId('lockOb').addEventListener('click',()=>{locks.ob = !locks.ob; updateLockUI();});
+byId('lockFm').addEventListener('click',()=>{locks.fm = !locks.fm; updateLockUI();});
+
+byId('fmPills').querySelectorAll('.fm-pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    if(locks.fm) return;
+    fm = +p.dataset.fm; setFm(fm); clearOpt(); update();
+  });
+});
+
+function setFm(v){
+  fm = v;
+  document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('active', +p.dataset.fm === v));
+}
+
+byId('sliderMrr').addEventListener('input',()=>{clearOpt(); update();});
+byId('sliderOb').addEventListener('input',()=>{clearOpt(); update();});
+byId('sliderCac').addEventListener('input',()=>update());
+byId('chartX').addEventListener('change',()=>update());
+byId('chartY').addEventListener('change',()=>update());
+
+function clearOpt(){ document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('active-opt')); }
+
+function optimize(goal){
+  const MRR = []; for(let m=99; m<=3000; m+=25) MRR.push(m);
+  const OB = []; for(let o=0; o<=200; o+=5) OB.push(o);
+  const FM = [0,1,2,3,4,5,6];
+  const curMrr = +byId('sliderMrr').value;
+  const curOb = +byId('sliderOb').value;
+  const curFm = fm;
+  const cac = +byId('sliderCac').value;
+  const mrrRange = locks.mrr ? [curMrr] : MRR;
+  const obRange = locks.ob ? [curOb] : OB;
+  const fmRange = locks.fm ? [curFm] : FM;
+
+  let bestMrr = curMrr, bestOb = curOb, bestFm = curFm;
+  let best = goal === 'ltv' ? -Infinity : Infinity;
+  for(const m of mrrRange) for(const o of obRange) for(const f of fmRange){
+    const ltv = ltvBreakdown(m,o,f).calibrated;
+    const score = goal === 'ltv' ? ltv : churn12(m,o,f);
+    if((goal === 'ltv' && score > best) || (goal === 'churn' && score < best)){
+      best = score; bestMrr = m; bestOb = o; bestFm = f;
+    }
+  }
+  if(!locks.mrr) byId('sliderMrr').value = bestMrr;
+  if(!locks.ob) byId('sliderOb').value = bestOb;
+  if(!locks.fm) setFm(bestFm);
+  update();
+
+  const locked = Object.entries(locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
+  if(locked.length){
+    const metric = goal === 'ltv' ? fmtUSD(best) + ' calibrated LTV' : fmtPct(best) + ' 12-mo churn';
+    byId('lockNote').style.display = 'flex';
+    byId('lockNoteText').textContent = locked.join(', ') + ' locked and included in optimization score — best unlocked result: ' + metric + ' at ' + fmtUSD(bestMrr) + ' MRR, ' + bestOb + '% OB, ' + bestFm + ' free mo, ' + fmtUSD(cac) + ' CAC';
+  }
+}
+
+byId('btnMinChurn').addEventListener('click',()=>{ clearOpt(); byId('btnMinChurn').classList.add('active-opt'); optimize('churn'); });
+byId('btnMaxLtv').addEventListener('click',()=>{ clearOpt(); byId('btnMaxLtv').classList.add('active-opt'); optimize('ltv'); });
+
+function renderAudit(id, rows){
+  byId(id).innerHTML = rows.map(([name,val,coef,p,note])=>{
+    const cls = Math.abs(coef) < 1e-6 ? 'dim' : coef > 0 ? 'pos' : 'neg';
+    return `<div class="audit-row"><span class="audit-var">${name}<span class="audit-note">${note || ''}</span></span><span class="audit-live">${fmtN4(val)}</span><span class="audit-coef ${cls}">${coef>0?'+':''}${coef.toFixed(4)}</span><span class="audit-p">${fmtP(p)}</span></div>`;
+  }).join('');
+}
+
+function chartSeries(currentMrr, currentOb, currentFm, currentCac, xKey, yKey){
+  let xs = [];
+  if(xKey === 'mrr'){ for(let v=99; v<=3000; v+=50) xs.push(v); }
+  else if(xKey === 'ob'){ for(let v=0; v<=200; v+=5) xs.push(v); }
+  else if(xKey === 'fm'){ xs = [0,1,2,3,4,5,6]; }
+  else if(xKey === 'cac'){ for(let v=500; v<=12000; v+=250) xs.push(v); }
+  return xs.map(x=>{
+    const m = xKey === 'mrr' ? x : currentMrr;
+    const o = xKey === 'ob' ? x : currentOb;
+    const f = xKey === 'fm' ? x : currentFm;
+    const c = xKey === 'cac' ? x : currentCac;
+    const bk = ltvBreakdown(m,o,f);
+    const ltv = bk.calibrated;
+    const ch = churn12(m,o,f);
+    const ratio = ltv / c;
+    const net = ltv - c;
+    const pbRaw = paybackMonth(m,o,f,c);
+    const payback = pbRaw === null ? 61 : pbRaw;
+    let y;
+    if(yKey === 'ltv') y = ltv;
+    else if(yKey === 'churn') y = ch;
+    else if(yKey === 'ratio') y = ratio;
+    else if(yKey === 'net') y = net;
+    else y = payback;
+    return {x,y,m,o,f,c,ltv,churn:ch,ratio,net,payback:pbRaw};
+  });
+}
+
+function fmtChartVal(yKey, v){
+  if(yKey === 'ltv' || yKey === 'net') return fmtUSD(v);
+  if(yKey === 'churn') return fmtPct(v);
+  if(yKey === 'ratio') return v.toFixed(2) + '×';
+  if(v >= 61) return '>60 mo';
+  return Math.round(v) + ' mo';
+}
+function fmtXVal(xKey, v){
+  if(xKey === 'mrr') return fmtUSD(v);
+  if(xKey === 'ob') return Math.round(v) + '%';
+  if(xKey === 'fm') return Math.round(v) + ' mo';
+  return fmtUSD(v);
+}
+
+function drawSensitivityChart(mrr, obPct, fmVal, cac){
+  const canvas = byId('sensitivityCanvas');
+  if(!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  if(rect.width === 0 || rect.height === 0) return; // hidden tab
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0,0,w,h);
+  const xKey = byId('chartX').value;
+  const yKey = byId('chartY').value;
+  const data = chartSeries(mrr, obPct, fmVal, cac, xKey, yKey);
+  if(!data.length) return;
+  const pad = {l:62,r:18,t:18,b:42};
+  const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+  const xs = data.map(d=>d.x), ys = data.map(d=>d.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  let minY = Math.min(...ys), maxY = Math.max(...ys);
+  if(yKey === 'churn') { minY = 0; maxY = Math.max(maxY, .05); }
+  if(yKey === 'ratio') { minY = 0; maxY = Math.max(maxY, 1); }
+  if(yKey === 'payback') { minY = 0; maxY = 61; }
+  if(minY === maxY){ minY -= 1; maxY += 1; }
+  const yPad = (maxY - minY) * .08;
+  if(yKey !== 'churn' && yKey !== 'ratio' && yKey !== 'payback') { minY -= yPad; maxY += yPad; }
+
+  const xToPx = x => pad.l + ((x - minX) / (maxX - minX || 1)) * plotW;
+  const yToPx = y => pad.t + (1 - ((y - minY) / (maxY - minY || 1))) * plotH;
+
+  ctx.strokeStyle = 'rgba(255,255,255,.12)';
+  ctx.lineWidth = 1;
+  ctx.font = '11px Inter, system-ui, sans-serif';
+  ctx.fillStyle = '#737d91';
+  for(let i=0; i<=4; i++){
+    const yy = pad.t + (plotH * i / 4);
+    const val = maxY - (maxY-minY) * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(w-pad.r, yy); ctx.stroke();
+    ctx.fillText(fmtChartVal(yKey, val), 8, yy+4);
+  }
+  for(let i=0; i<=4; i++){
+    const xx = pad.l + (plotW * i / 4);
+    const val = minX + (maxX-minX) * i / 4;
+    ctx.fillText(fmtXVal(xKey, val), xx-18, h-14);
+  }
+  ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 2.5; ctx.beginPath();
+  data.forEach((d,i)=>{ const xx = xToPx(d.x), yy = yToPx(d.y); if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy); });
+  ctx.stroke();
+
+  const currentX = xKey === 'mrr' ? mrr : xKey === 'ob' ? obPct : xKey === 'fm' ? fmVal : cac;
+  const nearest = data.reduce((best,d)=>Math.abs(d.x-currentX)<Math.abs(best.x-currentX)?d:best, data[0]);
+  const nx = xToPx(nearest.x), ny = yToPx(nearest.y);
+  ctx.fillStyle = '#f4f6fb';
+  ctx.beginPath(); ctx.arc(nx, ny, 4.5, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = 'rgba(244,246,251,.55)';
+  ctx.beginPath(); ctx.moveTo(nx, pad.t); ctx.lineTo(nx, pad.t+plotH); ctx.stroke();
+
+  const label = fmtXVal(xKey, nearest.x) + ' → ' + fmtChartVal(yKey, nearest.y);
+  ctx.fillStyle = 'rgba(11,14,20,.92)';
+  const labelW = Math.min(210, Math.max(120, label.length * 6.5 + 18));
+  const lx = Math.min(w - labelW - 8, Math.max(8, nx - labelW / 2));
+  const ly = Math.max(8, ny - 34);
+  ctx.fillRect(lx, ly, labelW, 24);
+  ctx.strokeStyle = 'rgba(255,255,255,.16)';
+  ctx.strokeRect(lx, ly, labelW, 24);
+  ctx.fillStyle = '#f4f6fb';
+  ctx.fillText(label, lx + 9, ly + 16);
+
+  const fixedParts = [];
+  if(xKey !== 'mrr') fixedParts.push('MRR ' + fmtUSD(mrr));
+  if(xKey !== 'ob') fixedParts.push('OB ' + obPct + '%');
+  if(xKey !== 'fm') fixedParts.push(fmVal + ' free mo');
+  if(xKey !== 'cac') fixedParts.push('CAC ' + fmtUSD(cac));
+  byId('chartNote').textContent = 'Curve holds ' + fixedParts.join(' · ') + ' constant. Locked variables stay fixed and still affect the curve/score.';
+}
+
+function update(){
+  const mrr = +byId('sliderMrr').value;
+  const obPct = +byId('sliderOb').value;
+  const cac = +byId('sliderCac').value;
+  const f = features(mrr, obPct, fm, 9);
+
+  byId('mrrVal').textContent = '$' + mrr.toLocaleString();
+  byId('obVal').textContent = obPct + '%';
+  byId('obDollar').textContent = '= $' + Math.round(mrr * obPct / 100).toLocaleString() + ' upfront';
+  byId('cacVal').textContent = '$' + cac.toLocaleString();
+  byId('fmHint').textContent = fm === 0 ? 'MRR billing starts month 1' : `${fm} month${fm>1?'s':''} waived · billing starts month ${fm+1}`;
+
+  const h1 = monthlyHazard(mrr, obPct, fm, 1);
+  const c12 = churn12(mrr, obPct, fm);
+  const bk = ltvBreakdown(mrr, obPct, fm);
+  const ltv = bk.calibrated;
+  const ltvCac = ltv / cac;
+  const net = ltv - cac;
+  const pb = paybackMonth(mrr, obPct, fm, cac);
+
+  const ltvEl = byId('oLtv'); ltvEl.textContent = fmtUSD(ltv); ltvEl.className = 'metric-val ' + ltvClass(ltv, mrr);
+  byId('oLtvSub').textContent = `${fmtUSD(bk.analytical)} analytical × ${CALIBRATION}`;
+
+  const chEl = byId('oChurn'); chEl.textContent = fmtPct(c12); chEl.className = 'metric-val ' + riskClassChurn(c12);
+  byId('oChurnSub').textContent = c12 < .35 ? 'low risk' : c12 < .55 ? 'moderate' : 'high risk';
+
+  const hz = byId('oHazard'); hz.textContent = fmtPct(h1); hz.className = 'metric-val ' + (h1 < .03 ? 'good' : h1 < .05 ? 'warn' : 'bad');
+
+  const ratio = byId('oLtvCac'); ratio.textContent = ltvCac.toFixed(2) + '×';
+  ratio.className = 'metric-val ' + (ltvCac >= 3 ? 'good' : ltvCac >= 1.5 ? 'warn' : 'bad');
+  byId('oLtvCacSub').textContent = ltvCac >= 3 ? 'healthy' : ltvCac >= 1 ? 'pays back' : 'underwater';
+
+  const pbEl = byId('oPayback'); pbEl.textContent = pb === null ? '>60 mo' : pb === 0 ? '0 mo' : pb + ' mo';
+  pbEl.className = 'metric-val ' + (pb !== null && pb <= 12 ? 'good' : pb !== null && pb <= 24 ? 'warn' : 'bad');
+  byId('oPaybackSub').textContent = pb === null ? 'not recovered in 5yr' : pb === 0 ? 'upfront only' : `month ${pb}`;
+
+  const netEl = byId('oNet'); netEl.textContent = (net >= 0 ? '+' : '') + fmtUSD(net);
+  netEl.className = 'metric-val ' + (net >= 0 ? 'good' : 'bad');
+
+  const fill = byId('barFill');
+  fill.style.width = Math.min(c12 * 100, 100) + '%';
+  fill.style.background = c12 < .35 ? 'var(--green)' : c12 < .55 ? 'var(--amber)' : 'var(--red)';
+  byId('barLbl').textContent = fmtPct(c12);
+
+  byId('bUpfront').textContent = fmtUSD(bk.upfront);
+  byId('bMrrRev').textContent = fmtUSD(bk.mrrRev24);
+  byId('bLost').textContent = '−' + fmtUSD(bk.lost24);
+  byId('bAnalytical').textContent = fmtUSD(bk.analytical);
+  byId('bModel').textContent = fmtUSD(ltv);
+  byId('bCac').textContent = fmtUSD(cac);
+  byId('bRatio').textContent = ltvCac.toFixed(2) + '×';
+  const bNet = byId('bNet'); bNet.textContent = (net >= 0 ? '+' : '') + fmtUSD(net);
+  bNet.className = 'bk-val ' + (net >= 0 ? 'pos' : 'neg');
+
+  let ins = '';
+  if(fm === 2){
+    ins = `<strong>Two free months is the clearest free-month risk signal.</strong> <code>free_2mo_exact</code> adds about +38% churn odds and is marginally significant in the compact model.`;
+  } else if(fm >= 3){
+    ins = `<strong>${fm} free months.</strong> The compact model estimates higher churn odds for 3+ free months, but the coefficient is weaker than the 2-month signal. Treat this as directional.`;
+  } else if(obPct === 0){
+    ins = `<strong>No onboarding collected.</strong> The model applies the onboarding paid and onboarding-gap terms. <code>ob_waived_post_sign</code> is held at 0 because the calculator does not have a separate post-sign waiver toggle.`;
+  } else if(ltvCac < 1){
+    ins = `<strong>Underwater deal.</strong> At ${fmtUSD(cac)} CAC, calibrated LTV:CAC is ${ltvCac.toFixed(2)}×. Raise MRR, collect onboarding, reduce free months, or lower CAC.`;
+  } else {
+    ins = `<strong>${fmtUSD(mrr)} MRR · ${obPct}% onboarding · ${fm} free months · ${fmtUSD(cac)} CAC.</strong> Calibrated LTV is <strong>${fmtUSD(ltv)}</strong>, 12-mo churn is <strong>${fmtPct(c12)}</strong>, and LTV:CAC is <strong>${ltvCac.toFixed(2)}×</strong>.`;
+  }
+  byId('insight').innerHTML = ins;
+
+  renderAudit('auditChurn', [
+    ['log_mrr', f.log_mrr, CHURN_C.log_mrr, CHURN_P.log_mrr, 'p=0.1148; business-critical marginal'],
+    ['mrr_lt100', f.mrr_lt100, CHURN_C.mrr_lt100, CHURN_P.mrr_lt100, '~1 below $100'],
+    ['mrr_100_499', f.mrr_100_499, CHURN_C.mrr_100_499, CHURN_P.mrr_100_499, '$100–$499'],
+    ['mrr_1000p', f.mrr_1000p, CHURN_C.mrr_1000p, CHURN_P.mrr_1000p, '~1 above $1k'],
+    ['high_mrr', f.high_mrr, CHURN_C.high_mrr, CHURN_P.high_mrr, '~1 above $500'],
+    ['ob_collected_pct_mrr_sq', f.ob_collected_pct_mrr_sq, CHURN_C.ob_collected_pct_mrr_sq, CHURN_P.ob_collected_pct_mrr_sq, 'onboarding ratio squared'],
+    ['ob_actually_paid', f.ob_actually_paid, CHURN_C.ob_actually_paid, CHURN_P.ob_actually_paid, 'smooth 0→1'],
+    ['ob_waived_post_sign', f.ob_waived_post_sign, CHURN_C.ob_waived_post_sign, CHURN_P.ob_waived_post_sign, 'held at 0; no waiver toggle'],
+    ['ob_gap_x_mrr', f.ob_gap_x_mrr, CHURN_C.ob_gap_x_mrr, CHURN_P.ob_gap_x_mrr, 'max(0,1−ob_ratio)×log(mrr)'],
+    ['any_free', f.any_free, CHURN_C.any_free, CHURN_P.any_free, 'fm > 0'],
+    ['free_2mo_exact', f.free_2mo_exact, CHURN_C.free_2mo_exact, CHURN_P.free_2mo_exact, 'fm == 2'],
+    ['free_3plus', f.free_3plus, CHURN_C.free_3plus, CHURN_P.free_3plus, 'fm >= 3'],
+    ['anyfree_x_log_mrr', f.anyfree_x_log_mrr, CHURN_C.anyfree_x_log_mrr, CHURN_P.anyfree_x_log_mrr, 'exploratory interaction'],
+    ['anyfree_x_high_mrr', f.anyfree_x_high_mrr, CHURN_C.anyfree_x_high_mrr, CHURN_P.anyfree_x_high_mrr, 'exploratory interaction'],
+    ['anyfree_x_ob_collected_pct_mrr_sq', f.anyfree_x_ob_collected_pct_mrr_sq, CHURN_C.anyfree_x_ob_collected_pct_mrr_sq, CHURN_P.anyfree_x_ob_collected_pct_mrr_sq, 'business-critical marginal p=0.1443'],
+    ['anyfree_x_ob_actually_paid', f.anyfree_x_ob_actually_paid, CHURN_C.anyfree_x_ob_actually_paid, CHURN_P.anyfree_x_ob_actually_paid, 'exploratory interaction'],
+    ['anyfree_x_ob_waived_post_sign', f.anyfree_x_ob_waived_post_sign, CHURN_C.anyfree_x_ob_waived_post_sign, CHURN_P.anyfree_x_ob_waived_post_sign, 'held at 0; no waiver toggle'],
+    ['anyfree_x_ob_gap_x_mrr', f.anyfree_x_ob_gap_x_mrr, CHURN_C.anyfree_x_ob_gap_x_mrr, CHURN_P.anyfree_x_ob_gap_x_mrr, 'exploratory interaction'],
+    ['log_tenure', f.log_tenure, CHURN_C.log_tenure, CHURN_P.log_tenure, 'varies by month in LTV'],
+    ['log_tenure_sq', f.log_tenure_sq, CHURN_C.log_tenure_sq, CHURN_P.log_tenure_sq, 'varies by month in LTV'],
+    ['log_cohort_age', f.log_cohort_age, CHURN_C.log_cohort_age, CHURN_P.log_cohort_age, 'held at 14 mo'],
+    ['log_cohort_age_sq', f.log_cohort_age_sq, CHURN_C.log_cohort_age_sq, CHURN_P.log_cohort_age_sq, 'held at 14 mo'],
+  ]);
+  renderAudit('auditLtv', [
+    ['uncalibrated analytical LTV', bk.analytical, 1.0000, null, 'upfront + expected MRR through 120 mo'],
+    ['calibration factor', CALIBRATION, CALIBRATION, null, 'actual/analytical median'],
+    ['calibrated expected LTV', ltv, 1.0000, null, 'used for LTV:CAC and net value'],
+    ['mean monthly hazard benchmark', 0.049831, 0.049831, null, 'population mean from compact model'],
+    ['12-mo churn benchmark', 0.4585, 0.4585, null, 'population implied churn'],
+    ['24-mo churn benchmark', 0.7068, 0.7068, null, 'population implied churn'],
+  ]);
+
+  drawSensitivityChart(mrr, obPct, fm, cac);
+}
+
+window.addEventListener('resize', update);
+updateLockUI();
+update();
+})();
+</script>
+
+<!-- ============ EXPLORER LOGIC (IIFE) ============ -->
+<script>
+(function(){
+const CALIBRATION = 0.3854;
+const MAX_LTV_MONTHS = 120;
+const LOG_COH = Math.log(14);
+const LOG_COH2 = LOG_COH ** 2;
+const COLORS = ['#7dd3fc','#32d583','#fdb022','#f97066','#c084fc','#f0abfc','#a3e635','#93c5fd','#fb7185','#facc15','#5eead4','#d8b4fe','#60a5fa','#34d399','#f472b6','#f59e0b'];
+const FREE_LEVELS = [0,1,2,3];
+const OB_LEVELS = [0,50,100,150];
+const MRR_PRESETS = [250,500,1000,1500,2000,3000];
+let selectedMrr = new Set(['custom']);
+let selectedOb = new Set([0,50,100,150]);
+let selectedFree = new Set([0,1,2,3]);
+let visibleKeys = new Set();
+let SCENARIOS = [];
 
 function byId(id){ return document.getElementById(id); }
 function fmtUSD(v){ return '$' + Math.round(v || 0).toLocaleString(); }
 function fmtPct(v){ return ((v || 0)*100).toFixed(1) + '%'; }
-function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-function parseMoney(v){ if(v==null || v==='') return NaN; return +String(v).replace(/[\$,]/g,'').trim(); }
-function parsePct(v){ if(v==null || v==='') return NaN; const s=String(v).trim(); const n=+s.replace('%',''); if(Number.isNaN(n)) return NaN; return s.includes('%') ? n/100 : (n>3 ? n/100 : n); }
-function parseNum(v){ if(v==null || v==='') return NaN; const n=+String(v).replace(/[\$,]/g,'').replace('%','').trim(); return Number.isNaN(n)?NaN:n; }
-function pick(row, names){ for(const n of names){ if(Object.prototype.hasOwnProperty.call(row,n) && row[n]!=='' && row[n]!=null) return row[n]; } return null; }
-function parseDate(v){ const d = new Date(v); return Number.isNaN(d.getTime()) ? null : d; }
-function monthDiff(a,b){ return (b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth()); }
-function cohortKey(date, grain){ if(!date) return 'Unknown'; const y=date.getFullYear(), m=date.getMonth(); if(grain==='quarter') return y + ' Q' + (Math.floor(m/3)+1); return y + '-' + String(m+1).padStart(2,'0'); }
+function fmtRatio(v){ return (v || 0).toFixed(2) + '×'; }
+function fmtPayback(v){ return v == null ? '>60 mo' : v + ' mo'; }
 function color(i){ return COLORS[i % COLORS.length]; }
+function sig(x, thresh, width){ return 1/(1+Math.exp(-(x-thresh)/(width*.35))); }
+function smoothTiers(mrr){ const s100=sig(mrr,100,40),s500=sig(mrr,500,80),s1000=sig(mrr,1000,120); return {mrr_lt100:1-s100,mrr_100_499:s100*(1-s500),mrr_1000p:s1000,high_mrr:s500}; }
+function smoothObPaid(obPct){ return sig(obPct,7.5,7.5); }
 
-function csvParse(text){
-  const rows=[]; let row=[], cell='', q=false;
-  for(let i=0;i<text.length;i++){
-    const ch=text[i], next=text[i+1];
-    if(q){ if(ch==='"' && next==='"'){ cell+='"'; i++; } else if(ch==='"'){ q=false; } else cell+=ch; }
-    else { if(ch==='"') q=true; else if(ch===','){ row.push(cell); cell=''; } else if(ch==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; } else if(ch==='\r'){} else cell+=ch; }
-  }
-  if(cell.length || row.length){ row.push(cell); rows.push(row); }
-  if(!rows.length) return [];
-  const headers = rows[0].map(h=>h.trim());
-  return rows.slice(1).filter(r=>r.some(x=>String(x).trim()!=='')).map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]??''])));
+const CHURN_C = {intercept:-5.7143,log_mrr:0.3500,mrr_lt100:1.2017,mrr_100_499:0.4969,mrr_1000p:-0.3495,high_mrr:-0.6365,ob_collected_pct_mrr_sq:0.1258,ob_actually_paid:-0.3224,ob_waived_post_sign:-0.8896,ob_gap_x_mrr:0.1383,any_free:0.2503,free_2mo_exact:0.3226,free_3plus:0.1575,discount_length_mo:-0.0608,anyfree_x_log_mrr:-0.0562,anyfree_x_high_mrr:0.2422,anyfree_x_ob_collected_pct_mrr_sq:-0.0675,anyfree_x_ob_actually_paid:-0.1208,anyfree_x_ob_waived_post_sign:0.5261,anyfree_x_ob_gap_x_mrr:-0.0020,log_cohort_age:1.1622,log_cohort_age_sq:-0.2617,log_tenure:-0.3699,log_tenure_sq:0.0890};
+
+function features(mrr, obPct, fm, month=9){
+  const logMrr=Math.log(Math.max(mrr,1));
+  const obRatio=obPct/100;
+  const obSq=obRatio**2;
+  const obGap=Math.max(0,1-obRatio);
+  const tiers=smoothTiers(mrr);
+  const logTen=Math.log(Math.max(month,1));
+  const anyFree=fm>0?1:0;
+  const obPaid=smoothObPaid(obPct);
+  const waived=0;
+  return {log_mrr:logMrr,mrr_lt100:tiers.mrr_lt100,mrr_100_499:tiers.mrr_100_499,mrr_1000p:tiers.mrr_1000p,high_mrr:tiers.high_mrr,ob_collected_pct_mrr_sq:obSq,ob_actually_paid:obPaid,ob_waived_post_sign:waived,ob_gap_x_mrr:obGap*logMrr,any_free:anyFree,free_2mo_exact:fm===2?1:0,free_3plus:fm>=3?1:0,discount_length_mo:0,anyfree_x_log_mrr:anyFree*logMrr,anyfree_x_high_mrr:anyFree*tiers.high_mrr,anyfree_x_ob_collected_pct_mrr_sq:anyFree*obSq,anyfree_x_ob_actually_paid:anyFree*obPaid,anyfree_x_ob_waived_post_sign:anyFree*waived,anyfree_x_ob_gap_x_mrr:anyFree*obGap*logMrr,log_cohort_age:LOG_COH,log_cohort_age_sq:LOG_COH2,log_tenure:logTen,log_tenure_sq:logTen**2};
 }
+function logitHazard(mrr,obPct,fm,month=9){ const f=features(mrr,obPct,fm,month); return CHURN_C.intercept+CHURN_C.log_mrr*f.log_mrr+CHURN_C.mrr_lt100*f.mrr_lt100+CHURN_C.mrr_100_499*f.mrr_100_499+CHURN_C.mrr_1000p*f.mrr_1000p+CHURN_C.high_mrr*f.high_mrr+CHURN_C.ob_collected_pct_mrr_sq*f.ob_collected_pct_mrr_sq+CHURN_C.ob_actually_paid*f.ob_actually_paid+CHURN_C.ob_waived_post_sign*f.ob_waived_post_sign+CHURN_C.ob_gap_x_mrr*f.ob_gap_x_mrr+CHURN_C.any_free*f.any_free+CHURN_C.free_2mo_exact*f.free_2mo_exact+CHURN_C.free_3plus*f.free_3plus+CHURN_C.discount_length_mo*f.discount_length_mo+CHURN_C.anyfree_x_log_mrr*f.anyfree_x_log_mrr+CHURN_C.anyfree_x_high_mrr*f.anyfree_x_high_mrr+CHURN_C.anyfree_x_ob_collected_pct_mrr_sq*f.anyfree_x_ob_collected_pct_mrr_sq+CHURN_C.anyfree_x_ob_actually_paid*f.anyfree_x_ob_actually_paid+CHURN_C.anyfree_x_ob_waived_post_sign*f.anyfree_x_ob_waived_post_sign+CHURN_C.anyfree_x_ob_gap_x_mrr*f.anyfree_x_ob_gap_x_mrr+CHURN_C.log_cohort_age*f.log_cohort_age+CHURN_C.log_cohort_age_sq*f.log_cohort_age_sq+CHURN_C.log_tenure*f.log_tenure+CHURN_C.log_tenure_sq*f.log_tenure_sq; }
+function monthlyHazard(mrr,obPct,fm,month=9){ return 1/(1+Math.exp(-logitHazard(mrr,obPct,fm,month))); }
+function churnN(mrr,obPct,fm,n){ let survival=1; for(let t=1;t<=n;t++) survival*=1-monthlyHazard(mrr,obPct,fm,t); return 1-survival; }
+function ltvCurve(mrr,obPct,fm,maxMonths){ let survival=1; const upfront=mrr*(obPct/100); let cumulative=upfront; const curve=[cumulative*CALIBRATION]; for(let t=1;t<=maxMonths;t++){ survival*=1-monthlyHazard(mrr,obPct,fm,t); if(t>fm) cumulative += mrr*survival; curve.push(cumulative*CALIBRATION); } return curve; }
+function ltvBreakdown(mrr,obPct,fm,horizon){ const curve=ltvCurve(mrr,obPct,fm,Math.max(horizon,60)); const ltv=curve[horizon]; const analytical=ltv/CALIBRATION; const cac=+byId('cacInput').value; const ratio=ltv/(cac||1); const net=ltv-cac; let payback=null; for(let i=0;i<curve.length;i++){ if(curve[i]>=cac){ payback=i; break; } } const churnHorizon=churnN(mrr,obPct,fm,horizon); const churn12=churnN(mrr,obPct,fm,12); return {curve,ltv,analytical,ratio,net,payback,churnHorizon,churn12}; }
+function mrrValue(token){ return token === 'custom' ? +byId('mrrInput').value : +token; }
+function mrrLabel(token){ return token === 'custom' ? fmtUSD(+byId('mrrInput').value) : fmtUSD(+token); }
+function scenarioKey(mrrToken,fm,ob){ return mrrToken+'mrr_'+fm+'fm_'+ob+'ob'; }
+function scenarioName(mrrToken,fm,ob){ return mrrLabel(mrrToken)+' · '+fm+' free · '+ob+'% OB'; }
 
-function normalizeRows(rows){
-  return rows.map((r,idx)=>{
-    const cohortDate = parseDate(pick(r,COL.cohort));
-    const activeMonths = Math.max(1, Math.round(parseNum(pick(r,COL.activeMonths)) || 1));
-    const totalNet = Math.max(0, parseMoney(pick(r,COL.totalNetMrr)) || 0);
-    const avgMrrRaw = parseMoney(pick(r,COL.avgMrr));
-    const contractMrrRaw = parseMoney(pick(r,COL.contractMrr));
-    const mrr = Math.max(1, avgMrrRaw || contractMrrRaw || (totalNet/activeMonths) || 1);
-    const freeMonths = clamp(Math.round(parseNum(pick(r,COL.freeMonths)) || 0),0,12);
-    const obPct = Math.max(0, parsePct(pick(r,COL.obPct)) || 0);
-    const obCollectedRaw = parseMoney(pick(r,COL.obCollected));
-    const obCash = Math.max(0, Number.isFinite(obCollectedRaw) ? obCollectedRaw : mrr * obPct);
-    const churnMonths = parseNum(pick(r,COL.churnMonths));
-    const churned = Number.isFinite(churnMonths);
-    return {id:idx+1, cohortDate, activeMonths, totalNet, mrr, freeMonths, obPct, obCash, churned};
-  }).filter(a=>a.cohortDate && Number.isFinite(a.mrr));
-}
-
-function accountCurve(a, maxMonths, basis){
-  const arr=[];
-  const mrrOnlyTotal = Math.max(0, a.totalNet);
-  const monthlyAvg = a.activeMonths > 0 ? mrrOnlyTotal / a.activeMonths : 0;
-  for(let t=0;t<=maxMonths;t++){
-    const activeT = Math.min(t, a.activeMonths);
-    let val = monthlyAvg * activeT;
-    if(basis === 'include_ob') val += a.obCash;
-    arr.push(val);
-  }
-  return arr;
-}
-
-function bucketFree(a){ if(a.freeMonths<=0) return '0 free'; if(a.freeMonths===1) return '1 free'; if(a.freeMonths===2) return '2 free'; return '3+ free'; }
-function bucketOB(a){ const p=a.obPct; if(p<=0 || a.obCash<=0) return 'No OB'; if(p<0.5) return '<50%'; if(p<1.0) return '50–99%'; if(p<=1.25) return '~100%'; return '125%+'; }
-function bucketMRR(a){ if(a.mrr<100) return '<$100'; if(a.mrr<500) return '$100–499'; if(a.mrr<1000) return '$500–999'; return '$1k+'; }
-
-function groupBy(accounts, keyFn){
-  const m=new Map();
-  accounts.forEach(a=>{ const k=keyFn(a); if(!m.has(k)) m.set(k,[]); m.get(k).push(a); });
-  return m;
-}
-
-function avgCurve(accounts, maxMonths, basis){
-  const curve = Array(maxMonths+1).fill(0);
-  if(!accounts.length) return curve;
-  accounts.forEach(a=>{ const c=accountCurve(a,maxMonths,basis); c.forEach((v,i)=>curve[i]+=v); });
-  return curve.map(v=>v/accounts.length);
-}
-
-function paybackMonthFromCurve(curve,cac){
-  for(let i=0;i<curve.length;i++) if(curve[i] >= cac) return i;
-  return null;
-}
-
-function buildSeries(){
-  const cac = +byId('cacInput').value;
-  const grain = byId('cohortGrain').value;
-  const minN = +byId('minN').value;
-  const basis = byId('ltvBasis').value;
-  const maxMonths = +byId('maxMonths').value;
-  const accounts = ACCOUNTS;
-
-  function seriesFromGroups(groups, order=null){
-    let entries = Array.from(groups.entries()).map(([name,accs])=>({name,accs,n:accs.length,curve:avgCurve(accs,maxMonths,basis)})).filter(s=>s.n>=minN);
-    if(order) entries.sort((a,b)=>order.indexOf(a.name)-order.indexOf(b.name)); else entries.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-    return entries;
-  }
-
-  const cohortGroups = groupBy(accounts, a=>cohortKey(a.cohortDate, grain));
-  const freeGroups = groupBy(accounts, bucketFree);
-  const obGroups = groupBy(accounts, bucketOB);
-  const mrrGroups = groupBy(accounts, bucketMRR);
-
-  SERIES = {
-    accounts, cac, grain, minN, basis, maxMonths,
-    cohorts: seriesFromGroups(cohortGroups),
-    free: seriesFromGroups(freeGroups, ['0 free','1 free','2 free','3+ free']),
-    ob: seriesFromGroups(obGroups, ['No OB','<50%','50–99%','~100%','125%+']),
-    mrr: seriesFromGroups(mrrGroups, ['<$100','$100–499','$500–999','$1k+'])
-  };
-
-  updateMetrics();
-  drawAll();
-}
-
-function updateMetrics(){
-  const {accounts,cac,maxMonths,basis} = SERIES;
-  const curves = accounts.map(a=>accountCurve(a,maxMonths,basis));
-  const endVals = curves.map(c=>c[maxMonths]);
-  const avgMrr = accounts.reduce((s,a)=>s+a.mrr,0)/(accounts.length||1);
-  const avgLtv = endVals.reduce((s,v)=>s+v,0)/(endVals.length||1);
-  const above = endVals.filter(v=>v>=cac).length/(endVals.length||1);
-  const pbs = curves.map(c=>paybackMonthFromCurve(c,cac)).filter(v=>v!==null).sort((a,b)=>a-b);
-  const medPb = pbs.length ? pbs[Math.floor(pbs.length/2)] : null;
-  byId('mAccounts').textContent = accounts.length.toLocaleString();
-  byId('mMrr').textContent = fmtUSD(avgMrr);
-  byId('mLtv').textContent = fmtUSD(avgLtv);
-  byId('mLtvSub').textContent = 'month ' + maxMonths;
-  byId('mAbove').textContent = fmtPct(above);
-  byId('mAbove').className = 'metric-val ' + (above>=.5?'good':above>=.25?'warn':'bad');
-  byId('mAboveSub').textContent = 'above ' + fmtUSD(cac) + ' at month ' + maxMonths;
-  byId('mPayback').textContent = medPb===null ? '> '+maxMonths+' mo' : medPb + ' mo';
-}
-
-function drawLineChart(canvasId, series, opts={}){
-  const canvas=byId(canvasId), rect=canvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-  canvas.width=Math.max(1,Math.floor(rect.width*dpr)); canvas.height=Math.max(1,Math.floor(rect.height*dpr));
-  const ctx=canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  const w=rect.width,h=rect.height; ctx.clearRect(0,0,w,h);
-  const pad={l:64,r:18,t:18,b:38}; const plotW=w-pad.l-pad.r, plotH=h-pad.t-pad.b;
-  const maxMonths=SERIES.maxMonths, cac=SERIES.cac;
-  let maxY=Math.max(cac, ...series.flatMap(s=>s.curve)); maxY = Math.max(100, maxY*1.12);
-  const xPx=t=>pad.l+(t/maxMonths)*plotW, yPx=v=>pad.t+(1-v/maxY)*plotH;
-
-  ctx.font='11px Inter, system-ui, sans-serif'; ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.fillStyle='#737d91'; ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){ const yy=pad.t+plotH*i/4, val=maxY*(1-i/4); ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(w-pad.r,yy); ctx.stroke(); ctx.fillText(fmtUSD(val),8,yy+4); }
-  for(let i=0;i<=4;i++){ const xx=pad.l+plotW*i/4, val=Math.round(maxMonths*i/4); ctx.fillText('M'+val,xx-10,h-12); }
-
-  ctx.strokeStyle='rgba(253,176,34,.95)'; ctx.lineWidth=2; ctx.setLineDash([6,5]); ctx.beginPath(); ctx.moveTo(pad.l,yPx(cac)); ctx.lineTo(w-pad.r,yPx(cac)); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='#fdb022'; ctx.fillText('CAC '+fmtUSD(cac), pad.l+6, yPx(cac)-6);
-
-  const showAvg = byId('showAvg')?.checked;
-  series.forEach((s,i)=>{
-    ctx.strokeStyle = color(i); ctx.globalAlpha = opts.faint ? .38 : .88; ctx.lineWidth = 1.8;
-    ctx.beginPath(); s.curve.forEach((v,t)=>{ const xx=xPx(t), yy=yPx(v); if(t===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy); }); ctx.stroke();
-    ctx.globalAlpha = 1;
-    if(byId('showLabels')?.checked && canvasId==='cohortChart'){
-      const end=s.curve[maxMonths]; ctx.fillStyle=color(i); ctx.fillText(s.name, xPx(maxMonths)-42, yPx(end)-3);
-    }
+function buildScenarios(){
+  const horizon=+byId('horizon').value;
+  const scenarios=[];
+  [...selectedMrr].forEach(mt=>{
+    const mrr=mrrValue(mt);
+    [...selectedFree].sort((a,b)=>a-b).forEach(fm=>{
+      [...selectedOb].sort((a,b)=>a-b).forEach(ob=>{
+        const b=ltvBreakdown(mrr,ob,fm,horizon);
+        scenarios.push({key:scenarioKey(mt,fm,ob),name:scenarioName(mt,fm,ob),mrrToken:mt,fm,ob,mrr,...b});
+      });
+    });
   });
-
-  if(showAvg && series.length && canvasId==='cohortChart'){
-    const avg=Array(maxMonths+1).fill(0); let totalN=0;
-    series.forEach(s=>{ totalN+=s.n; s.curve.forEach((v,t)=>avg[t]+=v*s.n); });
-    avg.forEach((v,t)=>avg[t]=v/(totalN||1));
-    ctx.strokeStyle='#f4f6fb'; ctx.lineWidth=3.2; ctx.beginPath(); avg.forEach((v,t)=>{ const xx=xPx(t), yy=yPx(v); if(t===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy); }); ctx.stroke();
-  }
+  SCENARIOS=scenarios;
+  visibleKeys = new Set(scenarios.map(s=>s.key));
+  return scenarios;
 }
+function metricValue(s,metric){ if(metric==='ltv')return s.ltv; if(metric==='ratio')return s.ratio; if(metric==='churn')return s.churnHorizon; if(metric==='payback')return s.payback==null?61:s.payback; if(metric==='paybackProgress')return Math.min(1, s.ltv/(+byId('cacInput').value||1)); return s.net; }
+function metricLabel(metric,v){ if(metric==='ltv'||metric==='net')return fmtUSD(v); if(metric==='ratio')return fmtRatio(v); if(metric==='churn'||metric==='paybackProgress')return fmtPct(v); return v>=61?'>60 mo':Math.round(v)+' mo'; }
+function bestBy(metric,arr=SCENARIOS){ const sorted=[...arr].sort((a,b)=>{ if(metric==='churn')return a.churnHorizon-b.churnHorizon; if(metric==='payback')return (a.payback==null?61:a.payback)-(b.payback==null?61:b.payback); if(metric==='ratio')return b.ratio-a.ratio; if(metric==='paybackProgress')return metricValue(b,'paybackProgress')-metricValue(a,'paybackProgress'); return b.ltv-a.ltv; }); return sorted; }
+function avgCurves(curves){ if(!curves.length)return[]; return curves[0].map((_,i)=>curves.reduce((s,c)=>s+c[i],0)/curves.length); }
 
-function renderLegend(id, series){
-  byId(id).innerHTML = series.map((s,i)=>`<span class="legend-item"><span class="sw" style="background:${color(i)}"></span>${s.name} <span style="color:var(--text3)">n=${s.n}</span></span>`).join('');
-}
-
-function drawHeatmap(){
-  const canvas=byId('heatmapChart'), rect=canvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-  canvas.width=Math.floor(rect.width*dpr); canvas.height=Math.floor(rect.height*dpr); const ctx=canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  const w=rect.width,h=rect.height; ctx.clearRect(0,0,w,h);
-  const rows=['0 free','1 free','2 free','3+ free'], cols=['No OB','<50%','50–99%','~100%','125%+'];
-  const pad={l:76,r:12,t:34,b:16}; const cw=(w-pad.l-pad.r)/cols.length, rh=(h-pad.t-pad.b)/rows.length;
-  const {accounts,cac,maxMonths,basis}=SERIES;
-  ctx.font='11px Inter, system-ui, sans-serif';
-  cols.forEach((c,i)=>{ ctx.fillStyle='#aeb7c8'; ctx.fillText(c,pad.l+i*cw+8,20); });
-  rows.forEach((r,i)=>{ ctx.fillStyle='#aeb7c8'; ctx.fillText(r,8,pad.t+i*rh+rh/2+4); });
-  rows.forEach((r,ri)=>cols.forEach((c,ci)=>{
-    const accs=accounts.filter(a=>bucketFree(a)===r && bucketOB(a)===c);
-    const pbs=accs.map(a=>paybackMonthFromCurve(accountCurve(a,maxMonths,basis),cac)).filter(v=>v!==null).sort((a,b)=>a-b);
-    const med=pbs.length?pbs[Math.floor(pbs.length/2)]:null;
-    const x=pad.l+ci*cw,y=pad.t+ri*rh;
-    let alpha = med===null ? .14 : clamp(1 - med/(maxMonths+1), .22, .9);
-    ctx.fillStyle = med===null ? 'rgba(249,112,102,.18)' : `rgba(50,213,131,${alpha})`;
-    ctx.fillRect(x+2,y+2,cw-4,rh-4);
-    ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.strokeRect(x+2,y+2,cw-4,rh-4);
-    ctx.fillStyle='#f4f6fb'; ctx.font='bold 13px Inter, system-ui, sans-serif'; ctx.textAlign='center';
-    ctx.fillText(med===null?'> '+maxMonths:med+' mo',x+cw/2,y+rh/2-2);
-    ctx.font='10px Inter, system-ui, sans-serif'; ctx.fillStyle='#d1d5db'; ctx.fillText('n='+accs.length,x+cw/2,y+rh/2+13);
-    ctx.textAlign='left';
+function renderPicker(){
+  const box=byId('dimensionPicker');
+  const mrrOptions=[['custom','Custom '+fmtUSD(+byId('mrrInput').value)], ...MRR_PRESETS.map(v=>[String(v),fmtUSD(v)])];
+  const makeChips=(title,options,set,kind)=>`<div class="dim-box"><div class="dim-title">${title}</div><div class="chip-row">${options.map(([val,label])=>`<label class="chip"><input type="checkbox" data-kind="${kind}" data-val="${val}" ${set.has(kind==='mrr'?val:+val)?'checked':''}>${label}</label>`).join('')}</div><div class="dim-actions"><button type="button" class="mini-btn" data-action="all" data-kind="${kind}">All</button><button type="button" class="mini-btn" data-action="none" data-kind="${kind}">Clear</button></div></div>`;
+  box.innerHTML = makeChips('MRR levels',mrrOptions,selectedMrr,'mrr') + makeChips('Onboarding %',OB_LEVELS.map(v=>[String(v),v+'%']),selectedOb,'ob') + makeChips('Waived months',FREE_LEVELS.map(v=>[String(v),v+' mo']),selectedFree,'free');
+  box.querySelectorAll('input').forEach(inp=>inp.addEventListener('change',()=>{
+    const kind=inp.dataset.kind;
+    const val=kind==='mrr'?inp.dataset.val:+inp.dataset.val;
+    const set=kind==='mrr'?selectedMrr:kind==='ob'?selectedOb:selectedFree;
+    if(inp.checked) set.add(val); else set.delete(val);
+    if(!set.size) set.add(val);
+    update();
+  }));
+  box.querySelectorAll('.mini-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    const kind=btn.dataset.kind;
+    const action=btn.dataset.action;
+    const set=kind==='mrr'?selectedMrr:kind==='ob'?selectedOb:selectedFree;
+    set.clear();
+    if(action==='all'){
+      if(kind==='mrr'){ set.add('custom'); MRR_PRESETS.forEach(v=>set.add(String(v))); }
+      else if(kind==='ob') OB_LEVELS.forEach(v=>set.add(v));
+      else FREE_LEVELS.forEach(v=>set.add(v));
+    } else {
+      if(kind==='mrr') set.add('custom');
+      else if(kind==='ob') set.add(100);
+      else set.add(0);
+    }
+    update();
   }));
 }
 
-function renderTable(){
-  const segments=[];
-  [['Free months', bucketFree], ['Onboarding', bucketOB], ['MRR tier', bucketMRR]].forEach(([kind,fn])=>{
-    groupBy(SERIES.accounts, fn).forEach((accs,name)=>{
-      if(accs.length < SERIES.minN) return;
-      const curves=accs.map(a=>accountCurve(a,SERIES.maxMonths,SERIES.basis));
-      const end=curves.map(c=>c[SERIES.maxMonths]);
-      const pbs=curves.map(c=>paybackMonthFromCurve(c,SERIES.cac)).filter(v=>v!==null).sort((a,b)=>a-b);
-      segments.push({kind,name,n:accs.length,avgMrr:accs.reduce((s,a)=>s+a.mrr,0)/accs.length,avgOb:accs.reduce((s,a)=>s+a.obCash,0)/accs.length,avgFree:accs.reduce((s,a)=>s+a.freeMonths,0)/accs.length,ltv:end.reduce((s,v)=>s+v,0)/end.length,above:end.filter(v=>v>=SERIES.cac).length/end.length,payback:pbs.length?pbs[Math.floor(pbs.length/2)]:null,churn:accs.filter(a=>a.churned).length/accs.length});
-    });
-  });
-  const rows=segments.sort((a,b)=>a.kind.localeCompare(b.kind)||a.name.localeCompare(b.name));
-  byId('summaryTable').innerHTML = `<thead><tr><th>Type</th><th>Segment</th><th>Accounts</th><th>Avg MRR</th><th>Avg OB cash</th><th>Avg free mo</th><th>LTV @ M${SERIES.maxMonths}</th><th>% above CAC</th><th>Median payback</th><th>Churned %</th></tr></thead><tbody>` + rows.map(r=>`<tr><td>${r.kind}</td><td>${r.name}</td><td>${r.n.toLocaleString()}</td><td>${fmtUSD(r.avgMrr)}</td><td>${fmtUSD(r.avgOb)}</td><td>${r.avgFree.toFixed(1)}</td><td>${fmtUSD(r.ltv)}</td><td class="${r.above>=.5?'pos':r.above<.25?'neg':''}">${fmtPct(r.above)}</td><td>${r.payback===null?'> '+SERIES.maxMonths+' mo':r.payback+' mo'}</td><td>${fmtPct(r.churn)}</td></tr>`).join('') + '</tbody>';
-}
-
-function drawAll(){
-  byId('emptyState').style.display='none'; byId('dashboard').style.display='block';
-  drawLineChart('cohortChart', SERIES.cohorts, {faint:true}); renderLegend('cohortLegend', SERIES.cohorts.slice(0,18));
-  drawLineChart('freeChart', SERIES.free); renderLegend('freeLegend', SERIES.free);
-  drawLineChart('obChart', SERIES.ob); renderLegend('obLegend', SERIES.ob);
-  drawLineChart('mrrChart', SERIES.mrr); renderLegend('mrrLegend', SERIES.mrr);
-  drawHeatmap(); renderTable();
-}
-
-function showError(msg){ const e=byId('errorBox'); e.style.display='block'; e.textContent=msg; }
-function clearError(){ const e=byId('errorBox'); e.style.display='none'; e.textContent=''; }
-
-byId('csvFile').addEventListener('change', async e=>{
-  clearError(); const file=e.target.files[0]; if(!file) return;
-  try{ const text=await file.text(); const rows=csvParse(text); ACCOUNTS=normalizeRows(rows); if(!ACCOUNTS.length) throw new Error('No usable accounts found. Check column names.'); byId('statusPill').textContent=ACCOUNTS.length.toLocaleString()+' accounts loaded'; buildSeries(); }
-  catch(err){ showError(err.message || String(err)); }
-});
-
-['cacRange','cohortGrain','minN','ltvBasis','maxMonths','showAvg','showLabels'].forEach(id=>byId(id).addEventListener('input',()=>{ if(id==='cacRange') byId('cacInput').value=byId('cacRange').value; if(ACCOUNTS.length) buildSeries(); }));
-byId('cacInput').addEventListener('input',()=>{ byId('cacRange').value=byId('cacInput').value; if(ACCOUNTS.length) buildSeries(); });
-window.addEventListener('resize',()=>{ if(ACCOUNTS.length) drawAll(); });
-
-byId('loadSample').addEventListener('click',()=>{
-  const rows=[]; const start=new Date('2024-01-01');
-  for(let i=0;i<420;i++){
-    const cohort=new Date(start); cohort.setMonth(start.getMonth()+Math.floor(i/28));
-    const mrr=[85,250,650,1300][Math.floor(Math.random()*4)]*(.75+Math.random()*.65);
-    const free=[0,0,0,1,1,2,3][Math.floor(Math.random()*7)];
-    const obPct=[0,.5,1,1,1.25,1.5][Math.floor(Math.random()*6)];
-    const active=Math.max(1,Math.round(3+Math.random()*24 - free*.8 + (mrr>500?3:0)));
-    const churned=Math.random()<.48;
-    const total=mrr*Math.max(1,active-free)*(churned?.82:1.02)*(0.8+Math.random()*.35);
-    rows.push({first_mrr_revenue_month:cohort.toISOString().slice(0,10),monthly_active_revenue_months:active,monthly_total_net_mrr:total,avg_gross_mrr_active_months:mrr,contract_mrr_TO_ADD:mrr,number_of_free_months_at_start_TO_ADD:free,calculated_onboarding_pct_of_stripe_avg_mrr:obPct,total_onboarding_net_collected:mrr*obPct,'# of Months to churn':churned?active:''});
+function drawLineChart(canvasId, series, opts={}){
+  const canvas=byId(canvasId),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  if(rect.width === 0 || rect.height === 0) return; // hidden tab
+  canvas.width=Math.floor(rect.width*dpr);canvas.height=Math.floor(rect.height*dpr);
+  const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w=rect.width,h=rect.height;ctx.clearRect(0,0,w,h);
+  const pad={l:72,r:34,t:22,b:44}; const plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b;
+  const horizon=+byId('horizon').value,metric=opts.metric||byId('metric').value,cac=+byId('cacInput').value;
+  const data=series.map(s=>({s,curve:s.curve.map((ltv,t)=>{
+    if(metric==='ltv') return ltv;
+    if(metric==='ratio') return ltv/(cac||1);
+    if(metric==='net') return ltv-cac;
+    if(metric==='paybackProgress') return Math.min(1, ltv/(cac||1));
+    return t===0?0:churnN(s.mrr,s.ob,s.fm,t);
+  })}));
+  let ys=data.flatMap(d=>d.curve);
+  let minY=Math.min(0,...ys),maxY=Math.max(...ys, metric==='ratio'?1:0, metric==='paybackProgress'?1:0);
+  if(metric==='churn'||metric==='paybackProgress'){minY=0;maxY=Math.max(.05,maxY)}
+  if(minY===maxY){maxY+=1}
+  maxY*=1.08;
+  const xPx=t=>pad.l+(t/horizon)*plotW,yPx=v=>pad.t+(1-(v-minY)/(maxY-minY))*plotH;
+  ctx.font='11px Inter,system-ui,sans-serif';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const yy=pad.t+plotH*i/4,val=maxY-(maxY-minY)*i/4;
+    ctx.strokeStyle=i===4?'rgba(255,255,255,.18)':'rgba(255,255,255,.09)';
+    ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();
+    ctx.fillStyle='#737d91';ctx.fillText(metricLabel(metric,val),8,yy+4);
   }
-  ACCOUNTS=normalizeRows(rows); byId('statusPill').textContent=ACCOUNTS.length.toLocaleString()+' demo accounts loaded'; buildSeries();
-});
+  for(let i=0;i<=4;i++){const xx=pad.l+plotW*i/4,val=Math.round(horizon*i/4);ctx.fillStyle='#737d91';ctx.fillText('M'+val,xx-10,h-13)}
+  if(opts.showCac && metric==='ltv'){
+    ctx.strokeStyle='rgba(253,176,34,.95)';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(pad.l,yPx(cac));ctx.lineTo(w-pad.r,yPx(cac));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fdb022';ctx.fillText('CAC '+fmtUSD(cac),pad.l+6,yPx(cac)-6);
+  }
+  if(opts.showCac && (metric==='ratio'||metric==='paybackProgress')){
+    ctx.strokeStyle='rgba(253,176,34,.95)';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(pad.l,yPx(1));ctx.lineTo(w-pad.r,yPx(1));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fdb022';ctx.fillText('CAC breakeven',pad.l+6,yPx(1)-6);
+  }
+  const highlight=byId('highlightBest')?.checked;
+  const best=highlight&&series.length?bestBy(metric==='paybackProgress'?'ratio':metric,series)[0]:null;
+  const crowded=data.length>18;
+  data.forEach((d,i)=>{
+    const isBest=best&&d.s.key===best.key;
+    ctx.strokeStyle=color(i);ctx.lineWidth=isBest?3.8:(crowded?1.25:2.1);ctx.globalAlpha=isBest?1:(crowded?.42:.78);
+    ctx.beginPath();d.curve.forEach((v,t)=>{const xx=xPx(t),yy=yPx(v);if(t===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)});ctx.stroke();ctx.globalAlpha=1;
+    const end=d.curve[horizon];ctx.fillStyle=color(i);ctx.beginPath();ctx.arc(xPx(horizon),yPx(end),isBest?4.5:3,0,Math.PI*2);ctx.fill();
+  });
+  if(byId('showLabels')?.checked){
+    const labelData=data.map((d,i)=>({d,i,end:d.curve[horizon]})).sort((a,b)=>b.end-a.end);
+    let lastY=-999;
+    labelData.forEach(item=>{
+      const d=item.d,i=item.i,end=item.end;
+      let yy=yPx(end); if(Math.abs(yy-lastY)<13) yy=lastY+13; if(yy>pad.t+plotH) yy=pad.t+plotH; lastY=yy;
+      ctx.strokeStyle=color(i);ctx.lineWidth=1;ctx.globalAlpha=.6;ctx.beginPath();ctx.moveTo(xPx(horizon),yPx(end));ctx.lineTo(w-pad.r+3,yy);ctx.stroke();ctx.globalAlpha=1;
+      ctx.fillStyle=color(i);ctx.font='10.5px Inter,system-ui,sans-serif';ctx.fillText(d.s.name,w-pad.r+5,yy+3);
+    });
+  }
+}
+function renderLegend(id,series){ byId(id).innerHTML=series.map((s,i)=>`<span class="legend-item"><span class="sw" style="background:${color(i)}"></span>${s.name}</span>`).join(''); }
+function drawHeatmap(){
+  const canvas=byId('heatmapChart'),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  if(rect.width === 0 || rect.height === 0) return; // hidden tab
+  canvas.width=Math.floor(rect.width*dpr);canvas.height=Math.floor(rect.height*dpr);const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w=rect.width,h=rect.height;ctx.clearRect(0,0,w,h);
+  const rows=[...selectedFree].sort((a,b)=>a-b),cols=[...selectedOb].sort((a,b)=>a-b),goal=byId('goal').value;
+  const pad={l:72,r:12,t:34,b:16};const cw=(w-pad.l-pad.r)/Math.max(1,cols.length),rh=(h-pad.t-pad.b)/Math.max(1,rows.length);
+  ctx.font='11px Inter,system-ui,sans-serif';
+  cols.forEach((c,i)=>{ctx.fillStyle='#aeb7c8';ctx.fillText(c+'% OB',pad.l+i*cw+8,20)});
+  rows.forEach((r,i)=>{ctx.fillStyle='#aeb7c8';ctx.fillText(r+' free',8,pad.t+i*rh+rh/2+4)});
+  const cellBest=[]; rows.forEach(fm=>cols.forEach(ob=>{const choices=SCENARIOS.filter(s=>s.fm===fm&&s.ob===ob); if(choices.length) cellBest.push(bestBy(goal,choices)[0]);}));
+  const vals=cellBest.map(s=>metricValue(s,goal)); const min=Math.min(...vals),max=Math.max(...vals);
+  rows.forEach((fm,ri)=>cols.forEach((ob,ci)=>{
+    const choices=SCENARIOS.filter(s=>s.fm===fm&&s.ob===ob); if(!choices.length)return;
+    const s=bestBy(goal,choices)[0]; const v=metricValue(s,goal); let score;
+    if(goal==='ratio')score=(v-min)/(max-min||1);else score=1-(v-min)/(max-min||1);
+    score=Math.max(.12,Math.min(.92,score)); const x=pad.l+ci*cw,y=pad.t+ri*rh;
+    ctx.fillStyle=`rgba(50,213,131,${score})`;ctx.fillRect(x+2,y+2,cw-4,rh-4);ctx.strokeStyle='rgba(255,255,255,.08)';ctx.strokeRect(x+2,y+2,cw-4,rh-4);
+    ctx.textAlign='center';ctx.fillStyle='#f4f6fb';ctx.font='bold 13px Inter,system-ui,sans-serif';ctx.fillText(goal==='payback'?fmtPayback(s.payback):metricLabel(goal,v),x+cw/2,y+rh/2-8);
+    ctx.font='10px Inter,system-ui,sans-serif';ctx.fillStyle='#d1d5db';ctx.fillText(fmtUSD(s.mrr)+' MRR',x+cw/2,y+rh/2+7);ctx.fillText(fmtRatio(s.ratio)+' · '+fmtPct(s.churnHorizon),x+cw/2,y+rh/2+22);ctx.textAlign='left';
+  }));
+}
+function renderRanks(){ function rows(id,metric){ const top=bestBy(metric).slice(0,3); byId(id).innerHTML=top.map((s,i)=>`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-main">${s.name}<span class="rank-sub">${fmtUSD(s.mrr)} MRR · ${fmtRatio(s.ratio)} · horizon churn ${fmtPct(s.churnHorizon)}</span></div><div class="rank-val">${metric==='churn'?fmtPct(s.churnHorizon):metric==='payback'?fmtPayback(s.payback):fmtRatio(s.ratio)}</div></div>`).join(''); } rows('rankChurn','churn');rows('rankPayback','payback');rows('rankRatio','ratio'); }
+function renderSummary(){ const rows=[...SCENARIOS].sort((a,b)=>b.ratio-a.ratio); const horizon=+byId('horizon').value; byId('summaryTable').innerHTML=`<thead><tr><th>Scenario</th><th>MRR</th><th>LTV</th><th>LTV:CAC</th><th>Churn @ M${horizon}</th><th>Churn @ M12</th><th>Payback</th><th>Net</th></tr></thead><tbody>`+rows.map(s=>`<tr><td>${s.name}</td><td>${fmtUSD(s.mrr)}</td><td>${fmtUSD(s.ltv)}</td><td class="${s.ratio>=3?'pos':s.ratio<1?'neg':''}">${fmtRatio(s.ratio)}</td><td>${fmtPct(s.churnHorizon)}</td><td>${fmtPct(s.churn12)}</td><td>${fmtPayback(s.payback)}</td><td class="${s.net>=0?'pos':'neg'}">${fmtUSD(s.net)}</td></tr>`).join('')+`</tbody>`; }
+function updateMetrics(){ const bestRatio=bestBy('ratio')[0],bestChurn=bestBy('churn')[0],bestPayback=bestBy('payback')[0]; byId('mMrr').textContent=fmtUSD(+byId('mrrInput').value);byId('mCac').textContent=fmtUSD(+byId('cacInput').value);byId('mBestRatio').textContent=fmtRatio(bestRatio.ratio);byId('mBestRatio').className='metric-val '+(bestRatio.ratio>=3?'good':bestRatio.ratio>=1.5?'warn':'bad');byId('mBestRatioSub').textContent=bestRatio.name;byId('mBestChurn').textContent=fmtPct(bestChurn.churnHorizon);byId('mBestChurn').className='metric-val '+(bestChurn.churnHorizon<.35?'good':bestChurn.churnHorizon<.55?'warn':'bad');byId('mBestChurnSub').textContent=bestChurn.name;byId('mBestPayback').textContent=fmtPayback(bestPayback.payback);byId('mBestPayback').className='metric-val '+(bestPayback.payback!==null&&bestPayback.payback<=12?'good':bestPayback.payback!==null&&bestPayback.payback<=24?'warn':'bad');byId('mBestPaybackSub').textContent=bestPayback.name;byId('mScenarioCount').textContent=SCENARIOS.length.toLocaleString(); const alert=byId('scenarioAlert'); if(SCENARIOS.length>48){alert.style.display='block';alert.textContent='You are showing '+SCENARIOS.length+' scenarios. The rankings and heatmap are fine, but the line charts may be crowded. Turn off labels, use Focused, or clear a dimension for readability.';} else {alert.style.display='none';alert.textContent='';} }
+function update(){
+  buildScenarios(); renderPicker();
+  const shown=SCENARIOS.filter(s=>visibleKeys.has(s.key));
+  drawLineChart('matrixChart',shown,{metric:byId('metric').value,showCac:byId('showCac').checked});
+  renderLegend('matrixLegend',shown);
+  byId('aLines').textContent=shown.length.toLocaleString();
+  const visibleBest=shown.length?bestBy(byId('metric').value==='paybackProgress'?'ratio':byId('metric').value, shown)[0]:null;
+  byId('aBestVisible').textContent=visibleBest?visibleBest.name:'—';
+  byId('aMetric').textContent=byId('metric').selectedOptions[0].textContent;
+
+  const seg=byId('segment').value;
+  let segSeries=[];
+  if(seg==='free'){
+    segSeries=[...selectedFree].sort((a,b)=>a-b).map(fm=>{const vals=SCENARIOS.filter(s=>s.fm===fm); const base=vals[0]; return {...base,name:fm+' waived mo avg',curve:avgCurves(vals.map(v=>v.curve))};});
+  } else if(seg==='ob'){
+    segSeries=[...selectedOb].sort((a,b)=>a-b).map(ob=>{const vals=SCENARIOS.filter(s=>s.ob===ob); const base=vals[0]; return {...base,name:ob+'% OB avg',curve:avgCurves(vals.map(v=>v.curve))};});
+  } else if(seg==='mrr'){
+    segSeries=[...selectedMrr].map(mt=>{const vals=SCENARIOS.filter(s=>s.mrrToken===mt); const base=vals[0]; return {...base,name:mrrLabel(mt)+' MRR avg',curve:avgCurves(vals.map(v=>v.curve))};});
+  } else segSeries=shown;
+  drawLineChart('segmentChart',segSeries,{metric:byId('metric').value,showCac:byId('showCac').checked});
+  renderLegend('segmentLegend',segSeries);
+  drawHeatmap(); renderRanks(); renderSummary(); updateMetrics();
+}
+
+['mrrRange','cacRange'].forEach(id=>byId(id).addEventListener('input',()=>{ const target=id==='mrrRange'?'mrrInput':'cacInput'; byId(target).value=byId(id).value; update(); }));
+['mrrInput','cacInput'].forEach(id=>byId(id).addEventListener('input',()=>{ const target=id==='mrrInput'?'mrrRange':'cacRange'; byId(target).value=byId(id).value; update(); }));
+['horizon','metric','segment','goal','showLabels','showCac','highlightBest'].forEach(id=>byId(id).addEventListener('input',update));
+document.querySelectorAll('.preset-btn').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedMrr.clear(); selectedOb.clear(); selectedFree.clear();
+  if(btn.dataset.preset==='focused'){
+    selectedMrr.add('custom'); selectedOb.add(100); selectedOb.add(150); selectedFree.add(0); selectedFree.add(1);
+  } else if(btn.dataset.preset==='standard'){
+    selectedMrr.add('custom'); selectedMrr.add('1000'); [50,100,150].forEach(v=>selectedOb.add(v)); [0,1,2].forEach(v=>selectedFree.add(v));
+  } else {
+    selectedMrr.add('custom'); MRR_PRESETS.forEach(v=>selectedMrr.add(String(v))); OB_LEVELS.forEach(v=>selectedOb.add(v)); FREE_LEVELS.forEach(v=>selectedFree.add(v));
+  }
+  update();
+}));
+window.addEventListener('resize',update);
+update();
+})();
 </script>
 </body>
 </html>
