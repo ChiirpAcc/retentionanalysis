@@ -184,6 +184,67 @@ code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radi
 .chart-wrap-calc{position:relative;height:250px;background:#0b0e14;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:8px}
 #sensitivityCanvas{width:100%;height:100%;display:block}
 
+/* ============ EXECUTIVE BRIEF ============ */
+.brief{margin:0 0 18px;border:1px solid rgba(125,211,252,.22);background:linear-gradient(180deg,rgba(125,211,252,.05),rgba(192,132,252,.03));border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+.brief-hdr{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+.brief-hdr h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.brief-hdr .brief-tag{font-size:11px;color:var(--text2);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.04);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.brief-frame{margin:8px 0 18px;color:var(--text2);font-size:14px;line-height:1.55;border-left:3px solid var(--blue);padding:6px 0 6px 14px}
+.brief-frame strong{color:var(--text)}
+.brief-live{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.brief-live-card{border:1px solid var(--line);background:rgba(11,14,20,.6);border-radius:14px;padding:10px 12px}
+.brief-live-k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900}
+.brief-live-v{margin-top:4px;font-size:15px;font-weight:900;letter-spacing:-.02em;color:var(--text)}
+.brief-live-sub{font-size:10.5px;color:var(--text3);margin-top:2px}
+details.brief-block{border:1px solid var(--line);background:rgba(18,23,34,.7);border-radius:18px;margin-bottom:10px;overflow:hidden}
+details.brief-block[open]{border-color:rgba(125,211,252,.3)}
+details.brief-block > summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;user-select:none}
+details.brief-block > summary::-webkit-details-marker{display:none}
+.brief-sum-l{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.brief-sum-num{height:26px;width:26px;border-radius:8px;background:rgba(125,211,252,.13);color:var(--blue);display:grid;place-items:center;font-weight:900;font-size:13px;flex:0 0 auto}
+.brief-sum-title{font-weight:800;font-size:14px}
+.brief-sum-sub{font-size:12px;color:var(--text3);font-weight:500;margin-top:2px}
+.brief-chev{color:var(--text3);font-size:18px;transition:transform .15s ease;flex:0 0 auto}
+details[open] .brief-chev{transform:rotate(90deg)}
+.brief-body{padding:0 16px 16px;color:var(--text2);font-size:13px;line-height:1.55}
+.brief-body p{margin:0 0 10px}
+.brief-body strong{color:var(--text)}
+.finding-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.finding{border:1px solid var(--line);background:#0b0e14;border-radius:14px;padding:14px}
+.finding-tag{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-weight:900;background:rgba(125,211,252,.12);padding:3px 8px;border-radius:999px;margin-bottom:8px}
+.finding h4{margin:0 0 8px;font-size:14px;color:var(--text);letter-spacing:-.01em}
+.finding p{margin:0 0 8px;font-size:12.5px;color:var(--text2);line-height:1.5}
+.finding ul{margin:6px 0 0;padding-left:18px;color:var(--text2);font-size:12px;line-height:1.55}
+.finding ul li{margin-bottom:3px}
+.finding .key-num{font-family:"DM Mono",ui-monospace,monospace;color:var(--green);font-weight:800}
+.finding.spotlight{border-color:rgba(50,213,131,.4);background:linear-gradient(180deg,rgba(50,213,131,.07),rgba(50,213,131,.02))}
+.finding.spotlight .finding-tag{color:var(--green);background:rgba(50,213,131,.12)}
+.goal-table{width:100%;font-size:12.5px}
+.goal-table th{color:var(--text2);font-size:10.5px;font-weight:900;letter-spacing:.06em}
+.goal-table td:first-child{font-weight:700;color:var(--text)}
+.rule-list{display:grid;gap:10px}
+.rule{border:1px solid var(--line);background:#0b0e14;border-radius:14px;padding:12px 14px}
+.rule-name{font-weight:800;color:var(--text);font-size:13px;margin-bottom:4px}
+.rule-name .pill{font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:rgba(192,132,252,.13);color:var(--purple);border-radius:999px;padding:3px 7px;margin-left:6px}
+.rule-body{font-size:12.5px;color:var(--text2);line-height:1.5}
+.guard-table{width:100%;font-size:12.5px;margin-top:8px}
+.guard-table th{color:var(--text2);font-size:10.5px;font-weight:900;letter-spacing:.06em}
+.guard-table td:first-child{font-weight:700;color:var(--text);white-space:nowrap}
+.checklist{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.checklist li{padding:11px 13px;border:1px solid var(--line);background:#0b0e14;border-radius:12px;font-size:12.5px;color:var(--text2);display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
+.checklist .q{height:22px;width:22px;border-radius:6px;background:rgba(253,176,34,.13);color:var(--amber);display:grid;place-items:center;font-weight:900;font-size:12px}
+.checklist strong{color:var(--text);display:block;margin-bottom:3px}
+.policy-card{border:2px solid rgba(50,213,131,.32);background:linear-gradient(180deg,rgba(50,213,131,.06),rgba(50,213,131,.01));border-radius:16px;padding:16px}
+.policy-hdr{font-size:13px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.policy-default{font-size:15px;color:var(--text);font-weight:700;margin-bottom:12px;line-height:1.4}
+.policy-tier{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:8px 0;border-top:1px solid rgba(50,213,131,.18);font-size:12.5px}
+.policy-tier:first-of-type{border-top:0}
+.policy-tier-k{font-weight:800;color:var(--green)}
+.policy-tier-v{color:var(--text2);line-height:1.5}
+.caveat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.caveat-card{border:1px solid var(--line);background:#0b0e14;border-radius:12px;padding:12px;font-size:12px;color:var(--text2);line-height:1.5}
+.caveat-card strong{display:block;margin-bottom:4px;color:var(--text);font-size:12.5px}
+
 /* ============ RESPONSIVE ============ */
 @media(max-width:1050px){
   .controls{grid-template-columns:1fr 1fr}
@@ -192,6 +253,9 @@ code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radi
   .metrics.sticky-metrics{position:static}
   .hero,.home-hero{grid-template-columns:1fr}
   .home-feat{grid-template-columns:1fr}
+  .brief-live{grid-template-columns:repeat(2,1fr)}
+  .finding-grid{grid-template-columns:1fr}
+  .caveat-row{grid-template-columns:1fr}
 }
 @media(max-width:900px){
   .calc-grid{grid-template-columns:1fr}
@@ -413,11 +477,11 @@ code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radi
 
     <div class="sticky-top">
       <div class="nav">
-        <a href="#overview">Overview</a><a href="#scenario">Scenario curves</a><a href="#segments">Dynamic segment</a><a href="#heatmap">Optimal heatmap</a><a href="#rankings">Top 3</a><a href="#summary">Summary</a>
+        <a href="#brief">Exec brief</a><a href="#overview">Overview</a><a href="#scenario">Scenario curves</a><a href="#segments">Dynamic segment</a><a href="#heatmap">Optimal heatmap</a><a href="#rankings">Top 3</a><a href="#summary">Summary</a>
       </div>
       <div class="panel">
         <div class="controls">
-          <div class="field"><label>Custom MRR anchor</label><div class="range-wrap"><input type="range" id="mrrRange" min="99" max="3000" step="1" value="650"><input type="number" id="mrrInput" min="1" step="1" value="650"></div></div>
+          <div class="field"><label>Custom MRR anchor</label><div class="range-wrap"><input type="range" id="mrrRange" min="99" max="3000" step="1" value="1500"><input type="number" id="mrrInput" min="1" step="1" value="1500"></div></div>
           <div class="field"><label>CAC threshold</label><div class="range-wrap"><input type="range" id="cacRange" min="500" max="20000" step="100" value="5000"><input type="number" id="cacInput" min="0" step="100" value="5000"></div></div>
           <div class="field"><label>Horizon</label><select id="horizon"><option value="12">12 months</option><option value="18">18 months</option><option value="24" selected>24 months</option><option value="36">36 months</option><option value="60">60 months</option></select></div>
           <div class="field"><label>Chart metric</label><select id="metric"><option value="ltv">Calibrated LTV</option><option value="ratio" selected>LTV:CAC</option><option value="churn">Projected churn</option><option value="paybackProgress">CAC recovery %</option><option value="net">Net value</option></select></div>
@@ -443,8 +507,246 @@ code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radi
       <div class="callout"><div class="callout-k">Revenue rule</div><div class="callout-v">Waived months delay MRR. Onboarding cash can appear immediately, but MRR only starts after waived months end.</div></div>
     </div>
 
+    <!-- ============ EXECUTIVE DECISION BRIEF ============ -->
+    <div id="brief" class="section-anchor"></div>
+    <section class="brief" id="briefSection">
+      <div class="brief-hdr">
+        <div>
+          <h2>Executive Decision Brief</h2>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">Translates the model into decisions, rules, and a recommended default policy. Tied to the assumptions selected above.</div>
+        </div>
+        <span class="brief-tag">For MRR band <span id="briefMrrBand">$1,000–$2,250</span></span>
+      </div>
+
+      <div class="brief-frame">
+        <strong>What we are deciding:</strong> how much onboarding to charge — and whether to allow waived months — without meaningfully harming churn or payback. Our pricing range is <strong>$1,000–$2,250 MRR</strong>, so the policy needs to work across that band rather than for a single price point.
+      </div>
+
+      <div class="brief-live">
+        <div class="brief-live-card"><div class="brief-live-k">Selected CAC</div><div class="brief-live-v" id="bxCac">$5,000</div><div class="brief-live-sub">payback target</div></div>
+        <div class="brief-live-card"><div class="brief-live-k">Horizon</div><div class="brief-live-v" id="bxHorizon">24 mo</div><div class="brief-live-sub">LTV evaluation window</div></div>
+        <div class="brief-live-card"><div class="brief-live-k">Scenarios evaluated</div><div class="brief-live-v" id="bxScenarios">0</div><div class="brief-live-sub">grid of selections above</div></div>
+        <div class="brief-live-card"><div class="brief-live-k">Best LTV:CAC found</div><div class="brief-live-v" id="bxBest">—</div><div class="brief-live-sub" id="bxBestSub">—</div></div>
+      </div>
+
+      <!-- 1. KEY FINDINGS -->
+      <details class="brief-block" open>
+        <summary>
+          <div class="brief-sum-l">
+            <div class="brief-sum-num">1</div>
+            <div>
+              <div class="brief-sum-title">Key findings</div>
+              <div class="brief-sum-sub">The five things to know before approving a deal in this MRR band.</div>
+            </div>
+          </div>
+          <span class="brief-chev">›</span>
+        </summary>
+        <div class="brief-body">
+          <div class="finding-grid">
+
+            <!-- The headline finding for the user's specific question -->
+            <div class="finding spotlight" style="grid-column:1/-1">
+              <span class="finding-tag">Headline finding · onboarding sweet spot</span>
+              <h4>Onboarding helps churn — but only up to about 100% of MRR</h4>
+              <p>The model says onboarding has a <strong>U-shaped</strong> effect on churn. Going from no onboarding to 100% of MRR cuts predicted 12-month churn dramatically. Going <em>above</em> 100% slowly raises predicted churn again, because the squared onboarding term in the regression gets larger.</p>
+              <p>At MRR $1,500, 0 free months, the model predicts:</p>
+              <ul>
+                <li>0% onboarding → <span class="key-num">~71%</span> 12-mo churn</li>
+                <li>50% onboarding → <span class="key-num">~44%</span></li>
+                <li><strong>100% onboarding → <span class="key-num">~32%</span> (lowest)</strong></li>
+                <li>125% onboarding → <span class="key-num">~34%</span></li>
+                <li>150% onboarding → <span class="key-num">~37%</span></li>
+                <li>200% onboarding → <span class="key-num">~43%</span></li>
+              </ul>
+              <p style="margin-top:10px"><strong>Operational read:</strong> 100% of MRR is the churn-optimal onboarding charge. You can charge 125–150% and trade ~2–5 percentage points of churn for meaningfully more upfront cash and faster payback. Going past 150% should require a strategic reason — the model is no longer rewarding you for the extra collection.</p>
+            </div>
+
+            <div class="finding">
+              <span class="finding-tag">A · MRR</span>
+              <h4>Higher MRR strengthens economics, but does not lower churn much in this band</h4>
+              <p>Across $1,000 → $2,250 MRR, predicted 12-mo churn at 100% onboarding moves only from ~33% to ~36%. MRR is the biggest <strong>economic</strong> lever (LTV scales with it directly) but not a meaningful churn lever inside this band.</p>
+              <p>Practical: don't discount MRR to "save" churn. The churn change is small and the LTV cost is large.</p>
+            </div>
+
+            <div class="finding">
+              <span class="finding-tag">B · Onboarding cash timing</span>
+              <h4>Onboarding shortens CAC payback more than any other lever</h4>
+              <p>Onboarding cash hits on day 1 and counts toward CAC payback immediately. A $1,500 deal with 100% onboarding recovers $1,500 of CAC up front before any subscription revenue. The same deal at 0% onboarding has to earn that first $1,500 from MRR while still bleeding higher early-month churn.</p>
+            </div>
+
+            <div class="finding">
+              <span class="finding-tag">C · Waived months</span>
+              <h4>Waived months are doubly costly</h4>
+              <p>They delay MRR <em>and</em> the model attaches a churn penalty to them. The 2-month waiver in particular has the strongest churn signal in the regression (<code>free_2mo_exact</code>, +0.32 log-odds).</p>
+              <ul>
+                <li>0 free months: clean baseline</li>
+                <li>1 free month: small but tolerable</li>
+                <li>2 free months: clearest churn penalty in the data — treat as exception-only</li>
+                <li>3+ free months: shouldn't be standard</li>
+              </ul>
+            </div>
+
+            <div class="finding">
+              <span class="finding-tag">D · Goal trade-offs</span>
+              <h4>Different goals favor different structures</h4>
+              <table class="goal-table">
+                <thead><tr><th>Goal</th><th>Favors</th><th>Trade-off</th></tr></thead>
+                <tbody>
+                  <tr><td>Min churn</td><td>100% OB · 0 free mo</td><td>Leaves cash on the table vs. higher OB</td></tr>
+                  <tr><td>Min payback</td><td>High OB (125–150%) · 0 free</td><td>Adds 2–5 pp churn vs. 100%</td></tr>
+                  <tr><td>Max LTV:CAC</td><td>High MRR · 100% OB · 0 free</td><td>Hardest to negotiate</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="finding">
+              <span class="finding-tag">E · CAC sensitivity</span>
+              <h4>CAC threshold changes what's viable, not the curves</h4>
+              <p>The churn and LTV curves don't depend on CAC. CAC just sets the bar. At higher CAC, the same deal structure can drop from "healthy" to "underwater" without anything else changing — which is why waived-month tolerance should tighten when CAC rises.</p>
+              <p style="margin-top:8px">Selected CAC: <span id="bxCacInline" class="key-num">$5,000</span>. To clear 3× LTV:CAC at this CAC, a deal needs <span id="bx3xLtv" class="key-num">$15,000</span> calibrated LTV.</p>
+            </div>
+
+          </div>
+        </div>
+      </details>
+
+      <!-- 2. DECISION RULES -->
+      <details class="brief-block" open>
+        <summary>
+          <div class="brief-sum-l">
+            <div class="brief-sum-num">2</div>
+            <div>
+              <div class="brief-sum-title">Decision rules we should adopt</div>
+              <div class="brief-sum-sub">Operational guardrails reps and approvers can apply without re-running the model.</div>
+            </div>
+          </div>
+          <span class="brief-chev">›</span>
+        </summary>
+        <div class="brief-body">
+          <div class="rule-list">
+            <div class="rule">
+              <div class="rule-name">Rule 1 — Onboarding floor of 100% of MRR <span class="pill">Default</span></div>
+              <div class="rule-body">100% is the model's churn-optimal point. Quoting below 100% should be the exception, not the standard, and should require a clear reason (multi-year commitment, strategic logo, etc.).</div>
+            </div>
+            <div class="rule">
+              <div class="rule-name">Rule 2 — Onboarding ceiling of 150% unless justified <span class="pill">Soft cap</span></div>
+              <div class="rule-body">Between 100% and 150% the churn cost is small (~2–5 pp) and the cash benefit is real. Above 150%, the model says you're paying for it in churn without a payback gain that clearly justifies it.</div>
+            </div>
+            <div class="rule">
+              <div class="rule-name">Rule 3 — Treat 2+ waived months as exception-only <span class="pill">Approval</span></div>
+              <div class="rule-body">The regression's strongest free-month signal is at exactly 2 waived months. If a deal needs them, it should be offset by 125–150% onboarding and stay above the LTV:CAC and payback targets.</div>
+            </div>
+            <div class="rule">
+              <div class="rule-name">Rule 4 — Use LTV:CAC <em>and</em> payback together</div>
+              <div class="rule-body">A deal with strong long-term LTV:CAC can still pay back too slowly to be safe. Require both checks before approving anything non-standard.</div>
+            </div>
+            <div class="rule">
+              <div class="rule-name">Rule 5 — MRR-band guardrails <span class="pill">$1k–$2.25k</span></div>
+              <div class="rule-body">
+                <table class="guard-table">
+                  <thead><tr><th>MRR band</th><th>Onboarding floor</th><th>Waived months allowed</th></tr></thead>
+                  <tbody>
+                    <tr><td>$1,000–$1,499</td><td>100% (no exceptions below)</td><td>0 standard · 1 with approval</td></tr>
+                    <tr><td>$1,500–$1,999</td><td>100% standard · 125%+ preferred</td><td>0–1 standard · 2 only with 125%+ OB</td></tr>
+                    <tr><td>$2,000–$2,250</td><td>100% standard · flexibility allowed</td><td>0–1 standard · 2 if economics still clear</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- 3. RECOMMENDED DEFAULT POLICY -->
+      <details class="brief-block" open>
+        <summary>
+          <div class="brief-sum-l">
+            <div class="brief-sum-num">3</div>
+            <div>
+              <div class="brief-sum-title">Recommended default policy</div>
+              <div class="brief-sum-sub">The starting point reps should quote unless something pushes them off it.</div>
+            </div>
+          </div>
+          <span class="brief-chev">›</span>
+        </summary>
+        <div class="brief-body">
+          <div class="policy-card">
+            <div class="policy-hdr">Policy-safe default</div>
+            <div class="policy-default">Quote <strong>100% onboarding · 0 waived months</strong> on every deal in the $1,000–$2,250 MRR band. Any deviation must be justified by improved LTV:CAC, faster payback, or strategic value.</div>
+
+            <div class="policy-tier">
+              <div class="policy-tier-k">Default</div>
+              <div class="policy-tier-v">100% onboarding, 0 waived months. Churn-optimal per the model. No approval needed.</div>
+            </div>
+            <div class="policy-tier">
+              <div class="policy-tier-k">Allowed</div>
+              <div class="policy-tier-v">125–150% onboarding, 0 waived months. Adds ~2–5 pp churn but improves cash and payback. Use when the rep can negotiate it.</div>
+            </div>
+            <div class="policy-tier">
+              <div class="policy-tier-k">Allowed</div>
+              <div class="policy-tier-v">100% onboarding, 1 waived month. LTV:CAC must remain above target and payback inside threshold.</div>
+            </div>
+            <div class="policy-tier">
+              <div class="policy-tier-k">Exception</div>
+              <div class="policy-tier-v">2 waived months only with 125%+ onboarding offset and explicit approval. Should be rare.</div>
+            </div>
+            <div class="policy-tier">
+              <div class="policy-tier-k">Avoid</div>
+              <div class="policy-tier-v">Onboarding below 100%, 3+ waived months, or any combination that doesn't clear the LTV:CAC and payback bar.</div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- 4. OPEN DECISIONS -->
+      <details class="brief-block">
+        <summary>
+          <div class="brief-sum-l">
+            <div class="brief-sum-num">4</div>
+            <div>
+              <div class="brief-sum-title">Open decisions for the leadership team</div>
+              <div class="brief-sum-sub">The thresholds the model can't pick for you.</div>
+            </div>
+          </div>
+          <span class="brief-chev">›</span>
+        </summary>
+        <div class="brief-body">
+          <ul class="checklist">
+            <li><span class="q">?</span><div><strong>What is our target CAC payback window?</strong>6, 12, or 18 months? This single number determines whether 1 waived month is acceptable on a $1,500 deal.</div></li>
+            <li><span class="q">?</span><div><strong>What LTV:CAC ratio do we require?</strong>1.5× minimum to approve, 2× standard, 3× target? The brief assumes 3× as the aspirational target.</div></li>
+            <li><span class="q">?</span><div><strong>When are waived months allowed?</strong>Never by default · only 1 month · 2 months only at $1,500+ MRR with onboarding offset?</div></li>
+            <li><span class="q">?</span><div><strong>Is 100% onboarding the floor, or can reps quote 75–90% to close?</strong>The model penalizes anything below 100% with rising churn — but in negotiations a small concession may be the difference between winning and losing.</div></li>
+            <li><span class="q">?</span><div><strong>Should CAC vary by channel?</strong>If sales-led CAC is higher than self-serve CAC, the same deal structure looks healthy in one channel and underwater in the other.</div></li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- 5. MODEL CAVEATS -->
+      <details class="brief-block">
+        <summary>
+          <div class="brief-sum-l">
+            <div class="brief-sum-num">5</div>
+            <div>
+              <div class="brief-sum-title">Model confidence &amp; caveats</div>
+              <div class="brief-sum-sub">Read this before treating any single prediction as truth.</div>
+            </div>
+          </div>
+          <span class="brief-chev">›</span>
+        </summary>
+        <div class="brief-body">
+          <p>This is a <strong>directional decision-support model</strong>, not an account-level forecast. Decisions should rest on relative comparisons and guardrails, not point predictions.</p>
+          <div class="caveat-row">
+            <div class="caveat-card"><strong>Stable, modest fit</strong>The compact churn regression is stable (no NaN standard errors, N = 14,208) but pseudo-R² is only ~0.022. It captures direction well; magnitudes should be treated as approximate.</div>
+            <div class="caveat-card"><strong>Waiver-post-sign held at 0</strong>The model has a separate term for "onboarding contracted but waived after signing." The dashboard does not separately observe this, so we hold that variable at 0. If you start tracking post-sign waivers, churn predictions for those deals will worsen.</div>
+            <div class="caveat-card"><strong>LTV is calibrated, not raw</strong>Analytical LTV from churn survival is multiplied by the calibration factor 0.3854, the median actual/analytical ratio observed historically. This corrects for analytical LTV's tendency to overstate.</div>
+            <div class="caveat-card"><strong>Use rankings, not absolute LTV</strong>Two scenarios that differ by $500 of predicted LTV are essentially indistinguishable in this model. Two scenarios that differ by $5,000 are meaningfully different.</div>
+          </div>
+        </div>
+      </details>
+    </section>
+
     <div class="metrics sticky-metrics">
-      <div class="metric"><div class="metric-lbl">Selected MRR</div><div class="metric-val" id="mMrr">$650</div><div class="metric-sub">custom anchor</div></div>
+      <div class="metric"><div class="metric-lbl">Selected MRR</div><div class="metric-val" id="mMrr">$1,500</div><div class="metric-sub">custom anchor</div></div>
       <div class="metric"><div class="metric-lbl">CAC threshold</div><div class="metric-val purple" id="mCac">$5,000</div><div class="metric-sub">payback target</div></div>
       <div class="metric"><div class="metric-lbl">Best LTV:CAC</div><div class="metric-val" id="mBestRatio">0.00×</div><div class="metric-sub" id="mBestRatioSub">scenario</div></div>
       <div class="metric"><div class="metric-lbl">Lowest horizon churn</div><div class="metric-val" id="mBestChurn">0%</div><div class="metric-sub" id="mBestChurnSub">scenario</div></div>
