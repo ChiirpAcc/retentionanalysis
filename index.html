@@ -561,44 +561,45 @@ details[open] .brief-chev{transform:rotate(90deg)}
           <div class="finding-grid">
 
             <div class="finding spotlight" style="grid-column:1/-1">
-              <span class="finding-tag">Headline finding · onboarding sweet spot</span>
-              <h4>Onboarding helps churn — but only up to about 100% of MRR</h4>
-              <p>The model says onboarding has a <strong>U-shaped</strong> effect on churn. Going from no onboarding to 100% of MRR cuts predicted 12-month churn dramatically. Going <em>above</em> 100% slowly raises predicted churn again, because the squared onboarding term in the regression gets larger.</p>
-              <p>At MRR $1,500, 0 free months, the model predicts:</p>
+              <span class="finding-tag">Headline finding · onboarding raises churn and kills win rate</span>
+              <h4>Higher onboarding increases churn monotonically — and collapses win rate above ~25%</h4>
+              <p>The L2 logistic churn model has <strong>both</strong> <code>ob_pct</code> (coef +0.116) and <code>ob_pct_sq</code> (coef +0.624) as positive — meaning more onboarding <em>always</em> raises predicted churn. There is no U-shape minimum at 100%. The churn minimum is near <strong>25% OB</strong>. At the same time, the win-rate model has a large negative coefficient on <code>avg_ob_pct</code> (−0.204), meaning higher onboarding also reduces the probability of winning the deal — hitting the 5% model floor around OB=75%.</p>
+              <p>At MRR $1,500, 0 free months, the churn model predicts:</p>
               <ul>
-                <li>0% onboarding → <span class="key-num">~71%</span> 12-mo churn</li>
-                <li>50% onboarding → <span class="key-num">~44%</span></li>
-                <li><strong>100% onboarding → <span class="key-num">~32%</span> (lowest)</strong></li>
-                <li>125% onboarding → <span class="key-num">~34%</span></li>
-                <li>150% onboarding → <span class="key-num">~37%</span></li>
-                <li>200% onboarding → <span class="key-num">~43%</span></li>
+                <li>0% onboarding → <span class="key-num">~34%</span> 12-mo churn</li>
+                <li><strong>25% onboarding → <span class="key-num">~33%</span> (model minimum)</strong></li>
+                <li>50% onboarding → <span class="key-num">~34%</span></li>
+                <li>100% onboarding → <span class="key-num">~43%</span></li>
+                <li>150% onboarding → <span class="key-num">~62%</span></li>
+                <li>200% onboarding → <span class="key-num">~84%</span></li>
               </ul>
-              <p style="margin-top:10px"><strong>Operational read:</strong> 100% of MRR is the churn-optimal onboarding charge. You can charge 125–150% and trade ~2–5 percentage points of churn for meaningfully more upfront cash and faster payback. Going past 150% should require a strategic reason — the model is no longer rewarding you for the extra collection.</p>
+              <p style="margin-top:10px"><strong>Operational read:</strong> Onboarding is a cash and payback lever, not a churn lever. Lower onboarding improves both churn <em>and</em> win rate — the trade-off is upfront cash and payback speed. Use the Forecast tab to find the OB level that maximizes expected pipeline LTV for your actual CAC and pipeline size.</p>
             </div>
 
             <div class="finding">
               <span class="finding-tag">A · MRR</span>
-              <h4>Higher MRR strengthens economics, but does not lower churn much in this band</h4>
-              <p>Across $1,000 → $2,250 MRR, predicted 12-mo churn at 100% onboarding moves only from ~33% to ~36%. MRR is the biggest <strong>economic</strong> lever (LTV scales with it directly) but not a meaningful churn lever inside this band.</p>
-              <p>Practical: don't discount MRR to "save" churn. The churn change is small and the LTV cost is large.</p>
+              <h4>Higher MRR lowers churn and strengthens all economics</h4>
+              <p>The model's <code>high_mrr</code> (coef −0.293) and <code>log_mrr</code> (coef −0.153) both reduce churn for larger accounts. LTV scales directly with MRR, so higher MRR improves every metric simultaneously.</p>
+              <p>Practical: don't discount MRR to close — churn improves with higher MRR in this model, so discounting is doubly costly.</p>
             </div>
 
             <div class="finding">
               <span class="finding-tag">B · Onboarding cash timing</span>
-              <h4>Onboarding shortens CAC payback more than any other lever</h4>
-              <p>Onboarding cash hits on day 1 and counts toward CAC payback immediately. A $1,500 deal with 100% onboarding recovers $1,500 of CAC up front before any subscription revenue. The same deal at 0% onboarding has to earn that first $1,500 from MRR while still bleeding higher early-month churn.</p>
+              <h4>Onboarding accelerates payback, but at a churn and win-rate cost</h4>
+              <p>Onboarding cash hits on day 1 and counts toward CAC payback immediately. A $1,500 deal at 100% OB recovers $578 of calibrated CAC upfront. But the same deal at 100% OB has ~43% predicted churn and a win-rate model output at the 5% floor — meaning the expected number of won deals is very low. Model the full pipeline, not just one won deal.</p>
             </div>
 
             <div class="finding">
               <span class="finding-tag">C · Waived months</span>
-              <h4>Waived months are doubly costly</h4>
-              <p>They delay MRR <em>and</em> the model attaches a churn penalty to them. The 2-month waiver in particular has the strongest churn signal in the regression (<code>free_2mo_exact</code>, +0.32 log-odds).</p>
+              <h4>Waived months consistently raise churn — the jump at 2 months is sharp</h4>
+              <p>At MRR $1,500 with 0% OB, the churn model predicts:</p>
               <ul>
-                <li>0 free months: clean baseline</li>
-                <li>1 free month: small but tolerable</li>
-                <li>2 free months: clearest churn penalty in the data — treat as exception-only</li>
-                <li>3+ free months: shouldn't be standard</li>
+                <li>0 free months: <span class="key-num">~34%</span></li>
+                <li>1 free month: <span class="key-num">~39%</span></li>
+                <li>2 free months: <span class="key-num">~57%</span> — large jump</li>
+                <li>3+ free months: <span class="key-num">~75%</span></li>
               </ul>
+              <p>The 1→2 free month step is the biggest single increase. Treat 2+ waived months as exception-only.</p>
             </div>
 
             <div class="finding">
@@ -607,9 +608,10 @@ details[open] .brief-chev{transform:rotate(90deg)}
               <table class="goal-table">
                 <thead><tr><th>Goal</th><th>Favors</th><th>Trade-off</th></tr></thead>
                 <tbody>
-                  <tr><td>Min churn</td><td>100% OB · 0 free mo</td><td>Leaves cash on the table vs. higher OB</td></tr>
-                  <tr><td>Min payback</td><td>High OB (125–150%) · 0 free</td><td>Adds 2–5 pp churn vs. 100%</td></tr>
-                  <tr><td>Max LTV:CAC</td><td>High MRR · 100% OB · 0 free</td><td>Hardest to negotiate</td></tr>
+                  <tr><td>Min churn</td><td>Low OB (0–25%) · 0 free mo</td><td>Low upfront cash; win rate is preserved</td></tr>
+                  <tr><td>Max win rate</td><td>0% OB · 1 free mo</td><td>More churn; no upfront cash</td></tr>
+                  <tr><td>Min payback</td><td>Moderate OB (50%) · 0 free</td><td>Win rate stays viable; some churn increase</td></tr>
+                  <tr><td>Max pipeline LTV</td><td>Low OB · 0 free</td><td>Win rate × LTV product is highest here</td></tr>
                 </tbody>
               </table>
             </div>
@@ -617,7 +619,7 @@ details[open] .brief-chev{transform:rotate(90deg)}
             <div class="finding">
               <span class="finding-tag">E · CAC sensitivity</span>
               <h4>CAC threshold changes what's viable, not the curves</h4>
-              <p>The churn and LTV curves don't depend on CAC. CAC just sets the bar. At higher CAC, the same deal structure can drop from "healthy" to "underwater" without anything else changing — which is why waived-month tolerance should tighten when CAC rises.</p>
+              <p>The churn and LTV curves don't depend on CAC. CAC just sets the bar. When CAC is high, a low-OB structure (with its higher win rate) may generate more total won deals whose LTV collectively exceeds CAC spend — even though per-deal payback is slower.</p>
               <p style="margin-top:8px">Selected CAC: <span id="bxCacInline" class="key-num">$5,000</span>. To clear 3× LTV:CAC at this CAC, a deal needs <span id="bx3xLtv" class="key-num">$15,000</span> calibrated LTV.</p>
             </div>
 
@@ -640,33 +642,24 @@ details[open] .brief-chev{transform:rotate(90deg)}
         <div class="brief-body">
           <div class="rule-list">
             <div class="rule">
-              <div class="rule-name">Rule 1 — Onboarding floor of 100% of MRR <span class="pill">Default</span></div>
-              <div class="rule-body">100% is the model's churn-optimal point. Quoting below 100% should be the exception, not the standard, and should require a clear reason (multi-year commitment, strategic logo, etc.).</div>
+              <div class="rule-name">Rule 1 — Onboarding of 0–50% minimizes churn <span class="pill">Churn lens</span></div>
+              <div class="rule-body">The new model's churn minimum is near 25% OB — not 100%. If reducing churn is the primary goal, quoting 0–50% OB is better than quoting 100%+. Higher OB raises churn monotonically in this model.</div>
             </div>
             <div class="rule">
-              <div class="rule-name">Rule 2 — Onboarding ceiling of 150% unless justified <span class="pill">Soft cap</span></div>
-              <div class="rule-body">Between 100% and 150% the churn cost is small (~2–5 pp) and the cash benefit is real. Above 150%, the model says you're paying for it in churn without a payback gain that clearly justifies it.</div>
+              <div class="rule-name">Rule 2 — Onboarding above ~75% kills win rate <span class="pill">Win rate lens</span></div>
+              <div class="rule-body">The win-rate model hits its 5% floor around OB=75%. Deals quoted above that level are predicted to rarely close. If you need to charge high OB, expect very low win rate and plan pipeline size accordingly.</div>
             </div>
             <div class="rule">
               <div class="rule-name">Rule 3 — Treat 2+ waived months as exception-only <span class="pill">Approval</span></div>
-              <div class="rule-body">The regression's strongest free-month signal is at exactly 2 waived months. If a deal needs them, it should be offset by 125–150% onboarding and stay above the LTV:CAC and payback targets.</div>
+              <div class="rule-body">The 1→2 free month step is the largest single churn jump in the model (~39% → ~57% at MRR $1,500). If a deal needs 2 free months, it should be offset by other negotiated terms and stay above the LTV:CAC and payback targets.</div>
             </div>
             <div class="rule">
-              <div class="rule-name">Rule 4 — Use LTV:CAC <em>and</em> payback together</div>
-              <div class="rule-body">A deal with strong long-term LTV:CAC can still pay back too slowly to be safe. Require both checks before approving anything non-standard.</div>
+              <div class="rule-name">Rule 4 — Use LTV:CAC <em>and</em> win rate together</div>
+              <div class="rule-body">A deal structure with excellent per-deal LTV:CAC can still be a bad pipeline strategy if win rate is at 5%. Always evaluate expected pipeline LTV (LTV × win rate × pipeline size) alongside per-deal economics.</div>
             </div>
             <div class="rule">
-              <div class="rule-name">Rule 5 — MRR-band guardrails <span class="pill">$1k–$2.25k</span></div>
-              <div class="rule-body">
-                <table class="guard-table">
-                  <thead><tr><th>MRR band</th><th>Onboarding floor</th><th>Waived months allowed</th></tr></thead>
-                  <tbody>
-                    <tr><td>$1,000–$1,499</td><td>100% (no exceptions below)</td><td>0 standard · 1 with approval</td></tr>
-                    <tr><td>$1,500–$1,999</td><td>100% standard · 125%+ preferred</td><td>0–1 standard · 2 only with 125%+ OB</td></tr>
-                    <tr><td>$2,000–$2,250</td><td>100% standard · flexibility allowed</td><td>0–1 standard · 2 if economics still clear</td></tr>
-                  </tbody>
-                </table>
-              </div>
+              <div class="rule-name">Rule 5 — Use the Forecast tab for OB decisions <span class="pill">Tool</span></div>
+              <div class="rule-body">The optimal OB level depends on your actual CAC, pipeline size, and whether you're optimizing per-deal payback or total pipeline value. The Forecast tab models all of this explicitly with both scoring models.</div>
             </div>
           </div>
         </div>
@@ -687,27 +680,27 @@ details[open] .brief-chev{transform:rotate(90deg)}
         <div class="brief-body">
           <div class="policy-card">
             <div class="policy-hdr">Policy-safe default</div>
-            <div class="policy-default">Quote <strong>100% onboarding · 0 waived months</strong> on every deal in the $1,000–$2,250 MRR band. Any deviation must be justified by improved LTV:CAC, faster payback, or strategic value.</div>
+            <div class="policy-default">Quote <strong>0–50% onboarding · 0 waived months</strong> as the starting point. Higher OB should be justified by payback requirements, not churn reduction — it does not reduce churn in the new model.</div>
 
             <div class="policy-tier">
               <div class="policy-tier-k">Default</div>
-              <div class="policy-tier-v">100% onboarding, 0 waived months. Churn-optimal per the model. No approval needed.</div>
+              <div class="policy-tier-v">0–25% onboarding, 0 waived months. Lowest churn, best win rate. Slowest upfront payback. No approval needed.</div>
             </div>
             <div class="policy-tier">
-              <div class="policy-tier-k">Allowed</div>
-              <div class="policy-tier-v">125–150% onboarding, 0 waived months. Adds ~2–5 pp churn but improves cash and payback. Use when the rep can negotiate it.</div>
+              <div class="policy-tier-k">Acceptable</div>
+              <div class="policy-tier-v">25–75% onboarding, 0 waived months. Win rate starts declining above 50% but is still viable. Use when faster payback is needed and pipeline can absorb lower win rate.</div>
             </div>
             <div class="policy-tier">
-              <div class="policy-tier-k">Allowed</div>
-              <div class="policy-tier-v">100% onboarding, 1 waived month. LTV:CAC must remain above target and payback inside threshold.</div>
+              <div class="policy-tier-k">Acceptable</div>
+              <div class="policy-tier-v">0–25% onboarding, 1 waived month. Small churn increase (~6 pp). Useful for competitive deals where a free month helps close.</div>
             </div>
             <div class="policy-tier">
               <div class="policy-tier-k">Exception</div>
-              <div class="policy-tier-v">2 waived months only with 125%+ onboarding offset and explicit approval. Should be rare.</div>
+              <div class="policy-tier-v">OB above 75% or 2 waived months — requires explicit justification. Win rate will be at or near the 5% model floor. Pipeline economics must be modeled in Forecast tab.</div>
             </div>
             <div class="policy-tier">
               <div class="policy-tier-k">Avoid</div>
-              <div class="policy-tier-v">Onboarding below 100%, 3+ waived months, or any combination that doesn't clear the LTV:CAC and payback bar.</div>
+              <div class="policy-tier-v">3+ waived months, or any combination where Forecast tab shows net pipeline value negative.</div>
             </div>
           </div>
         </div>
@@ -1327,7 +1320,7 @@ function fmtUSD(v){ return '$' + Math.round(v).toLocaleString(); }
 function fmtPct(v){ return (v * 100).toFixed(1) + '%'; }
 function fmtN4(v){ return typeof v === 'number' ? v.toFixed(4) : v; }
 function fmtP(v){ return v == null ? '—' : v.toFixed(4); }
-function riskClassChurn(c){ return c < .35 ? 'good' : c < .55 ? 'warn' : 'bad'; }
+function riskClassChurn(c){ return c < .40 ? 'good' : c < .65 ? 'warn' : 'bad'; }
 function ltvClass(v,mrr){ return v > mrr * 20 ? 'good' : v > mrr * 10 ? 'warn' : 'bad'; }
 
 function updateLockUI(){
@@ -1563,7 +1556,7 @@ function update(){
   byId('oLtvSub').textContent = `${fmtUSD(bk.analytical)} analytical × ${CALIBRATION}`;
 
   const chEl = byId('oChurn'); chEl.textContent = fmtPct(c12); chEl.className = 'metric-val ' + riskClassChurn(c12);
-  byId('oChurnSub').textContent = c12 < .35 ? 'low risk' : c12 < .55 ? 'moderate' : 'high risk';
+  byId('oChurnSub').textContent = c12 < .40 ? 'low risk' : c12 < .65 ? 'moderate' : 'high risk';
 
   const wrEl = byId('oWinRate'); wrEl.textContent = fmtPct(wr); wrEl.className = 'metric-val ' + (wr >= 0.28 ? 'good' : wr >= 0.18 ? 'warn' : 'bad');
   byId('oWinRateSub').textContent = 'model · clamped 5–40%';
@@ -1606,15 +1599,15 @@ function update(){
 
   let insight;
   if(ltvCac < 1){
-    insight = `<strong>Underwater.</strong> Calibrated LTV (${fmtUSD(ltv)}) is below CAC (${fmtUSD(cac)}). Raise onboarding toward <code>100%</code> or raise MRR. Win rate is currently <code>${fmtPct(wr)}</code> — discount or free months affect both churn and win rate.`;
+    insight = `<strong>Underwater.</strong> Calibrated LTV (${fmtUSD(ltv)}) is below CAC (${fmtUSD(cac)}). Lower onboarding toward <code>0–25%</code> to reduce churn. Win rate is currently <code>${fmtPct(wr)}</code> — discount or free months affect both metrics.`;
   } else if(c12 > .70){
-    insight = `<strong>High churn risk (${fmtPct(c12)}).</strong> At this deal structure, over 70% of won accounts are predicted to churn within a year. Win rate is <code>${fmtPct(wr)}</code>.`;
+    insight = `<strong>High churn risk (${fmtPct(c12)}).</strong> In the new model, <strong>lower</strong> onboarding reduces churn. Try reducing OB toward <code>0–25%</code> or removing waived months. Win rate is <code>${fmtPct(wr)}</code>.`;
   } else if(pb === null){
-    insight = `<strong>CAC does not pay back within 5 years.</strong> Onboarding cash (day-1) is the fastest payback lever. Try raising onboarding toward <code>100%</code> or removing waived months.`;
-  } else if(c12 < .50 && ltvCac >= 3){
+    insight = `<strong>CAC does not pay back within 5 years.</strong> Onboarding cash (day-1) is the fastest payback lever — but note that raising OB also raises churn and lowers win rate in this model. Try the Forecast tab to see total pipeline impact.`;
+  } else if(c12 < .40 && ltvCac >= 3){
     insight = `<strong>Strong structure.</strong> <code>${obPctPct}%</code> onboarding with <code>${fm}</code> waived month${fm===1?'':'s'} → ${fmtPct(c12)} churn · ${ltvCac.toFixed(2)}× LTV:CAC · win rate <code>${fmtPct(wr)}</code>. Payback in ${pb===0?'upfront only':`month ${pb}`}.`;
   } else {
-    insight = `<strong>Acceptable.</strong> ${fmtPct(c12)} churn · ${ltvCac.toFixed(2)}× LTV:CAC · ${fmtPct(wr)} win rate. Payback in ${pb===0?'upfront only':`month ${pb}`}.`;
+    insight = `<strong>Acceptable.</strong> ${fmtPct(c12)} churn · ${ltvCac.toFixed(2)}× LTV:CAC · ${fmtPct(wr)} win rate. Payback in ${pb===0?'upfront only':`month ${pb}`}. Use the Forecast tab to model full pipeline impact.`;
   }
   byId('insight').innerHTML = insight;
 
@@ -2293,7 +2286,7 @@ window.addEventListener('resize', ()=>{
   function fmtUSD(v){ return '$' + Math.round(v).toLocaleString(); }
   function fmtK(v){ return v >= 1000 ? '$' + (v/1000).toFixed(v>=10000?0:1) + 'k' : '$' + Math.round(v); }
   function fmtPct(v){ return (v*100).toFixed(1) + '%'; }
-  function riskCls(c){ return c < .50 ? 'good' : c < .70 ? 'warn' : 'bad'; }
+  function riskCls(c){ return c < .40 ? 'good' : c < .65 ? 'warn' : 'bad'; }
   function wrCls(w){ return w >= 0.28 ? 'good' : w >= 0.18 ? 'warn' : 'bad'; }
 
   // FM pills
