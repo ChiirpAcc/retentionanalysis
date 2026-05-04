@@ -1162,7 +1162,7 @@ function buildChurnFeatures(mrr, obPct, freeMonths, discountPct, cohortAge) {
   const fm = Math.min(Math.max(freeMonths, 0), 6);
   const fmSq = fm ** 2;
   const anyFree = fm > 0 ? 1 : 0;
-  const free_1mo = anyFree; // binary: has any waived month
+  const free_1mo = fm === 1 ? 1 : 0;   // EXACTLY 1 free month (not anyFree)
   const free_2mo = fm === 2 ? 1 : 0;
   const free_3plus = fm >= 3 ? 1 : 0;
   const c15 = Math.abs(discountPct - 0.15) <= 0.005 ? 1 : 0;
