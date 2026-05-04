@@ -148,7 +148,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:8px}
 .locked-slider{opacity:.45;pointer-events:none}
 .range-ends{display:flex;justify-content:space-between;color:var(--text3);font-size:11px;margin-top:2px}
 .divider{height:1px;background:var(--line);margin:18px 0}
-.fm-pills{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:10px}
+.fm-pills{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
 .fm-pill{border:1px solid var(--line);border-radius:12px;text-align:center;padding:9px 0;cursor:pointer;color:var(--text2);background:#11151e;font-weight:700}
 .fm-pill.active{background:rgba(125,211,252,.14);border-color:rgba(125,211,252,.62);color:var(--text)}
 .locked-pill{opacity:.48;cursor:not-allowed}
@@ -298,27 +298,32 @@ details[open] .brief-chev{transform:rotate(90deg)}
       <span class="tag">Calibrated analytical LTV · compact churn model</span>
     </div>
 
-    <div class="home-hero">
+    <div class="home-hero" style="grid-template-columns:1fr 1fr 1fr">
       <div class="home-card" data-go="calculator">
         <h2>🧮 Deal Structure Calculator</h2>
-        <p>Single-deal calculator with optimizer buttons (minimize churn or maximize LTV), a variable audit panel showing every churn-model coefficient, and a sensitivity chart for sweeping any input.</p>
+        <p>Single-deal calculator with optimizer buttons (minimize churn or maximize LTV), a variable audit panel showing every model coefficient, and a sensitivity chart for sweeping any input.</p>
         <span class="cta">Open the calculator →</span>
       </div>
       <div class="home-card" data-go="explorer">
-        <h2>📊 Projected Deal Structure Explorer</h2>
-        <p>Scenario grid that builds every combination of MRR, onboarding %, and waived months. Includes ranking cards, an optimal heatmap, and a full summary table for executive review.</p>
+        <h2>📊 Scenario Explorer</h2>
+        <p>Scenario grid across every combination of MRR, onboarding %, and waived months. Includes ranking cards, an optimal heatmap, and a full summary table for executive review.</p>
         <span class="cta">Open the explorer →</span>
+      </div>
+      <div class="home-card" data-go="forecast">
+        <h2>🎯 Deal Forecast</h2>
+        <p>Pipeline simulator using the win-rate and churn models together. Set your deal structure, lock variables, and optimize for minimum churn, maximum LTV:CAC, or maximum net revenue.</p>
+        <span class="cta">Open the forecast →</span>
       </div>
     </div>
 
     <div class="home-feat">
       <div class="callout"><div class="callout-k">When to use the calculator</div><div class="callout-v">You have a specific deal in front of you and want to see what changing one variable does. Lock the variables that are non-negotiable, then optimize the rest.</div></div>
       <div class="callout"><div class="callout-k">When to use the explorer</div><div class="callout-v">You want to compare deal structures directionally across many configurations. Best for setting pricing policy or finding the best structure for a goal metric.</div></div>
-      <div class="callout"><div class="callout-k">Shared model</div><div class="callout-v">Both tools use the same compact churn model (pseudo R² = 0.0218, N = 14,208) and the 0.3854 calibration factor on analytical LTV. Use the rankings and relative differences, not absolute predictions.</div></div>
+      <div class="callout"><div class="callout-k">When to use the forecast</div><div class="callout-v">You want to model total pipeline economics — how many deals close, how many survive year 1, and what net revenue looks like across the whole pipeline.</div></div>
     </div>
 
     <div class="note">
-      <strong>Important:</strong> Neither tool reads a CSV or historical cohort. Both project from the same regression. Treat outputs as directional. The calculator is for one deal; the explorer is for grids of deals.
+      <strong>Important:</strong> All three tools project from the same two models: a 42-feature L2 logistic churn model (AUC 0.78, N=2,944) and an 8-feature ElasticNet win-rate model (LOO R²=0.45, N=14 months). Treat outputs as directional. Use rankings and relative differences, not absolute predictions.
     </div>
   </div>
 </section>
@@ -370,9 +375,6 @@ details[open] .brief-chev{transform:rotate(90deg)}
             <div class="fm-pill" data-fm="1">1</div>
             <div class="fm-pill" data-fm="2">2</div>
             <div class="fm-pill" data-fm="3">3</div>
-            <div class="fm-pill" data-fm="4">4</div>
-            <div class="fm-pill" data-fm="5">5</div>
-            <div class="fm-pill" data-fm="6">6</div>
           </div>
           <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-top:4px" id="fmHint">MRR billing starts month 1</div>
         </div>
@@ -385,18 +387,6 @@ details[open] .brief-chev{transform:rotate(90deg)}
           <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-bottom:4px">not affected by optimizer buttons</div>
           <input type="range" id="sliderCac" class="cac-slider" min="500" max="12000" step="100" value="5000">
           <div class="range-ends"><span>$500</span><span>$12,000</span></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field">
-          <div class="field-hdr"><span class="field-lbl" style="color:var(--amber)">Discount / coupon</span></div>
-          <select id="sliderDisc" style="width:100%;background:#0b0e14;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:13px;margin-top:6px">
-            <option value="0">No discount</option>
-            <option value="0.15">15% coupon</option>
-            <option value="0.25">25% coupon</option>
-          </select>
-          <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-top:4px">affects both churn and win-rate models</div>
         </div>
 
         <div id="lockNote" style="display:none" class="lock-note"><span>🔒</span><span id="lockNoteText"></span></div>
@@ -817,20 +807,39 @@ details[open] .brief-chev{transform:rotate(90deg)}
   <div class="calc-app">
     <div class="hdr">
       <h1>Deal Forecast</h1>
-      <span class="tag">100-deal pipeline · win-rate + churn models · expected revenue</span>
+      <span class="tag">Pipeline simulator · win-rate + churn models · lock &amp; optimize</span>
     </div>
 
-    <div class="note" style="margin-bottom:18px">
-      <strong>How it works:</strong> Set the deal structure for your pipeline. The win-rate model predicts how many of 100 deals you expect to <em>win</em>. The churn model predicts how many of those won accounts churn within a year. Revenue and LTV flow from the survivors.
+    <div class="note" style="margin-bottom:14px">
+      <strong>How it works:</strong> Set your deal structure. The win-rate model predicts how many of your pipeline deals close. The churn model predicts how many won accounts survive year 1. Lock any variable to hold it fixed, then optimize for your goal.
     </div>
 
-    <div style="display:grid;grid-template-columns:340px 1fr;gap:16px">
-      <!-- LEFT: controls -->
+    <!-- Optimizer buttons -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <button class="opt-btn" id="fc_btnMinChurn" style="border-color:var(--line)">
+        <div class="opt-icon" style="background:rgba(125,211,252,.13);color:var(--blue)">↓</div>
+        <div><span style="font-weight:700">Minimize Churn</span><span class="opt-sub">Best structure for retention</span></div>
+      </button>
+      <button class="opt-btn" id="fc_btnMaxLtv" style="border-color:var(--line)">
+        <div class="opt-icon" style="background:rgba(192,132,252,.13);color:var(--purple)">↑</div>
+        <div><span style="font-weight:700">Max LTV:CAC</span><span class="opt-sub">Best per-deal economics</span></div>
+      </button>
+      <button class="opt-btn" id="fc_btnMaxRev" style="border-color:var(--line)">
+        <div class="opt-icon" style="background:rgba(50,213,131,.13);color:var(--green)">$</div>
+        <div><span style="font-weight:700">Max Net Revenue</span><span class="opt-sub">Best total pipeline value</span></div>
+      </button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:16px">
+      <!-- LEFT: controls with lock buttons -->
       <div class="controls-pane" style="min-height:unset">
-        <div style="font-size:13px;font-weight:900;margin-bottom:16px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em">Deal structure inputs</div>
+        <div style="font-size:11px;font-weight:900;margin-bottom:14px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Deal structure · 🔒 to lock from optimizer</div>
 
         <div class="field" style="margin-bottom:14px">
-          <div class="field-hdr"><span class="field-lbl">Contract MRR</span></div>
+          <div class="field-hdr">
+            <span class="field-lbl">Contract MRR</span>
+            <button class="lock-btn" id="fc_lockMrr">🔓</button>
+          </div>
           <div class="field-val-row" style="margin-bottom:4px"><span class="field-val" id="fc_mrrVal">$1,500</span></div>
           <input type="range" id="fc_sliderMrr" min="99" max="3000" step="1" value="1500">
           <div class="range-ends"><span>$99</span><span>$3,000</span></div>
@@ -839,7 +848,10 @@ details[open] .brief-chev{transform:rotate(90deg)}
         <div class="divider"></div>
 
         <div class="field" style="margin-bottom:14px">
-          <div class="field-hdr"><span class="field-lbl">Onboarding fee (% of MRR)</span></div>
+          <div class="field-hdr">
+            <span class="field-lbl">Onboarding fee (% of MRR)</span>
+            <button class="lock-btn" id="fc_lockOb">🔓</button>
+          </div>
           <div class="field-val-row" style="margin-bottom:4px"><span class="field-val" id="fc_obVal">100%</span></div>
           <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:4px" id="fc_obDollar">= $1,500 upfront</div>
           <input type="range" id="fc_sliderOb" min="0" max="200" step="5" value="100">
@@ -849,33 +861,23 @@ details[open] .brief-chev{transform:rotate(90deg)}
         <div class="divider"></div>
 
         <div class="field" style="margin-bottom:14px">
-          <div class="field-hdr"><span class="field-lbl">Free months waived</span></div>
+          <div class="field-hdr">
+            <span class="field-lbl">Free months waived</span>
+            <button class="lock-btn" id="fc_lockFm">🔓</button>
+          </div>
           <div class="fm-pills" id="fc_fmPills" style="margin-top:8px">
             <div class="fm-pill active" data-fm="0">0</div>
             <div class="fm-pill" data-fm="1">1</div>
             <div class="fm-pill" data-fm="2">2</div>
             <div class="fm-pill" data-fm="3">3</div>
-            <div class="fm-pill" data-fm="4">4</div>
-            <div class="fm-pill" data-fm="5">5</div>
-            <div class="fm-pill" data-fm="6">6</div>
           </div>
+          <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-top:4px" id="fc_fmHint">MRR billing starts month 1</div>
         </div>
 
         <div class="divider"></div>
 
         <div class="field" style="margin-bottom:14px">
-          <div class="field-lbl" style="display:block;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);font-weight:800">Discount / coupon</div>
-          <select id="fc_sliderDisc" style="width:100%;background:#0b0e14;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:13px">
-            <option value="0">No discount</option>
-            <option value="0.15">15% coupon</option>
-            <option value="0.25">25% coupon</option>
-          </select>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field" style="margin-bottom:14px">
-          <div class="field-hdr"><span class="field-lbl cac-lbl">CAC per deal</span></div>
+          <div class="field-hdr"><span class="field-lbl cac-lbl">CAC per won account</span></div>
           <div class="field-val-row" style="margin-bottom:4px"><span class="field-val" id="fc_cacVal" style="color:var(--purple)">$5,000</span></div>
           <input type="range" id="fc_sliderCac" class="cac-slider" min="500" max="12000" step="100" value="5000">
           <div class="range-ends"><span>$500</span><span>$12,000</span></div>
@@ -891,6 +893,8 @@ details[open] .brief-chev{transform:rotate(90deg)}
           </div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px">deals in pipeline</div>
         </div>
+
+        <div id="fc_lockNote" style="display:none;margin-top:14px" class="lock-note"><span>🔒</span><span id="fc_lockNoteText"></span></div>
       </div>
 
       <!-- RIGHT: outputs -->
@@ -900,7 +904,7 @@ details[open] .brief-chev{transform:rotate(90deg)}
           <div class="metric-card" style="border-color:rgba(50,213,131,.35)">
             <div class="metric-lbl">Win rate</div>
             <div class="metric-val good" id="fc_winRate">—</div>
-            <div class="metric-sub">model prediction</div>
+            <div class="metric-sub" id="fc_winRateSub">model prediction</div>
           </div>
           <div class="metric-card">
             <div class="metric-lbl">Expected wins</div>
@@ -913,7 +917,7 @@ details[open] .brief-chev{transform:rotate(90deg)}
             <div class="metric-sub">of won accounts</div>
           </div>
           <div class="metric-card">
-            <div class="metric-lbl">Accounts surviving yr 1</div>
+            <div class="metric-lbl">Surviving yr 1</div>
             <div class="metric-val" id="fc_surviving">—</div>
             <div class="metric-sub" id="fc_survivingSub">expected</div>
           </div>
@@ -921,7 +925,7 @@ details[open] .brief-chev{transform:rotate(90deg)}
 
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
           <div class="metric-card primary">
-            <div class="metric-lbl">Calibrated LTV / deal</div>
+            <div class="metric-lbl">Calibrated LTV / won</div>
             <div class="metric-val" id="fc_ltv">—</div>
             <div class="metric-sub">per won account</div>
           </div>
@@ -933,84 +937,48 @@ details[open] .brief-chev{transform:rotate(90deg)}
           <div class="metric-card cac-card">
             <div class="metric-lbl">Total upfront cash</div>
             <div class="metric-val" id="fc_upfrontTotal">—</div>
-            <div class="metric-sub" id="fc_upfrontSub">OB × expected wins</div>
+            <div class="metric-sub" id="fc_upfrontSub">OB × wins</div>
           </div>
           <div class="metric-card cac-card">
-            <div class="metric-lbl">Total expected LTV</div>
-            <div class="metric-val" id="fc_ltvTotal">—</div>
-            <div class="metric-sub" id="fc_ltvTotalSub">pipeline LTV</div>
+            <div class="metric-lbl">Net pipeline value</div>
+            <div class="metric-val" id="fc_netPipeline">—</div>
+            <div class="metric-sub">total LTV − total CAC</div>
           </div>
         </div>
 
-        <!-- funnel visualization -->
+        <!-- funnel -->
         <div class="bk" style="margin-top:0">
           <div style="font-size:12px;font-weight:900;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Pipeline funnel — <span id="fc_pipelineSize">100</span> deals</div>
-
-          <div class="bk-row">
-            <span class="bk-lbl">Deals in pipeline</span>
-            <span class="bk-val" id="fc_fDeals" style="color:var(--blue)">100</span>
-          </div>
+          <div class="bk-row"><span class="bk-lbl">Deals in pipeline</span><span class="bk-val" id="fc_fDeals" style="color:var(--blue)">100</span></div>
           <div style="height:1px;background:var(--line);margin:4px 0"></div>
 
-          <!-- Win stage -->
           <div style="margin:10px 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900">Win stage</div>
           <div class="bar-track" style="margin-bottom:8px"><div class="bar-fill" id="fc_winBar" style="background:linear-gradient(90deg,#32d583,#7dd3fc)"></div></div>
-          <div class="bk-row">
-            <span class="bk-lbl">Expected won accounts</span>
-            <span class="bk-val good" id="fc_fWon">—</span>
-          </div>
-          <div class="bk-row">
-            <span class="bk-lbl">Expected lost</span>
-            <span class="bk-val neg" id="fc_fLost">—</span>
-          </div>
-          <div class="bk-row">
-            <span class="bk-lbl">Upfront OB revenue (won deals)</span>
-            <span class="bk-val pos" id="fc_fUpfront">—</span>
-          </div>
+          <div class="bk-row"><span class="bk-lbl">Expected won accounts</span><span class="bk-val good" id="fc_fWon">—</span></div>
+          <div class="bk-row"><span class="bk-lbl">Expected lost</span><span class="bk-val neg" id="fc_fLost">—</span></div>
+          <div class="bk-row"><span class="bk-lbl">Upfront OB cash (won deals)</span><span class="bk-val pos" id="fc_fUpfront">—</span></div>
           <div style="height:1px;background:var(--line);margin:4px 0"></div>
 
-          <!-- Churn stage -->
           <div style="margin:10px 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900">Post-win churn (year 1)</div>
           <div class="bar-track" style="margin-bottom:8px"><div class="bar-fill" id="fc_churnBar" style="background:linear-gradient(90deg,#f97066,#c084fc)"></div></div>
-          <div class="bk-row">
-            <span class="bk-lbl">Expected to churn within 12 mo</span>
-            <span class="bk-val neg" id="fc_fChurned">—</span>
-          </div>
-          <div class="bk-row">
-            <span class="bk-lbl">Expected to survive year 1</span>
-            <span class="bk-val good" id="fc_fRetained">—</span>
-          </div>
+          <div class="bk-row"><span class="bk-lbl">Expected to churn within 12 mo</span><span class="bk-val neg" id="fc_fChurned">—</span></div>
+          <div class="bk-row"><span class="bk-lbl">Expected to survive year 1</span><span class="bk-val good" id="fc_fRetained">—</span></div>
           <div style="height:1px;background:var(--line);margin:4px 0"></div>
 
-          <!-- Revenue stage -->
-          <div style="margin:10px 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900">Revenue (per won account, calibrated)</div>
-          <div class="bk-row">
-            <span class="bk-lbl">Calibrated LTV / won account</span>
-            <span class="bk-val pos" id="fc_fLtv">—</span>
-          </div>
-          <div class="bk-row">
-            <span class="bk-lbl">Total pipeline LTV (won)</span>
-            <span class="bk-val pos" id="fc_fTotalLtv">—</span>
-          </div>
-          <div class="bk-row">
-            <span class="bk-lbl">Total CAC spend (pipeline)</span>
-            <span class="bk-val neg" id="fc_fTotalCac">—</span>
-          </div>
-          <div class="bk-row" style="border-bottom:none">
-            <span class="bk-lbl" style="font-weight:800;color:var(--text)">Net pipeline value (LTV − CAC)</span>
-            <span class="bk-val" id="fc_fNetPipeline">—</span>
-          </div>
+          <div style="margin:10px 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900">Revenue (calibrated, waived months excluded)</div>
+          <div class="bk-row"><span class="bk-lbl">Calibrated LTV / won account</span><span class="bk-val pos" id="fc_fLtv">—</span></div>
+          <div class="bk-row"><span class="bk-lbl">Total pipeline LTV (won × LTV)</span><span class="bk-val pos" id="fc_fTotalLtv">—</span></div>
+          <div class="bk-row"><span class="bk-lbl">Total CAC spend (wins × CAC/won)</span><span class="bk-val neg" id="fc_fTotalCac">—</span></div>
+          <div class="bk-row" style="border-bottom:none"><span class="bk-lbl" style="font-weight:800;color:var(--text)">Net pipeline value (LTV − CAC)</span><span class="bk-val" id="fc_fNetPipeline">—</span></div>
         </div>
 
-        <!-- Insight -->
         <div class="insight" id="fc_insight" style="margin-top:14px"></div>
 
-        <!-- Sensitivity: Win Rate vs. Churn across OB% -->
         <div class="sensitivity" style="margin-top:14px">
           <div class="chart-hdr">
             <div>
               <div class="chart-title">Win rate vs. churn — sweep onboarding %</div>
-              <div class="chart-note">Shows how win rate (green) and 12-mo churn (red) change as onboarding % varies. Other inputs held at current values.</div>
+              <div class="chart-note">Other inputs held at current values. Win rate (green) and 12-mo churn (red).</div>
             </div>
           </div>
           <div class="chart-wrap-calc" style="height:220px"><canvas id="fc_tradeoffCanvas"></canvas></div>
@@ -1138,7 +1106,7 @@ function sigmoid(x){ return 1 / (1 + Math.exp(-x)); }
  * Build all 42 churn features from raw deal inputs.
  * discountPct: decimal (0.15 = 15%, 0.25 = 25%, 1.0 = 100%)
  * obPct: decimal ratio (1.0 = 100% of MRR)
- * freeMonths: integer 0-6
+ * freeMonths: integer 0-3
  * cohortAge: months old (default 14 = current cohort)
  */
 function buildChurnFeatures(mrr, obPct, freeMonths, discountPct, cohortAge) {
@@ -1152,7 +1120,7 @@ function buildChurnFeatures(mrr, obPct, freeMonths, discountPct, cohortAge) {
   const high_mrr = mrr >= 500 ? 1 : 0;
   const ob = obPct; // already a decimal ratio e.g. 1.0 = 100%
   const obSq = ob ** 2;
-  const fm = Math.min(Math.max(freeMonths, 0), 6);
+  const fm = Math.min(Math.max(freeMonths, 0), 3);
   const fmSq = fm ** 2;
   const anyFree = fm > 0 ? 1 : 0;
   const free_1mo = fm === 1 ? 1 : 0;   // EXACTLY 1 free month (not anyFree)
@@ -1281,10 +1249,14 @@ function ltvBreakdown(mrr, obPct, freeMonths, discountPct) {
   let survival = 1, mrrRev24 = 0, noChurn24 = 0, analytical = upfront;
   for (let t = 1; t <= MAX_LTV_MONTHS; t++) {
     survival *= (1 - h);
-    const billable = t > freeMonths;
-    const expectedMrr = billable ? mrr * survival : 0;
+    // Waived months = $0. After waived period, full MRR (coupons removed from model).
+    const billedMrr = t > freeMonths ? mrr : 0;
+    const expectedMrr = billedMrr * survival;
     analytical += expectedMrr;
-    if (t <= 24) { mrrRev24 += expectedMrr; if (billable) noChurn24 += mrr; }
+    if (t <= 24) {
+      mrrRev24 += expectedMrr;
+      noChurn24 += billedMrr; // no-churn revenue also respects waived months
+    }
   }
   return {upfront, mrrRev24, lost24: noChurn24 - mrrRev24, analytical, calibrated: analytical * CALIBRATION, annualChurn};
 }
@@ -1357,7 +1329,6 @@ function setFm(v){
 byId('sliderMrr').addEventListener('input',()=>{clearOpt(); update();});
 byId('sliderOb').addEventListener('input',()=>{clearOpt(); update();});
 byId('sliderCac').addEventListener('input',()=>update());
-byId('sliderDisc').addEventListener('change',()=>update());
 byId('chartX').addEventListener('change',()=>update());
 byId('chartY').addEventListener('change',()=>update());
 
@@ -1366,12 +1337,12 @@ function clearOpt(){ document.querySelectorAll('.opt-btn').forEach(b=>b.classLis
 function optimize(goal){
   const MRR = []; for(let m=99; m<=3000; m+=25) MRR.push(m);
   const OB = []; for(let o=0; o<=200; o+=5) OB.push(o);  // stored as %
-  const FM = [0,1,2,3,4,5,6];
+  const FM = [0,1,2,3];
   const curMrr = +byId('sliderMrr').value;
   const curOb = +byId('sliderOb').value;
   const curFm = fm;
   const cac = +byId('sliderCac').value;
-  const discPct = +byId('sliderDisc').value;
+  const discPct = 0;
   const mrrRange = locks.mrr ? [curMrr] : MRR;
   const obRange = locks.ob ? [curOb] : OB;
   const fmRange = locks.fm ? [curFm] : FM;
@@ -1413,7 +1384,7 @@ function chartSeries(currentMrr, currentObPct, currentFm, currentCac, currentDis
   let xs = [];
   if(xKey === 'mrr'){ for(let v=99; v<=3000; v+=50) xs.push(v); }
   else if(xKey === 'ob'){ for(let v=0; v<=200; v+=5) xs.push(v); }
-  else if(xKey === 'fm'){ xs = [0,1,2,3,4,5,6]; }
+  else if(xKey === 'fm'){ xs = [0,1,2,3]; }
   else if(xKey === 'cac'){ for(let v=500; v<=12000; v+=250) xs.push(v); }
   return xs.map(x=>{
     const m = xKey === 'mrr' ? x : currentMrr;
@@ -1535,7 +1506,7 @@ function update(){
   const obPctPct = +byId('sliderOb').value;  // 0–200 as displayed %
   const obPctRatio = obPctPct / 100;          // convert to decimal ratio for model
   const cac = +byId('sliderCac').value;
-  const discPct = +byId('sliderDisc').value;  // 0, 0.15, 0.25
+  const discPct = 0; // coupons excluded — insufficient sample size
 
   byId('mrrVal').textContent = '$' + mrr.toLocaleString();
   byId('obVal').textContent = obPctPct + '%';
@@ -1649,8 +1620,7 @@ updateLockUI();
 update();
 
 window.addEventListener('resize', ()=>{
-  const disc = +byId('sliderDisc').value;
-  drawSensitivityChart(+byId('sliderMrr').value, +byId('sliderOb').value, fm, +byId('sliderCac').value, disc);
+  drawSensitivityChart(+byId('sliderMrr').value, +byId('sliderOb').value, fm, +byId('sliderCac').value, 0);
 });
 
 })();
@@ -2285,6 +2255,7 @@ window.addEventListener('resize', ()=>{
 (function(){
   const $ = id => document.getElementById(id);
   let fc_fm = 0;
+  const fc_locks = {mrr: false, ob: false, fm: false};
 
   function fmtUSD(v){ return '$' + Math.round(v).toLocaleString(); }
   function fmtK(v){ return v >= 1000 ? '$' + (v/1000).toFixed(v>=10000?0:1) + 'k' : '$' + Math.round(v); }
@@ -2292,172 +2263,226 @@ window.addEventListener('resize', ()=>{
   function riskCls(c){ return c < .40 ? 'good' : c < .65 ? 'warn' : 'bad'; }
   function wrCls(w){ return w >= 0.28 ? 'good' : w >= 0.18 ? 'warn' : 'bad'; }
 
-  // FM pills
+  // ===== Lock UI =====
+  function updateLockUI(){
+    ['mrr','ob','fm'].forEach(k=>{
+      const btn = $('fc_lock'+k[0].toUpperCase()+k.slice(1));
+      if(!btn) return;
+      btn.textContent = fc_locks[k] ? '🔒' : '🔓';
+      btn.classList.toggle('locked', fc_locks[k]);
+    });
+    const slMrr = $('fc_sliderMrr'); if(slMrr) slMrr.classList.toggle('locked-slider', fc_locks.mrr);
+    const slOb  = $('fc_sliderOb');  if(slOb)  slOb.classList.toggle('locked-slider', fc_locks.ob);
+    $('fc_fmPills').querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('locked-pill', fc_locks.fm));
+    const locked = Object.entries(fc_locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
+    const note = $('fc_lockNote');
+    if(locked.length){ note.style.display='flex'; $('fc_lockNoteText').textContent = locked.join(', ')+' locked — optimizer skips these'; }
+    else { note.style.display='none'; }
+  }
+
+  $('fc_lockMrr').addEventListener('click',()=>{ fc_locks.mrr=!fc_locks.mrr; updateLockUI(); });
+  $('fc_lockOb').addEventListener('click',()=>{ fc_locks.ob=!fc_locks.ob; updateLockUI(); });
+  $('fc_lockFm').addEventListener('click',()=>{ fc_locks.fm=!fc_locks.fm; updateLockUI(); });
+
+  // ===== FM pills =====
   $('fc_fmPills').querySelectorAll('.fm-pill').forEach(p=>{
     p.addEventListener('click',()=>{
+      if(fc_locks.fm) return;
       fc_fm = +p.dataset.fm;
-      $('fc_fmPills').querySelectorAll('.fm-pill').forEach(x=>x.classList.toggle('active', +x.dataset.fm === fc_fm));
-      update();
+      $('fc_fmPills').querySelectorAll('.fm-pill').forEach(x=>x.classList.toggle('active', +x.dataset.fm===fc_fm));
+      $('fc_fmHint').textContent = fc_fm===0?'MRR billing starts month 1':`${fc_fm} month${fc_fm>1?'s':''} waived · billing starts month ${fc_fm+1}`;
+      clearOptBtns(); update();
     });
   });
 
-  // Sync range+number for deals
+  // ===== Pipeline size sync =====
   const rDeals = $('fc_sliderDeals'), nDeals = $('fc_dealsInput');
-  function setDeals(v){ v = Math.max(1,Math.min(1000,Math.round(+v))); rDeals.value=v; nDeals.value=v; update(); }
+  function setDeals(v){ v=Math.max(1,Math.min(1000,Math.round(+v))); rDeals.value=v; nDeals.value=v; update(); }
   rDeals.addEventListener('input', ()=>setDeals(rDeals.value));
   nDeals.addEventListener('input', ()=>setDeals(nDeals.value));
 
-  [$('fc_sliderMrr'),$('fc_sliderOb'),$('fc_sliderCac')].forEach(el=>el.addEventListener('input',update));
-  $('fc_sliderDisc').addEventListener('change', update);
+  $('fc_sliderMrr').addEventListener('input', ()=>{ clearOptBtns(); update(); });
+  $('fc_sliderOb').addEventListener('input',  ()=>{ clearOptBtns(); update(); });
+  $('fc_sliderCac').addEventListener('input', update);
 
-  function drawTradeoffChart(mrr, fm, discPct){
+  // ===== Optimizer buttons =====
+  function clearOptBtns(){ ['fc_btnMinChurn','fc_btnMaxLtv','fc_btnMaxRev'].forEach(id=>{ const b=$( id); if(b) b.classList.remove('active-opt'); }); }
+
+  function optimize(goal){
+    const MRR=[]; for(let m=99;m<=3000;m+=50) MRR.push(m);
+    const OB=[]; for(let o=0;o<=200;o+=5) OB.push(o);
+    const FM=[0,1,2,3];
+    const curMrr=+$('fc_sliderMrr').value;
+    const curOb=+$('fc_sliderOb').value;
+    const curFm=fc_fm;
+    const cac=+$('fc_sliderCac').value;
+    const nP=+$('fc_dealsInput').value||100;
+
+    const mrrRange = fc_locks.mrr ? [curMrr] : MRR;
+    const obRange  = fc_locks.ob  ? [curOb]  : OB;
+    const fmRange  = fc_locks.fm  ? [curFm]  : FM;
+
+    let bestMrr=curMrr, bestOb=curOb, bestFm=curFm;
+    let best = (goal==='churn') ? Infinity : -Infinity;
+
+    for(const m of mrrRange) for(const o of obRange) for(const f of fmRange){
+      const oR=o/100;
+      const churn = scoreChurn(m, oR, f, 0);
+      const wr    = scoreWinRate(m, oR, f, 0);
+      const ltv   = ltvBreakdown(m, oR, f, 0).calibrated;
+      const ltvCac = ltv / cac;
+      const wins  = nP * wr;
+      const netPipeline = wins * ltv - wins * cac;
+
+      let score;
+      if(goal==='churn')  score = churn;
+      else if(goal==='ltvcac') score = ltvCac;
+      else score = netPipeline;  // maxrev
+
+      const better = goal==='churn' ? score < best : score > best;
+      if(better){ best=score; bestMrr=m; bestOb=o; bestFm=f; }
+    }
+
+    if(!fc_locks.mrr) $('fc_sliderMrr').value = bestMrr;
+    if(!fc_locks.ob)  $('fc_sliderOb').value  = bestOb;
+    if(!fc_locks.fm){ fc_fm=bestFm; $('fc_fmPills').querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('active',+p.dataset.fm===bestFm)); }
+    update();
+
+    const locked = Object.entries(fc_locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
+    if(locked.length){
+      $('fc_lockNote').style.display='flex';
+      $('fc_lockNoteText').textContent = locked.join(', ')+' locked — best unlocked result at $'+bestMrr+' MRR, '+bestOb+'% OB, '+bestFm+' free mo';
+    }
+  }
+
+  $('fc_btnMinChurn').addEventListener('click',()=>{ clearOptBtns(); $('fc_btnMinChurn').classList.add('active-opt'); optimize('churn'); });
+  $('fc_btnMaxLtv').addEventListener('click',()=>{ clearOptBtns(); $('fc_btnMaxLtv').classList.add('active-opt'); optimize('ltvcac'); });
+  $('fc_btnMaxRev').addEventListener('click',()=>{ clearOptBtns(); $('fc_btnMaxRev').classList.add('active-opt'); optimize('maxrev'); });
+
+  // ===== Tradeoff chart =====
+  function drawTradeoffChart(mrr, fm){
     const canvas = $('fc_tradeoffCanvas');
     if(!canvas) return;
     const rect = canvas.getBoundingClientRect();
     if(!rect.width || !rect.height) return;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = window.devicePixelRatio||1;
     canvas.width = Math.floor(rect.width*dpr);
     canvas.height = Math.floor(rect.height*dpr);
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr,0,0,dpr,0,0);
     const w=rect.width, h=rect.height;
     ctx.clearRect(0,0,w,h);
-
     const pad={l:54,r:18,t:16,b:36};
     const plotW=w-pad.l-pad.r, plotH=h-pad.t-pad.b;
-    const pts = [];
-    for(let o=0; o<=200; o+=5){
-      const oR = o/100;
-      pts.push({
-        o, oR,
-        wr: scoreWinRate(mrr, oR, fm, discPct),
-        ch: scoreChurn(mrr, oR, fm, discPct),
-      });
+    const pts=[];
+    for(let o=0;o<=200;o+=5){
+      const oR=o/100;
+      pts.push({o, wr:scoreWinRate(mrr,oR,fm,0), ch:scoreChurn(mrr,oR,fm,0)});
     }
-
-    // Grid
-    ctx.font='10px Inter, sans-serif'; ctx.fillStyle='#737d91'; ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1;
+    ctx.font='10px Inter,sans-serif'; ctx.fillStyle='#737d91'; ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1;
     for(let i=0;i<=5;i++){
       const yy=pad.t+plotH*i/5;
       ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(w-pad.r,yy); ctx.stroke();
       ctx.fillText((100-i*20)+'%', 6, yy+3);
     }
-    for(let i=0;i<=4;i++){
-      const xx=pad.l+plotW*i/4;
-      ctx.fillText((i*50)+'%', xx-8, h-12);
-    }
-
-    // Lines
-    function drawLine(key, color){
+    for(let i=0;i<=4;i++){ ctx.fillText((i*50)+'%', pad.l+plotW*i/4-8, h-12); }
+    function drawLine(key,color){
       ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
-      pts.forEach((p,idx)=>{
-        const xx=pad.l+(p.o/200)*plotW;
-        const yy=pad.t+(1-p[key])*plotH;
-        if(idx===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
-      });
+      pts.forEach((p,idx)=>{ const xx=pad.l+(p.o/200)*plotW; const yy=pad.t+(1-p[key])*plotH; if(idx===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy); });
       ctx.stroke();
     }
-    drawLine('wr','#32d583');
-    drawLine('ch','#f97066');
-
-    // Legend
+    drawLine('wr','#32d583'); drawLine('ch','#f97066');
     ctx.fillStyle='#32d583'; ctx.fillRect(w-120,pad.t,12,4); ctx.fillStyle='#aeb7c8'; ctx.font='10px Inter,sans-serif'; ctx.fillText('Win rate',w-104,pad.t+4);
     ctx.fillStyle='#f97066'; ctx.fillRect(w-120,pad.t+14,12,4); ctx.fillStyle='#aeb7c8'; ctx.fillText('12-mo churn',w-104,pad.t+18);
-
-    // X-axis label
-    ctx.fillStyle='#737d91'; ctx.textAlign='center';
-    ctx.fillText('Onboarding % of MRR', pad.l+plotW/2, h-2);
-    ctx.textAlign='left';
+    ctx.fillStyle='#737d91'; ctx.textAlign='center'; ctx.fillText('Onboarding % of MRR',pad.l+plotW/2,h-2); ctx.textAlign='left';
   }
 
+  // ===== Main update =====
   function update(){
-    const mrr = +$('fc_sliderMrr').value;
+    const mrr      = +$('fc_sliderMrr').value;
     const obPctPct = +$('fc_sliderOb').value;
-    const obR = obPctPct / 100;
-    const cac = +$('fc_sliderCac').value;
-    const discPct = +$('fc_sliderDisc').value;
-    const nPipeline = +$('fc_dealsInput').value || 100;
+    const obR      = obPctPct / 100;
+    const cac      = +$('fc_sliderCac').value;
+    const nPipeline= +$('fc_dealsInput').value || 100;
 
-    $('fc_mrrVal').textContent = '$' + mrr.toLocaleString();
-    $('fc_obVal').textContent = obPctPct + '%';
-    $('fc_obDollar').textContent = '= $' + Math.round(mrr * obR).toLocaleString() + ' upfront';
-    $('fc_cacVal').textContent = '$' + cac.toLocaleString();
+    $('fc_mrrVal').textContent = '$'+mrr.toLocaleString();
+    $('fc_obVal').textContent  = obPctPct+'%';
+    $('fc_obDollar').textContent = '= $'+Math.round(mrr*obR).toLocaleString()+' upfront';
+    $('fc_cacVal').textContent = '$'+cac.toLocaleString();
     $('fc_pipelineSize').textContent = nPipeline;
     $('fc_fDeals').textContent = nPipeline;
 
-    const wr = scoreWinRate(mrr, obR, fc_fm, discPct);
-    const churnRate = scoreChurn(mrr, obR, fc_fm, discPct);
-    const bk = ltvBreakdown(mrr, obR, fc_fm, discPct);
-    const ltv = bk.calibrated;
-    const ltvCac = ltv / cac;
+    const wr        = scoreWinRate(mrr, obR, fc_fm, 0);
+    const churnRate = scoreChurn(mrr, obR, fc_fm, 0);
+    const bk        = ltvBreakdown(mrr, obR, fc_fm, 0);
+    const ltv       = bk.calibrated;
+    const ltvCac    = ltv / cac;
 
-    const expectedWins = nPipeline * wr;
-    const expectedLost = nPipeline - expectedWins;
+    const expectedWins    = nPipeline * wr;
+    const expectedLost    = nPipeline - expectedWins;
     const expectedChurned = expectedWins * churnRate;
-    const expectedSurviving = expectedWins * (1 - churnRate);
-    const totalUpfront = expectedWins * bk.upfront;
-    const totalLtv = expectedWins * ltv;
-    const totalCac = nPipeline * cac; // CAC spent on all pipeline deals
-    const netPipeline = totalLtv - totalCac;
+    const expectedSurv    = expectedWins * (1 - churnRate);
+    const totalUpfront    = expectedWins * bk.upfront;
+    const totalLtv        = expectedWins * ltv;
+    const totalCac        = expectedWins * cac;   // CAC per WON account × expected wins
+    const netPipeline     = totalLtv - totalCac;
 
-    // Header metrics
-    const wrEl = $('fc_winRate'); wrEl.textContent = fmtPct(wr); wrEl.className = 'metric-val ' + wrCls(wr);
-    const winsEl = $('fc_expectedWins'); winsEl.textContent = expectedWins.toFixed(1);
-    winsEl.className = 'metric-val ' + wrCls(wr);
+    // Win-rate clamp warning
+    const atClamp = wr <= 0.051 || wr >= 0.399;
+    const wrSub = atClamp ? '⚠ at model clamp boundary' : 'model · clamped 5–40%';
+    const wrEl = $('fc_winRate'); wrEl.textContent=fmtPct(wr); wrEl.className='metric-val '+(atClamp?'warn':wrCls(wr));
+    $('fc_winRateSub').textContent = wrSub;
+
+    const winsEl = $('fc_expectedWins'); winsEl.textContent=expectedWins.toFixed(1); winsEl.className='metric-val '+wrCls(wr);
     $('fc_expectedWinsSub').textContent = `of ${nPipeline} deals`;
-    const chEl = $('fc_churnRate'); chEl.textContent = fmtPct(churnRate); chEl.className = 'metric-val ' + riskCls(churnRate);
-    const survEl = $('fc_surviving'); survEl.textContent = expectedSurviving.toFixed(1);
-    survEl.className = 'metric-val ' + (expectedSurviving >= expectedWins * 0.5 ? 'good' : 'warn');
+    const chEl = $('fc_churnRate'); chEl.textContent=fmtPct(churnRate); chEl.className='metric-val '+riskCls(churnRate);
+    const survEl = $('fc_surviving'); survEl.textContent=expectedSurv.toFixed(1);
+    survEl.className='metric-val '+(expectedSurv>=expectedWins*0.6?'good':'warn');
     $('fc_survivingSub').textContent = `of ${expectedWins.toFixed(1)} won`;
 
-    const ltvEl = $('fc_ltv'); ltvEl.textContent = fmtUSD(ltv); ltvEl.className = 'metric-val ' + (ltvCac >= 3 ? 'good' : ltvCac >= 1 ? 'warn' : 'bad');
-    const ltvCacEl = $('fc_ltvCac'); ltvCacEl.textContent = ltvCac.toFixed(2) + '×'; ltvCacEl.className = 'metric-val ' + (ltvCac >= 3 ? 'good' : ltvCac >= 1.5 ? 'warn' : 'bad');
-    $('fc_ltvCacSub').textContent = ltvCac >= 3 ? 'healthy' : ltvCac >= 1 ? 'pays back' : 'underwater';
+    const ltvEl=$('fc_ltv'); ltvEl.textContent=fmtUSD(ltv); ltvEl.className='metric-val '+(ltvCac>=3?'good':ltvCac>=1?'warn':'bad');
+    const lcEl=$('fc_ltvCac'); lcEl.textContent=ltvCac.toFixed(2)+'×'; lcEl.className='metric-val '+(ltvCac>=3?'good':ltvCac>=1.5?'warn':'bad');
+    $('fc_ltvCacSub').textContent = ltvCac>=3?'healthy':ltvCac>=1?'pays back':'underwater';
     $('fc_upfrontTotal').textContent = fmtK(totalUpfront);
-    $('fc_upfrontSub').textContent = fmtUSD(bk.upfront) + ' × ' + expectedWins.toFixed(1) + ' wins';
-    $('fc_ltvTotal').textContent = fmtK(totalLtv);
-    $('fc_ltvTotalSub').textContent = fmtUSD(ltv) + ' × ' + expectedWins.toFixed(1) + ' wins';
+    $('fc_upfrontSub').textContent   = fmtUSD(bk.upfront)+' × '+expectedWins.toFixed(1)+' wins';
+    const netEl=$('fc_netPipeline'); netEl.textContent=(netPipeline>=0?'+':'−')+fmtK(Math.abs(netPipeline));
+    netEl.className='metric-val '+(netPipeline>=0?'good':'bad');
 
     // Funnel
-    $('fc_winBar').style.width = Math.min(wr*100,100) + '%';
-    $('fc_churnBar').style.width = Math.min(churnRate*100,100) + '%';
-    $('fc_fWon').textContent = expectedWins.toFixed(1);
-    $('fc_fWon').className = 'bk-val pos';
-    $('fc_fLost').textContent = '−' + expectedLost.toFixed(1);
-    $('fc_fUpfront').textContent = fmtUSD(totalUpfront);
-    $('fc_fChurned').textContent = '−' + expectedChurned.toFixed(1);
-    $('fc_fRetained').textContent = expectedSurviving.toFixed(1);
-    $('fc_fLtv').textContent = fmtUSD(ltv);
+    $('fc_winBar').style.width  = Math.min(wr*100,100)+'%';
+    $('fc_churnBar').style.width= Math.min(churnRate*100,100)+'%';
+    $('fc_fWon').textContent  = expectedWins.toFixed(1); $('fc_fWon').className='bk-val pos';
+    $('fc_fLost').textContent = '−'+expectedLost.toFixed(1);
+    $('fc_fUpfront').textContent  = fmtUSD(totalUpfront);
+    $('fc_fChurned').textContent  = '−'+expectedChurned.toFixed(1);
+    $('fc_fRetained').textContent = expectedSurv.toFixed(1);
+    $('fc_fLtv').textContent      = fmtUSD(ltv);
     $('fc_fTotalLtv').textContent = fmtUSD(totalLtv);
-    $('fc_fTotalCac').textContent = '−' + fmtUSD(totalCac);
-    const netEl = $('fc_fNetPipeline');
-    netEl.textContent = (netPipeline >= 0 ? '+' : '−') + fmtUSD(Math.abs(netPipeline));
-    netEl.className = 'bk-val ' + (netPipeline >= 0 ? 'pos' : 'neg');
+    $('fc_fTotalCac').textContent = '−'+fmtUSD(totalCac);
+    const fnEl=$('fc_fNetPipeline'); fnEl.textContent=(netPipeline>=0?'+':'−')+fmtUSD(Math.abs(netPipeline));
+    fnEl.className='bk-val '+(netPipeline>=0?'pos':'neg');
 
     // Insight
-    let insight = '';
-    const eWr = (wr * 100).toFixed(0);
-    const eCh = (churnRate * 100).toFixed(0);
-    if(ltvCac < 1){
-      insight = `<strong>Pipeline is underwater.</strong> Even with ${expectedWins.toFixed(1)} wins from this pipeline, calibrated LTV (${fmtUSD(ltv)}) is below CAC (${fmtUSD(cac)}). Raise onboarding or MRR.`;
-    } else if(churnRate > 0.75){
-      insight = `<strong>High churn risk.</strong> ${eCh}% of won accounts predicted to churn in year 1. Only ${expectedSurviving.toFixed(1)} of ${expectedWins.toFixed(1)} expected wins survive. Consider reducing free months.`;
-    } else if(wr < 0.15){
-      insight = `<strong>Low win rate (${eWr}%).</strong> This deal structure is predicted to win only ${expectedWins.toFixed(1)} of ${nPipeline} deals. A 15–25% discount or 1 free month may improve win rate.`;
+    let insight='';
+    if(ltvCac<1){
+      insight=`<strong>Underwater per deal.</strong> LTV (${fmtUSD(ltv)}) &lt; CAC (${fmtUSD(cac)}). Lower onboarding toward 0–25% to reduce churn, or raise MRR.`;
+    } else if(atClamp){
+      insight=`<strong>Win rate at model boundary (${fmtPct(wr)}).</strong> The model is at its clamp limit — treat directionally. ${expectedWins.toFixed(1)} expected wins from ${nPipeline} deals. Net pipeline: ${(netPipeline>=0?'+':'−')+fmtUSD(Math.abs(netPipeline))}.`;
+    } else if(churnRate>0.75){
+      insight=`<strong>High churn risk (${fmtPct(churnRate)}).</strong> Only ${expectedSurv.toFixed(1)} of ${expectedWins.toFixed(1)} won accounts survive year 1. Reduce free months or lower onboarding.`;
     } else {
-      insight = `<strong>Forecast summary:</strong> ${expectedWins.toFixed(1)} expected wins (${eWr}% win rate) from ${nPipeline} deals. ${expectedSurviving.toFixed(1)} survive year 1 after ${eCh}% churn. Total pipeline LTV: <strong>${fmtUSD(totalLtv)}</strong> vs. CAC spend ${fmtUSD(totalCac)} → net <strong>${(netPipeline>=0?'+':'−')+fmtUSD(Math.abs(netPipeline))}</strong>.`;
+      insight=`<strong>Forecast:</strong> ${expectedWins.toFixed(1)} wins (${fmtPct(wr)}) from ${nPipeline} deals. ${expectedSurv.toFixed(1)} survive yr 1. LTV:CAC ${ltvCac.toFixed(2)}×. Net pipeline <strong>${(netPipeline>=0?'+':'−')+fmtUSD(Math.abs(netPipeline))}</strong>.`;
     }
     $('fc_insight').innerHTML = insight;
 
-    drawTradeoffChart(mrr, fc_fm, discPct);
+    drawTradeoffChart(mrr, fc_fm);
   }
 
+  updateLockUI();
   update();
 
   window.addEventListener('resize', ()=>{
-    const mrr = +$('fc_sliderMrr').value;
-    const discPct = +$('fc_sliderDisc').value;
-    drawTradeoffChart(mrr, fc_fm, discPct);
+    drawTradeoffChart(+$('fc_sliderMrr').value, fc_fm);
   });
 })();
 </script>
