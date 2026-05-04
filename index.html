@@ -396,7 +396,7 @@ details[open] .brief-chev{transform:rotate(90deg)}
         <div class="metrics-grid">
           <div class="metric-card primary"><div class="metric-lbl">Calibrated LTV</div><div class="metric-val" id="oLtv">$0</div><div class="metric-sub" id="oLtvSub">analytical × 0.3854</div></div>
           <div class="metric-card"><div class="metric-lbl">12-month churn</div><div class="metric-val" id="oChurn">0%</div><div class="metric-sub" id="oChurnSub">risk</div></div>
-          <div class="metric-card" style="border-color:rgba(50,213,131,.35)"><div class="metric-lbl">Win rate</div><div class="metric-val" id="oWinRate">0%</div><div class="metric-sub" id="oWinRateSub">model · clamped 5–40%</div></div>
+          <div class="metric-card" style="border-color:rgba(50,213,131,.35)"><div class="metric-lbl">Win rate</div><div class="metric-val" id="oWinRate">0%</div><div class="metric-sub" id="oWinRateSub">model · max 40%</div></div>
           <div class="metric-card"><div class="metric-lbl">Monthly hazard</div><div class="metric-val" id="oHazard">0%</div><div class="metric-sub">derived from annual</div></div>
           <div class="metric-card cac-card"><div class="metric-lbl">LTV : CAC</div><div class="metric-val" id="oLtvCac">0×</div><div class="metric-sub" id="oLtvCacSub">ratio</div></div>
           <div class="metric-card cac-card"><div class="metric-lbl">CAC payback</div><div class="metric-val" id="oPayback">—</div><div class="metric-sub" id="oPaybackSub">calibrated cash curve</div></div>
@@ -1083,7 +1083,7 @@ const CHURN_MODEL = {
 // ============================================================
 const WINRATE_MODEL = {
   intercept: 0.2324,
-  win_rate_min_clamp: 0.05,
+  win_rate_min_clamp: 0.0,
   win_rate_max_clamp: 0.40,
   features: [
     {name:'avg_log_mrr',      mean:6.494034, std:0.304220, coef:-0.067788},
@@ -1530,7 +1530,7 @@ function update(){
   byId('oChurnSub').textContent = c12 < .40 ? 'low risk' : c12 < .65 ? 'moderate' : 'high risk';
 
   const wrEl = byId('oWinRate'); wrEl.textContent = fmtPct(wr); wrEl.className = 'metric-val ' + (wr >= 0.28 ? 'good' : wr >= 0.18 ? 'warn' : 'bad');
-  byId('oWinRateSub').textContent = 'model · clamped 5–40%';
+  byId('oWinRateSub').textContent = 'model · max 40%';
 
   const hz = byId('oHazard'); hz.textContent = fmtPct(h1); hz.className = 'metric-val ' + (h1 < .03 ? 'good' : h1 < .05 ? 'warn' : 'bad');
 
@@ -2428,8 +2428,8 @@ window.addEventListener('resize', ()=>{
     const netPipeline     = totalLtv - totalCac;
 
     // Win-rate clamp warning
-    const atClamp = wr <= 0.051 || wr >= 0.399;
-    const wrSub = atClamp ? '⚠ at model clamp boundary' : 'model · clamped 5–40%';
+    const atClamp = wr >= 0.399;
+    const wrSub = atClamp ? '⚠ at model clamp boundary (40%)' : 'model · max 40%';
     const wrEl = $('fc_winRate'); wrEl.textContent=fmtPct(wr); wrEl.className='metric-val '+(atClamp?'warn':wrCls(wr));
     $('fc_winRateSub').textContent = wrSub;
 
