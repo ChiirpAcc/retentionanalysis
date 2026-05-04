@@ -92,7 +92,7 @@ body{margin:0;background:radial-gradient(circle at top left,#1b2540 0,#0f1117 42
 .dim-box{border:1px solid var(--line);border-radius:16px;background:#0b0e14;padding:12px}
 .dim-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);font-weight:900;margin-bottom:8px}
 .chip-row{display:flex;flex-wrap:wrap;gap:7px}
-.chip{border:1px solid var(--line);border-radius:999px;padding:7px 9px;color:var(--text2);font-size:12px;display:flex;align-items:center;gap:6px;background:#11151e}
+.chip{border:1px solid var(--line);border-radius:999px;padding:7px 9px;color:var(--text2);font-size:12px;display:flex;align-items:center;gap:6px;background:#11151e;cursor:pointer}
 .chip input{accent-color:var(--blue)}
 .chip:has(input:checked){border-color:rgba(125,211,252,.7);background:rgba(125,211,252,.11);color:var(--text)}
 .dim-actions{display:flex;gap:6px;margin-top:10px}
@@ -490,7 +490,7 @@ details[open] .brief-chev{transform:rotate(90deg)}
         </div>
         <div class="toolbar" style="margin-top:12px">
           <button class="preset-btn" data-preset="focused">Focused</button>
-          <button class="preset-btn" data-preset="standard">Standard</button>
+          <button class="preset-btn active" data-preset="standard">Standard</button>
           <button class="preset-btn" data-preset="wide">Wide search</button>
         </div>
         <div class="hint">This page intentionally uses projections only. LTV is derived from the compact churn model, then calibrated by 0.3854. No historical cohort CSV or observed CAC-by-month is used.</div>
@@ -1206,307 +1206,812 @@ function update(){
   pbEl.className = 'metric-val ' + (pb !== null && pb <= 12 ? 'good' : pb !== null && pb <= 24 ? 'warn' : 'bad');
   byId('oPaybackSub').textContent = pb === null ? 'not recovered in 5yr' : pb === 0 ? 'upfront only' : `month ${pb}`;
 
-  const netEl = byId('oNet'); netEl.textContent = (net >= 0 ? '+' : '') + fmtUSD(net);
+  const netEl = byId('oNet'); netEl.textContent = (net >= 0 ? '+' : '−') + fmtUSD(Math.abs(net));
   netEl.className = 'metric-val ' + (net >= 0 ? 'good' : 'bad');
 
+  // ===== Churn risk bar =====
   const fill = byId('barFill');
-  fill.style.width = Math.min(c12 * 100, 100) + '%';
-  fill.style.background = c12 < .35 ? 'var(--green)' : c12 < .55 ? 'var(--amber)' : 'var(--red)';
+  const pct = Math.min(c12 * 100, 100);
+  fill.style.width = pct + '%';
+  fill.style.background = c12 < .35
+    ? 'linear-gradient(90deg,#32d583,#7dd3fc)'
+    : c12 < .55
+      ? 'linear-gradient(90deg,#fdb022,#f0abfc)'
+      : 'linear-gradient(90deg,#f97066,#c084fc)';
   byId('barLbl').textContent = fmtPct(c12);
 
+  // ===== Breakdown table =====
   byId('bUpfront').textContent = fmtUSD(bk.upfront);
   byId('bMrrRev').textContent = fmtUSD(bk.mrrRev24);
   byId('bLost').textContent = '−' + fmtUSD(bk.lost24);
   byId('bAnalytical').textContent = fmtUSD(bk.analytical);
-  byId('bModel').textContent = fmtUSD(ltv);
+  byId('bModel').textContent = fmtUSD(bk.calibrated);
   byId('bCac').textContent = fmtUSD(cac);
-  byId('bRatio').textContent = ltvCac.toFixed(2) + '×';
-  const bNet = byId('bNet'); bNet.textContent = (net >= 0 ? '+' : '') + fmtUSD(net);
+  const bRatio = byId('bRatio');
+  bRatio.textContent = ltvCac.toFixed(2) + '×';
+  bRatio.className = 'bk-val ' + (ltvCac >= 3 ? 'pos' : ltvCac >= 1 ? 'purple' : 'neg');
+  const bNet = byId('bNet');
+  bNet.textContent = (net >= 0 ? '+' : '−') + fmtUSD(Math.abs(net));
   bNet.className = 'bk-val ' + (net >= 0 ? 'pos' : 'neg');
 
-  let ins = '';
-  if(fm === 2){
-    ins = `<strong>Two free months is the clearest free-month risk signal.</strong> <code>free_2mo_exact</code> adds about +38% churn odds and is marginally significant in the compact model.`;
-  } else if(fm >= 3){
-    ins = `<strong>${fm} free months.</strong> The compact model estimates higher churn odds for 3+ free months, but the coefficient is weaker than the 2-month signal. Treat this as directional.`;
-  } else if(obPct === 0){
-    ins = `<strong>No onboarding collected.</strong> The model applies the onboarding paid and onboarding-gap terms. <code>ob_waived_post_sign</code> is held at 0 because the calculator does not have a separate post-sign waiver toggle.`;
-  } else if(ltvCac < 1){
-    ins = `<strong>Underwater deal.</strong> At ${fmtUSD(cac)} CAC, calibrated LTV:CAC is ${ltvCac.toFixed(2)}×. Raise MRR, collect onboarding, reduce free months, or lower CAC.`;
+  // ===== Insight =====
+  let insight;
+  if(ltvCac < 1){
+    insight = `<strong>Underwater.</strong> Calibrated LTV (${fmtUSD(ltv)}) is below CAC (${fmtUSD(cac)}). The fastest fixes are raising onboarding toward <code>100%</code> (the model's churn-optimal point) or raising MRR. Reducing CAC works too if it's controllable.`;
+  } else if(c12 > .55){
+    insight = `<strong>High churn risk (${fmtPct(c12)}).</strong> The model's onboarding U-shape penalizes both <code>0%</code> and <code>${obPct}%</code>. Move onboarding toward <code>100–125%</code> to cut predicted 12-mo churn.`;
+  } else if(pb === null){
+    insight = `<strong>CAC does not pay back within 5 years.</strong> Onboarding cash is the fastest payback lever — it counts on day 1. Try ${obPct < 100 ? 'raising onboarding to <code>100%</code>' : 'raising onboarding past <code>125%</code> or removing waived months'}.`;
+  } else if(c12 < .35 && ltvCac >= 3){
+    insight = `<strong>Strong structure.</strong> <code>${obPct}%</code> onboarding with <code>${fm}</code> waived month${fm===1?'':'s'} yields ${fmtPct(c12)} 12-mo churn and ${ltvCac.toFixed(2)}× LTV:CAC. Payback in ${pb===0?'upfront only':`month ${pb}`}.`;
   } else {
-    ins = `<strong>${fmtUSD(mrr)} MRR · ${obPct}% onboarding · ${fm} free months · ${fmtUSD(cac)} CAC.</strong> Calibrated LTV is <strong>${fmtUSD(ltv)}</strong>, 12-mo churn is <strong>${fmtPct(c12)}</strong>, and LTV:CAC is <strong>${ltvCac.toFixed(2)}×</strong>.`;
+    insight = `<strong>Acceptable.</strong> ${fmtPct(c12)} 12-mo churn, ${ltvCac.toFixed(2)}× LTV:CAC, payback in ${pb===0?'upfront only':`month ${pb}`}. Use the sensitivity chart to see which lever moves the needle most.`;
   }
-  byId('insight').innerHTML = ins;
+  byId('insight').innerHTML = insight;
 
+  // ===== Audit tables =====
   renderAudit('auditChurn', [
-    ['log_mrr', f.log_mrr, CHURN_C.log_mrr, CHURN_P.log_mrr, 'p=0.1148; business-critical marginal'],
-    ['mrr_lt100', f.mrr_lt100, CHURN_C.mrr_lt100, CHURN_P.mrr_lt100, '~1 below $100'],
-    ['mrr_100_499', f.mrr_100_499, CHURN_C.mrr_100_499, CHURN_P.mrr_100_499, '$100–$499'],
-    ['mrr_1000p', f.mrr_1000p, CHURN_C.mrr_1000p, CHURN_P.mrr_1000p, '~1 above $1k'],
-    ['high_mrr', f.high_mrr, CHURN_C.high_mrr, CHURN_P.high_mrr, '~1 above $500'],
-    ['ob_collected_pct_mrr_sq', f.ob_collected_pct_mrr_sq, CHURN_C.ob_collected_pct_mrr_sq, CHURN_P.ob_collected_pct_mrr_sq, 'onboarding ratio squared'],
-    ['ob_actually_paid', f.ob_actually_paid, CHURN_C.ob_actually_paid, CHURN_P.ob_actually_paid, 'smooth 0→1'],
-    ['ob_waived_post_sign', f.ob_waived_post_sign, CHURN_C.ob_waived_post_sign, CHURN_P.ob_waived_post_sign, 'held at 0; no waiver toggle'],
-    ['ob_gap_x_mrr', f.ob_gap_x_mrr, CHURN_C.ob_gap_x_mrr, CHURN_P.ob_gap_x_mrr, 'max(0,1−ob_ratio)×log(mrr)'],
-    ['any_free', f.any_free, CHURN_C.any_free, CHURN_P.any_free, 'fm > 0'],
-    ['free_2mo_exact', f.free_2mo_exact, CHURN_C.free_2mo_exact, CHURN_P.free_2mo_exact, 'fm == 2'],
-    ['free_3plus', f.free_3plus, CHURN_C.free_3plus, CHURN_P.free_3plus, 'fm >= 3'],
-    ['anyfree_x_log_mrr', f.anyfree_x_log_mrr, CHURN_C.anyfree_x_log_mrr, CHURN_P.anyfree_x_log_mrr, 'exploratory interaction'],
-    ['anyfree_x_high_mrr', f.anyfree_x_high_mrr, CHURN_C.anyfree_x_high_mrr, CHURN_P.anyfree_x_high_mrr, 'exploratory interaction'],
-    ['anyfree_x_ob_collected_pct_mrr_sq', f.anyfree_x_ob_collected_pct_mrr_sq, CHURN_C.anyfree_x_ob_collected_pct_mrr_sq, CHURN_P.anyfree_x_ob_collected_pct_mrr_sq, 'business-critical marginal p=0.1443'],
-    ['anyfree_x_ob_actually_paid', f.anyfree_x_ob_actually_paid, CHURN_C.anyfree_x_ob_actually_paid, CHURN_P.anyfree_x_ob_actually_paid, 'exploratory interaction'],
-    ['anyfree_x_ob_waived_post_sign', f.anyfree_x_ob_waived_post_sign, CHURN_C.anyfree_x_ob_waived_post_sign, CHURN_P.anyfree_x_ob_waived_post_sign, 'held at 0; no waiver toggle'],
-    ['anyfree_x_ob_gap_x_mrr', f.anyfree_x_ob_gap_x_mrr, CHURN_C.anyfree_x_ob_gap_x_mrr, CHURN_P.anyfree_x_ob_gap_x_mrr, 'exploratory interaction'],
-    ['log_tenure', f.log_tenure, CHURN_C.log_tenure, CHURN_P.log_tenure, 'varies by month in LTV'],
-    ['log_tenure_sq', f.log_tenure_sq, CHURN_C.log_tenure_sq, CHURN_P.log_tenure_sq, 'varies by month in LTV'],
-    ['log_cohort_age', f.log_cohort_age, CHURN_C.log_cohort_age, CHURN_P.log_cohort_age, 'held at 14 mo'],
-    ['log_cohort_age_sq', f.log_cohort_age_sq, CHURN_C.log_cohort_age_sq, CHURN_P.log_cohort_age_sq, 'held at 14 mo'],
+    ['log_mrr', f.log_mrr, CHURN_C.log_mrr, CHURN_P.log_mrr, 'log of contract MRR'],
+    ['mrr_lt100', f.mrr_lt100, CHURN_C.mrr_lt100, CHURN_P.mrr_lt100, 'smooth tier &lt;$100'],
+    ['mrr_100_499', f.mrr_100_499, CHURN_C.mrr_100_499, CHURN_P.mrr_100_499, 'smooth tier $100–$499'],
+    ['mrr_1000p', f.mrr_1000p, CHURN_C.mrr_1000p, CHURN_P.mrr_1000p, 'smooth tier ≥$1,000'],
+    ['high_mrr', f.high_mrr, CHURN_C.high_mrr, CHURN_P.high_mrr, 'smooth ≥$500 indicator'],
+    ['ob_collected_pct_mrr_sq', f.ob_collected_pct_mrr_sq, CHURN_C.ob_collected_pct_mrr_sq, CHURN_P.ob_collected_pct_mrr_sq, '(OB/MRR)² · drives U-shape'],
+    ['ob_actually_paid', f.ob_actually_paid, CHURN_C.ob_actually_paid, CHURN_P.ob_actually_paid, 'smooth paid-OB indicator'],
+    ['ob_waived_post_sign', f.ob_waived_post_sign, CHURN_C.ob_waived_post_sign, CHURN_P.ob_waived_post_sign, 'held at 0 (not observed)'],
+    ['ob_gap_x_mrr', f.ob_gap_x_mrr, CHURN_C.ob_gap_x_mrr, CHURN_P.ob_gap_x_mrr, '(1−OB%)·log MRR'],
+    ['any_free', f.any_free, CHURN_C.any_free, CHURN_P.any_free, 'any waived month'],
+    ['free_2mo_exact', f.free_2mo_exact, CHURN_C.free_2mo_exact, CHURN_P.free_2mo_exact, 'exactly 2 waived'],
+    ['free_3plus', f.free_3plus, CHURN_C.free_3plus, CHURN_P.free_3plus, '3+ waived months'],
+    ['anyfree_x_log_mrr', f.anyfree_x_log_mrr, CHURN_C.anyfree_x_log_mrr, CHURN_P.anyfree_x_log_mrr, 'free × log MRR'],
+    ['anyfree_x_high_mrr', f.anyfree_x_high_mrr, CHURN_C.anyfree_x_high_mrr, CHURN_P.anyfree_x_high_mrr, 'free × high-MRR'],
+    ['log_cohort_age', f.log_cohort_age, CHURN_C.log_cohort_age, CHURN_P.log_cohort_age, 'fixed at log(14)'],
+    ['log_cohort_age_sq', f.log_cohort_age_sq, CHURN_C.log_cohort_age_sq, CHURN_P.log_cohort_age_sq, 'log(14)²'],
+    ['log_tenure', f.log_tenure, CHURN_C.log_tenure, CHURN_P.log_tenure, 'log(month) · evaluated at month 9'],
+    ['log_tenure_sq', f.log_tenure_sq, CHURN_C.log_tenure_sq, CHURN_P.log_tenure_sq, 'log(month)²'],
   ]);
+
   renderAudit('auditLtv', [
-    ['uncalibrated analytical LTV', bk.analytical, 1.0000, null, 'upfront + expected MRR through 120 mo'],
-    ['calibration factor', CALIBRATION, CALIBRATION, null, 'actual/analytical median'],
-    ['calibrated expected LTV', ltv, 1.0000, null, 'used for LTV:CAC and net value'],
-    ['mean monthly hazard benchmark', 0.049831, 0.049831, null, 'population mean from compact model'],
-    ['12-mo churn benchmark', 0.4585, 0.4585, null, 'population implied churn'],
-    ['24-mo churn benchmark', 0.7068, 0.7068, null, 'population implied churn'],
+    ['Upfront onboarding cash', bk.upfront, 1, null, 'MRR × OB%'],
+    ['Expected MRR collected (24 mo)', bk.mrrRev24, 1, null, 'sum survival·MRR over billing months 1–24'],
+    ['Revenue lost to churn (24 mo)', -bk.lost24, -1, null, 'no-churn MRR minus expected MRR'],
+    ['Analytical LTV (raw)', bk.analytical, 1, null, 'survival-weighted, 120-month tail'],
+    ['Calibration factor', CALIBRATION, CALIBRATION, null, 'median actual ÷ analytical (historical)'],
+    ['Calibrated LTV (final)', bk.calibrated, 1, null, 'analytical × calibration · final reported LTV'],
   ]);
 
   drawSensitivityChart(mrr, obPct, fm, cac);
 }
 
-window.addEventListener('resize', update);
+// ===== Init =====
 updateLockUI();
 update();
-})();
+
+// Redraw sensitivity chart when window resizes or this tab becomes visible
+window.addEventListener('resize', ()=>{
+  drawSensitivityChart(+byId('sliderMrr').value, +byId('sliderOb').value, fm, +byId('sliderCac').value);
+});
+
+})(); // end calculator IIFE
 </script>
 
 <!-- ============ EXPLORER LOGIC (IIFE) ============ -->
 <script>
 (function(){
+// ===== Shared model (duplicated — each IIFE is isolated) =====
 const CALIBRATION = 0.3854;
 const MAX_LTV_MONTHS = 120;
 const LOG_COH = Math.log(14);
 const LOG_COH2 = LOG_COH ** 2;
-const COLORS = ['#7dd3fc','#32d583','#fdb022','#f97066','#c084fc','#f0abfc','#a3e635','#93c5fd','#fb7185','#facc15','#5eead4','#d8b4fe','#60a5fa','#34d399','#f472b6','#f59e0b'];
-const FREE_LEVELS = [0,1,2,3];
-const OB_LEVELS = [0,50,100,150];
-const MRR_PRESETS = [250,500,1000,1500,2000,3000];
-let selectedMrr = new Set(['custom']);
-let selectedOb = new Set([0,50,100,150]);
-let selectedFree = new Set([0,1,2,3]);
-let visibleKeys = new Set();
-let SCENARIOS = [];
 
-function byId(id){ return document.getElementById(id); }
-function fmtUSD(v){ return '$' + Math.round(v || 0).toLocaleString(); }
-function fmtPct(v){ return ((v || 0)*100).toFixed(1) + '%'; }
-function fmtRatio(v){ return (v || 0).toFixed(2) + '×'; }
-function fmtPayback(v){ return v == null ? '>60 mo' : v + ' mo'; }
-function color(i){ return COLORS[i % COLORS.length]; }
-function sig(x, thresh, width){ return 1/(1+Math.exp(-(x-thresh)/(width*.35))); }
-function smoothTiers(mrr){ const s100=sig(mrr,100,40),s500=sig(mrr,500,80),s1000=sig(mrr,1000,120); return {mrr_lt100:1-s100,mrr_100_499:s100*(1-s500),mrr_1000p:s1000,high_mrr:s500}; }
-function smoothObPaid(obPct){ return sig(obPct,7.5,7.5); }
-
-const CHURN_C = {intercept:-5.7143,log_mrr:0.3500,mrr_lt100:1.2017,mrr_100_499:0.4969,mrr_1000p:-0.3495,high_mrr:-0.6365,ob_collected_pct_mrr_sq:0.1258,ob_actually_paid:-0.3224,ob_waived_post_sign:-0.8896,ob_gap_x_mrr:0.1383,any_free:0.2503,free_2mo_exact:0.3226,free_3plus:0.1575,discount_length_mo:-0.0608,anyfree_x_log_mrr:-0.0562,anyfree_x_high_mrr:0.2422,anyfree_x_ob_collected_pct_mrr_sq:-0.0675,anyfree_x_ob_actually_paid:-0.1208,anyfree_x_ob_waived_post_sign:0.5261,anyfree_x_ob_gap_x_mrr:-0.0020,log_cohort_age:1.1622,log_cohort_age_sq:-0.2617,log_tenure:-0.3699,log_tenure_sq:0.0890};
-
-function features(mrr, obPct, fm, month=9){
-  const logMrr=Math.log(Math.max(mrr,1));
-  const obRatio=obPct/100;
-  const obSq=obRatio**2;
-  const obGap=Math.max(0,1-obRatio);
-  const tiers=smoothTiers(mrr);
-  const logTen=Math.log(Math.max(month,1));
-  const anyFree=fm>0?1:0;
-  const obPaid=smoothObPaid(obPct);
-  const waived=0;
-  return {log_mrr:logMrr,mrr_lt100:tiers.mrr_lt100,mrr_100_499:tiers.mrr_100_499,mrr_1000p:tiers.mrr_1000p,high_mrr:tiers.high_mrr,ob_collected_pct_mrr_sq:obSq,ob_actually_paid:obPaid,ob_waived_post_sign:waived,ob_gap_x_mrr:obGap*logMrr,any_free:anyFree,free_2mo_exact:fm===2?1:0,free_3plus:fm>=3?1:0,discount_length_mo:0,anyfree_x_log_mrr:anyFree*logMrr,anyfree_x_high_mrr:anyFree*tiers.high_mrr,anyfree_x_ob_collected_pct_mrr_sq:anyFree*obSq,anyfree_x_ob_actually_paid:anyFree*obPaid,anyfree_x_ob_waived_post_sign:anyFree*waived,anyfree_x_ob_gap_x_mrr:anyFree*obGap*logMrr,log_cohort_age:LOG_COH,log_cohort_age_sq:LOG_COH2,log_tenure:logTen,log_tenure_sq:logTen**2};
+function sig(x, thresh, width){ return 1/(1+Math.exp(-(x-thresh)/(width*0.35))); }
+function smoothTiers(mrr){
+  const s100 = sig(mrr,100,40), s500 = sig(mrr,500,80), s1000 = sig(mrr,1000,120);
+  return {mrr_lt100:1-s100, mrr_100_499:s100*(1-s500), mrr_1000p:s1000, high_mrr:s500};
 }
-function logitHazard(mrr,obPct,fm,month=9){ const f=features(mrr,obPct,fm,month); return CHURN_C.intercept+CHURN_C.log_mrr*f.log_mrr+CHURN_C.mrr_lt100*f.mrr_lt100+CHURN_C.mrr_100_499*f.mrr_100_499+CHURN_C.mrr_1000p*f.mrr_1000p+CHURN_C.high_mrr*f.high_mrr+CHURN_C.ob_collected_pct_mrr_sq*f.ob_collected_pct_mrr_sq+CHURN_C.ob_actually_paid*f.ob_actually_paid+CHURN_C.ob_waived_post_sign*f.ob_waived_post_sign+CHURN_C.ob_gap_x_mrr*f.ob_gap_x_mrr+CHURN_C.any_free*f.any_free+CHURN_C.free_2mo_exact*f.free_2mo_exact+CHURN_C.free_3plus*f.free_3plus+CHURN_C.discount_length_mo*f.discount_length_mo+CHURN_C.anyfree_x_log_mrr*f.anyfree_x_log_mrr+CHURN_C.anyfree_x_high_mrr*f.anyfree_x_high_mrr+CHURN_C.anyfree_x_ob_collected_pct_mrr_sq*f.anyfree_x_ob_collected_pct_mrr_sq+CHURN_C.anyfree_x_ob_actually_paid*f.anyfree_x_ob_actually_paid+CHURN_C.anyfree_x_ob_waived_post_sign*f.anyfree_x_ob_waived_post_sign+CHURN_C.anyfree_x_ob_gap_x_mrr*f.anyfree_x_ob_gap_x_mrr+CHURN_C.log_cohort_age*f.log_cohort_age+CHURN_C.log_cohort_age_sq*f.log_cohort_age_sq+CHURN_C.log_tenure*f.log_tenure+CHURN_C.log_tenure_sq*f.log_tenure_sq; }
-function monthlyHazard(mrr,obPct,fm,month=9){ return 1/(1+Math.exp(-logitHazard(mrr,obPct,fm,month))); }
-function churnN(mrr,obPct,fm,n){ let survival=1; for(let t=1;t<=n;t++) survival*=1-monthlyHazard(mrr,obPct,fm,t); return 1-survival; }
-function ltvCurve(mrr,obPct,fm,maxMonths){ let survival=1; const upfront=mrr*(obPct/100); let cumulative=upfront; const curve=[cumulative*CALIBRATION]; for(let t=1;t<=maxMonths;t++){ survival*=1-monthlyHazard(mrr,obPct,fm,t); if(t>fm) cumulative += mrr*survival; curve.push(cumulative*CALIBRATION); } return curve; }
-function ltvBreakdown(mrr,obPct,fm,horizon){ const curve=ltvCurve(mrr,obPct,fm,Math.max(horizon,60)); const ltv=curve[horizon]; const analytical=ltv/CALIBRATION; const cac=+byId('cacInput').value; const ratio=ltv/(cac||1); const net=ltv-cac; let payback=null; for(let i=0;i<curve.length;i++){ if(curve[i]>=cac){ payback=i; break; } } const churnHorizon=churnN(mrr,obPct,fm,horizon); const churn12=churnN(mrr,obPct,fm,12); return {curve,ltv,analytical,ratio,net,payback,churnHorizon,churn12}; }
-function mrrValue(token){ return token === 'custom' ? +byId('mrrInput').value : +token; }
-function mrrLabel(token){ return token === 'custom' ? fmtUSD(+byId('mrrInput').value) : fmtUSD(+token); }
-function scenarioKey(mrrToken,fm,ob){ return mrrToken+'mrr_'+fm+'fm_'+ob+'ob'; }
-function scenarioName(mrrToken,fm,ob){ return mrrLabel(mrrToken)+' · '+fm+' free · '+ob+'% OB'; }
+function smoothObPaid(o){ return sig(o,7.5,7.5); }
+function features(mrr,obPct,fm,month=9){
+  const logMrr = Math.log(Math.max(mrr,1)), obRatio = obPct/100, obSq = obRatio**2;
+  const obGap = Math.max(0,1-obRatio), t = smoothTiers(mrr), logTen = Math.log(Math.max(month,1));
+  const anyFree = fm>0?1:0, obWPS = 0, obAP = smoothObPaid(obPct);
+  return {log_mrr:logMrr, mrr_lt100:t.mrr_lt100, mrr_100_499:t.mrr_100_499, mrr_1000p:t.mrr_1000p, high_mrr:t.high_mrr,
+    ob_collected_pct_mrr_sq:obSq, ob_actually_paid:obAP, ob_waived_post_sign:obWPS, ob_gap_x_mrr:obGap*logMrr,
+    any_free:anyFree, free_2mo_exact:fm===2?1:0, free_3plus:fm>=3?1:0, discount_length_mo:0,
+    anyfree_x_log_mrr:anyFree*logMrr, anyfree_x_high_mrr:anyFree*t.high_mrr,
+    anyfree_x_ob_collected_pct_mrr_sq:anyFree*obSq, anyfree_x_ob_actually_paid:anyFree*obAP,
+    anyfree_x_ob_waived_post_sign:anyFree*obWPS, anyfree_x_ob_gap_x_mrr:anyFree*obGap*logMrr,
+    log_cohort_age:LOG_COH, log_cohort_age_sq:LOG_COH2, log_tenure:logTen, log_tenure_sq:logTen**2};
+}
+const C = {intercept:-5.7143,log_mrr:0.3500,mrr_lt100:1.2017,mrr_100_499:0.4969,mrr_1000p:-0.3495,high_mrr:-0.6365,ob_collected_pct_mrr_sq:0.1258,ob_actually_paid:-0.3224,ob_waived_post_sign:-0.8896,ob_gap_x_mrr:0.1383,any_free:0.2503,free_2mo_exact:0.3226,free_3plus:0.1575,discount_length_mo:-0.0608,anyfree_x_log_mrr:-0.0562,anyfree_x_high_mrr:0.2422,anyfree_x_ob_collected_pct_mrr_sq:-0.0675,anyfree_x_ob_actually_paid:-0.1208,anyfree_x_ob_waived_post_sign:0.5261,anyfree_x_ob_gap_x_mrr:-0.0020,log_cohort_age:1.1622,log_cohort_age_sq:-0.2617,log_tenure:-0.3699,log_tenure_sq:0.0890};
+function logitHazard(m,o,f,month=9){
+  const x = features(m,o,f,month);
+  return C.intercept+C.log_mrr*x.log_mrr+C.mrr_lt100*x.mrr_lt100+C.mrr_100_499*x.mrr_100_499+C.mrr_1000p*x.mrr_1000p+C.high_mrr*x.high_mrr
+    +C.ob_collected_pct_mrr_sq*x.ob_collected_pct_mrr_sq+C.ob_actually_paid*x.ob_actually_paid+C.ob_waived_post_sign*x.ob_waived_post_sign
+    +C.ob_gap_x_mrr*x.ob_gap_x_mrr+C.any_free*x.any_free+C.free_2mo_exact*x.free_2mo_exact+C.free_3plus*x.free_3plus
+    +C.discount_length_mo*x.discount_length_mo+C.anyfree_x_log_mrr*x.anyfree_x_log_mrr+C.anyfree_x_high_mrr*x.anyfree_x_high_mrr
+    +C.anyfree_x_ob_collected_pct_mrr_sq*x.anyfree_x_ob_collected_pct_mrr_sq+C.anyfree_x_ob_actually_paid*x.anyfree_x_ob_actually_paid
+    +C.anyfree_x_ob_waived_post_sign*x.anyfree_x_ob_waived_post_sign+C.anyfree_x_ob_gap_x_mrr*x.anyfree_x_ob_gap_x_mrr
+    +C.log_cohort_age*x.log_cohort_age+C.log_cohort_age_sq*x.log_cohort_age_sq+C.log_tenure*x.log_tenure+C.log_tenure_sq*x.log_tenure_sq;
+}
+function monthlyHazard(m,o,f,t){ return 1/(1+Math.exp(-logitHazard(m,o,f,t))); }
+function churnN(m,o,f,n){ let s=1; for(let t=1;t<=n;t++) s *= (1-monthlyHazard(m,o,f,t)); return 1-s; }
 
+function ltvBreakdown(m,o,f){
+  const upfront = m*(o/100); let survival=1, mrrRev24=0, noChurn24=0, analytical=upfront;
+  for(let t=1;t<=MAX_LTV_MONTHS;t++){
+    const h = monthlyHazard(m,o,f,t); survival *= (1-h);
+    const billable = t > f, exp = billable ? m*survival : 0;
+    analytical += exp;
+    if(t<=24){ mrrRev24 += exp; if(billable) noChurn24 += m; }
+  }
+  return {upfront, mrrRev24, lost24:noChurn24-mrrRev24, analytical, calibrated:analytical*CALIBRATION};
+}
+function paybackMonth(m,o,f,cac){
+  let cum = m*(o/100)*CALIBRATION, survival=1;
+  if(cum>=cac) return 0;
+  for(let t=1;t<=60;t++){
+    survival *= (1-monthlyHazard(m,o,f,t));
+    if(t>f) cum += m*survival*CALIBRATION;
+    if(cum>=cac) return t;
+  }
+  return null;
+}
+
+// ===== Per-month time series for one scenario =====
+// Returns array indexed by month (0..horizon) of cumulative metrics.
+function scenarioCurve(m, o, f, cac, horizon){
+  const upfrontCal = m*(o/100)*CALIBRATION;
+  let survival=1, cumLtv = upfrontCal;
+  const pts = [{month:0, ltv:cumLtv, churn:0, ratio:cumLtv/cac, paybackProgress:Math.min(100,cumLtv/cac*100), net:cumLtv-cac}];
+  for(let t=1;t<=horizon;t++){
+    const h = monthlyHazard(m,o,f,t); survival *= (1-h);
+    if(t>f) cumLtv += m*survival*CALIBRATION;
+    const churn = 1 - survival;
+    pts.push({month:t, ltv:cumLtv, churn, ratio:cumLtv/cac, paybackProgress:Math.min(100,cumLtv/cac*100), net:cumLtv-cac});
+  }
+  return pts;
+}
+
+// ===== State =====
+const MRR_OPTIONS = [500, 750, 1000, 1500, 2000, 2250, 2500, 3000];
+const OB_OPTIONS = [0, 25, 50, 75, 100, 125, 150, 200];
+const FM_OPTIONS = [0, 1, 2, 3];
+const PRESETS = {
+  focused: {mrr:[1500], ob:[100,125], fm:[0,1]},
+  standard:{mrr:[1000,1500,2000], ob:[50,100,125,150], fm:[0,1,2]},
+  wide:    {mrr:[500,1000,1500,2000,2500], ob:[0,50,100,125,150,200], fm:[0,1,2,3]},
+};
+const PALETTE = ['#7dd3fc','#c084fc','#32d583','#fdb022','#f97066','#f0abfc','#94a3b8','#fde68a','#a7f3d0','#bae6fd','#fbcfe8','#fed7aa','#86efac','#fca5a5','#d8b4fe','#67e8f9','#fcd34d','#f9a8d4'];
+
+const state = {
+  selMrr: new Set(PRESETS.standard.mrr),
+  selOb:  new Set(PRESETS.standard.ob),
+  selFm:  new Set(PRESETS.standard.fm),
+  customMrr: 1500,
+  cac: 5000,
+  horizon: 24,
+  metric: 'ratio',
+  segment: 'matrix',
+  goal: 'ratio',
+  showLabels: false,
+  showCac: true,
+  highlightBest: true,
+};
+
+// ===== Helpers =====
+const $ = id => document.getElementById(id);
+const fmtUSD = v => '$' + Math.round(v).toLocaleString();
+const fmtUSDk = v => v >= 1000 ? '$' + (v/1000).toFixed(v >= 10000 ? 0 : 1) + 'k' : '$' + Math.round(v);
+const fmtPct = v => (v*100).toFixed(1) + '%';
+const fmtPct0 = v => Math.round(v*100) + '%';
+const fmtRatio = v => v.toFixed(2) + '×';
+const fmtPb = pb => pb === null ? '>60mo' : pb === 0 ? 'upfront' : pb + 'mo';
+const colorFor = i => PALETTE[i % PALETTE.length];
+
+const METRIC_LABELS = {ltv:'Calibrated LTV', ratio:'LTV:CAC', churn:'Projected churn', paybackProgress:'CAC recovery %', net:'Net value'};
+const METRIC_FMT = {ltv:v=>fmtUSDk(v), ratio:v=>fmtRatio(v), churn:v=>fmtPct0(v), paybackProgress:v=>Math.round(v)+'%', net:v=>fmtUSDk(v)};
+const SEGMENT_LABELS = {free:'Waived months', ob:'Onboarding %', mrr:'MRR tier', matrix:'Free × onboarding'};
+const GOAL_LABELS = {churn:'min churn', payback:'min payback', ratio:'max LTV:CAC'};
+
+// ===== Build all scenarios =====
 function buildScenarios(){
-  const horizon=+byId('horizon').value;
-  const scenarios=[];
-  [...selectedMrr].forEach(mt=>{
-    const mrr=mrrValue(mt);
-    [...selectedFree].sort((a,b)=>a-b).forEach(fm=>{
-      [...selectedOb].sort((a,b)=>a-b).forEach(ob=>{
-        const b=ltvBreakdown(mrr,ob,fm,horizon);
-        scenarios.push({key:scenarioKey(mt,fm,ob),name:scenarioName(mt,fm,ob),mrrToken:mt,fm,ob,mrr,...b});
+  const out = [];
+  const mrrs = [...state.selMrr].sort((a,b)=>a-b);
+  const obs = [...state.selOb].sort((a,b)=>a-b);
+  const fms = [...state.selFm].sort((a,b)=>a-b);
+  for(const m of mrrs) for(const o of obs) for(const f of fms){
+    const bk = ltvBreakdown(m,o,f);
+    const ltv = bk.calibrated;
+    const churnH = churnN(m,o,f,state.horizon);
+    const churn12v = churnN(m,o,f,12);
+    const pb = paybackMonth(m,o,f,state.cac);
+    out.push({
+      mrr:m, ob:o, fm:f,
+      key: `${m}-${o}-${f}`,
+      label: `$${m.toLocaleString()} · ${o}% OB · ${f} mo`,
+      shortLabel: `$${m>=1000?(m/1000)+'k':m}/${o}%/${f}fm`,
+      ltv, analytical:bk.analytical, upfront:bk.upfront,
+      churn: churnH, churn12: churn12v,
+      ratio: ltv/state.cac, net: ltv - state.cac,
+      payback: pb,
+    });
+  }
+  return out;
+}
+
+// ===== Dimension picker =====
+function renderDimPicker(){
+  const html = `
+    <div class="dim-box">
+      <div class="dim-title">MRR tier</div>
+      <div class="chip-row">
+        ${MRR_OPTIONS.map(v=>`<label class="chip"><input type="checkbox" data-dim="mrr" data-val="${v}" ${state.selMrr.has(v)?'checked':''}> $${v.toLocaleString()}</label>`).join('')}
+      </div>
+      <div class="dim-actions"><button class="mini-btn" data-action="all" data-dim="mrr">all</button><button class="mini-btn" data-action="none" data-dim="mrr">none</button></div>
+    </div>
+    <div class="dim-box">
+      <div class="dim-title">Onboarding %</div>
+      <div class="chip-row">
+        ${OB_OPTIONS.map(v=>`<label class="chip"><input type="checkbox" data-dim="ob" data-val="${v}" ${state.selOb.has(v)?'checked':''}> ${v}%</label>`).join('')}
+      </div>
+      <div class="dim-actions"><button class="mini-btn" data-action="all" data-dim="ob">all</button><button class="mini-btn" data-action="none" data-dim="ob">none</button></div>
+    </div>
+    <div class="dim-box">
+      <div class="dim-title">Waived months</div>
+      <div class="chip-row">
+        ${FM_OPTIONS.map(v=>`<label class="chip"><input type="checkbox" data-dim="fm" data-val="${v}" ${state.selFm.has(v)?'checked':''}> ${v} mo</label>`).join('')}
+      </div>
+      <div class="dim-actions"><button class="mini-btn" data-action="all" data-dim="fm">all</button><button class="mini-btn" data-action="none" data-dim="fm">none</button></div>
+    </div>`;
+  $('dimensionPicker').innerHTML = html;
+  $('dimensionPicker').querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const dim = cb.dataset.dim, val = +cb.dataset.val;
+      const set = dim === 'mrr' ? state.selMrr : dim === 'ob' ? state.selOb : state.selFm;
+      if(cb.checked) set.add(val); else set.delete(val);
+      updateAll();
+    });
+  });
+  $('dimensionPicker').querySelectorAll('.mini-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const dim = btn.dataset.dim, action = btn.dataset.action;
+      const set = dim === 'mrr' ? state.selMrr : dim === 'ob' ? state.selOb : state.selFm;
+      const opts = dim === 'mrr' ? MRR_OPTIONS : dim === 'ob' ? OB_OPTIONS : FM_OPTIONS;
+      set.clear();
+      if(action === 'all') opts.forEach(v=>set.add(v));
+      renderDimPicker();
+      updateAll();
+    });
+  });
+}
+
+// ===== Canvas helpers =====
+function setupCanvas(canvas){
+  const rect = canvas.getBoundingClientRect();
+  if(rect.width === 0 || rect.height === 0) return null;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,rect.width,rect.height);
+  return {ctx, w:rect.width, h:rect.height};
+}
+
+function fmtMetricVal(metric, v){ return METRIC_FMT[metric](v); }
+
+function metricLimits(metric, scenarios){
+  if(metric === 'churn') return {min:0, max:1};
+  if(metric === 'paybackProgress') return {min:0, max:100};
+  // For ltv/ratio/net look at all scenario curves
+  let mn = Infinity, mx = -Infinity;
+  scenarios.forEach(s=>{
+    const curve = scenarioCurve(s.mrr, s.ob, s.fm, state.cac, state.horizon);
+    curve.forEach(p=>{
+      const v = p[metric];
+      if(v < mn) mn = v;
+      if(v > mx) mx = v;
+    });
+  });
+  if(!isFinite(mn) || !isFinite(mx)){ mn = 0; mx = 1; }
+  if(mn === mx){ mn -= 1; mx += 1; }
+  if(metric === 'ltv' || metric === 'ratio'){ mn = Math.min(mn, 0); }
+  const pad = (mx - mn) * 0.08;
+  return {min:mn - (metric === 'churn' || metric === 'paybackProgress' ? 0 : pad), max:mx + pad};
+}
+
+// ===== Matrix chart (scenario curves over time) =====
+function drawMatrixChart(scenarios){
+  const c = $('matrixChart'); if(!c) return;
+  const sz = setupCanvas(c); if(!sz) return;
+  const {ctx, w, h} = sz;
+  const pad = {l:62,r:24,t:14,b:36};
+  const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+  const metric = state.metric;
+  const lim = metricLimits(metric, scenarios);
+
+  // Background grid
+  ctx.font = '11px Inter, system-ui, sans-serif';
+  ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.fillStyle = '#737d91'; ctx.lineWidth = 1;
+  for(let i=0;i<=5;i++){
+    const yy = pad.t + plotH * i / 5;
+    ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(w-pad.r, yy); ctx.stroke();
+    const val = lim.max - (lim.max - lim.min) * i / 5;
+    ctx.fillText(fmtMetricVal(metric, val), 6, yy+4);
+  }
+  for(let i=0;i<=6;i++){
+    const xx = pad.l + plotW * i / 6;
+    const m = Math.round(state.horizon * i / 6);
+    ctx.fillText('m' + m, xx-9, h-12);
+  }
+
+  if(scenarios.length === 0){
+    ctx.fillStyle = '#737d91'; ctx.font = '13px Inter, sans-serif';
+    ctx.fillText('No scenarios selected — pick at least one chip from each dimension below.', pad.l + 12, pad.t + plotH/2);
+    return;
+  }
+
+  // CAC line — only meaningful for ratio (=1) and paybackProgress (=100)
+  if(state.showCac){
+    let cacY = null;
+    if(metric === 'ratio') cacY = 1;
+    else if(metric === 'paybackProgress') cacY = 100;
+    if(cacY !== null && cacY >= lim.min && cacY <= lim.max){
+      const yy = pad.t + (1 - (cacY - lim.min) / (lim.max - lim.min)) * plotH;
+      ctx.strokeStyle = 'rgba(192,132,252,.55)'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([6,4]); ctx.beginPath();
+      ctx.moveTo(pad.l, yy); ctx.lineTo(w-pad.r, yy); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#c084fc'; ctx.font = '10px Inter, sans-serif';
+      ctx.fillText(metric === 'ratio' ? 'CAC line (1×)' : 'CAC recovered (100%)', w-pad.r-110, yy-4);
+    }
+  }
+
+  // Find the "best" scenario by metric for highlighting
+  let bestIdx = -1, bestVal = state.metric === 'churn' ? Infinity : -Infinity;
+  const finalVals = scenarios.map((s,i)=>{
+    const v = state.metric === 'ltv' ? s.ltv : state.metric === 'ratio' ? s.ratio
+      : state.metric === 'churn' ? s.churn : state.metric === 'net' ? s.net
+      : (s.payback === null ? 0 : 100);
+    if(state.metric === 'churn'){ if(v < bestVal){ bestVal = v; bestIdx = i; } }
+    else { if(v > bestVal){ bestVal = v; bestIdx = i; } }
+    return v;
+  });
+
+  // Draw lines
+  scenarios.forEach((s,i)=>{
+    const curve = scenarioCurve(s.mrr, s.ob, s.fm, state.cac, state.horizon);
+    const isBest = i === bestIdx && state.highlightBest;
+    ctx.strokeStyle = colorFor(i);
+    ctx.lineWidth = isBest ? 3 : 1.5;
+    ctx.globalAlpha = isBest ? 1 : (state.highlightBest && bestIdx >= 0 ? 0.65 : 1);
+    ctx.beginPath();
+    curve.forEach((p, idx)=>{
+      const xx = pad.l + (p.month / state.horizon) * plotW;
+      const yy = pad.t + (1 - (p[metric] - lim.min) / (lim.max - lim.min)) * plotH;
+      if(idx === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+    });
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    if(state.showLabels){
+      const last = curve[curve.length - 1];
+      const yy = pad.t + (1 - (last[metric] - lim.min) / (lim.max - lim.min)) * plotH;
+      ctx.fillStyle = colorFor(i);
+      ctx.font = (isBest ? 'bold ' : '') + '10px Inter, sans-serif';
+      ctx.fillText(s.shortLabel, w-pad.r-58, yy+3);
+    }
+  });
+
+  // Audit pills
+  $('aLines').textContent = scenarios.length;
+  $('aBestVisible').textContent = bestIdx >= 0 ? scenarios[bestIdx].label : '—';
+  $('aMetric').textContent = METRIC_LABELS[metric];
+}
+
+function renderMatrixLegend(scenarios){
+  $('matrixLegend').innerHTML = scenarios.map((s,i)=>
+    `<div class="legend-item"><span class="sw" style="background:${colorFor(i)}"></span>${s.label}</div>`
+  ).join('') || '<span style="color:var(--text3)">No scenarios.</span>';
+}
+
+// ===== Segment chart (aggregated bars) =====
+function drawSegmentChart(scenarios){
+  const c = $('segmentChart'); if(!c) return;
+  const sz = setupCanvas(c); if(!sz) return;
+  const {ctx, w, h} = sz;
+  const pad = {l:62,r:18,t:18,b:46};
+  const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+  const seg = state.segment, metric = state.metric;
+
+  if(scenarios.length === 0){
+    ctx.fillStyle = '#737d91'; ctx.font = '12px Inter, sans-serif';
+    ctx.fillText('Select scenarios to populate the segment view.', pad.l, pad.t + plotH/2);
+    return;
+  }
+
+  // Aggregate
+  function valOf(s){
+    if(metric === 'ltv') return s.ltv;
+    if(metric === 'ratio') return s.ratio;
+    if(metric === 'churn') return s.churn;
+    if(metric === 'net') return s.net;
+    return s.payback === null ? 0 : 100;
+  }
+  let groups = []; // {label, value, items, color}
+  if(seg === 'matrix'){
+    // OB on x, fm as groups within
+    const obs = [...new Set(scenarios.map(s=>s.ob))].sort((a,b)=>a-b);
+    const fms = [...new Set(scenarios.map(s=>s.fm))].sort((a,b)=>a-b);
+    obs.forEach(o=>{
+      fms.forEach(f=>{
+        const items = scenarios.filter(s=>s.ob === o && s.fm === f);
+        if(items.length){
+          const avg = items.reduce((a,s)=>a+valOf(s),0) / items.length;
+          groups.push({label:`${o}% / ${f}fm`, value:avg, items, color:colorFor(fms.indexOf(f)*3)});
+        }
       });
     });
-  });
-  SCENARIOS=scenarios;
-  visibleKeys = new Set(scenarios.map(s=>s.key));
-  return scenarios;
-}
-function metricValue(s,metric){ if(metric==='ltv')return s.ltv; if(metric==='ratio')return s.ratio; if(metric==='churn')return s.churnHorizon; if(metric==='payback')return s.payback==null?61:s.payback; if(metric==='paybackProgress')return Math.min(1, s.ltv/(+byId('cacInput').value||1)); return s.net; }
-function metricLabel(metric,v){ if(metric==='ltv'||metric==='net')return fmtUSD(v); if(metric==='ratio')return fmtRatio(v); if(metric==='churn'||metric==='paybackProgress')return fmtPct(v); return v>=61?'>60 mo':Math.round(v)+' mo'; }
-function bestBy(metric,arr=SCENARIOS){ const sorted=[...arr].sort((a,b)=>{ if(metric==='churn')return a.churnHorizon-b.churnHorizon; if(metric==='payback')return (a.payback==null?61:a.payback)-(b.payback==null?61:b.payback); if(metric==='ratio')return b.ratio-a.ratio; if(metric==='paybackProgress')return metricValue(b,'paybackProgress')-metricValue(a,'paybackProgress'); return b.ltv-a.ltv; }); return sorted; }
-function avgCurves(curves){ if(!curves.length)return[]; return curves[0].map((_,i)=>curves.reduce((s,c)=>s+c[i],0)/curves.length); }
-
-function renderPicker(){
-  const box=byId('dimensionPicker');
-  const mrrOptions=[['custom','Custom '+fmtUSD(+byId('mrrInput').value)], ...MRR_PRESETS.map(v=>[String(v),fmtUSD(v)])];
-  const makeChips=(title,options,set,kind)=>`<div class="dim-box"><div class="dim-title">${title}</div><div class="chip-row">${options.map(([val,label])=>`<label class="chip"><input type="checkbox" data-kind="${kind}" data-val="${val}" ${set.has(kind==='mrr'?val:+val)?'checked':''}>${label}</label>`).join('')}</div><div class="dim-actions"><button type="button" class="mini-btn" data-action="all" data-kind="${kind}">All</button><button type="button" class="mini-btn" data-action="none" data-kind="${kind}">Clear</button></div></div>`;
-  box.innerHTML = makeChips('MRR levels',mrrOptions,selectedMrr,'mrr') + makeChips('Onboarding %',OB_LEVELS.map(v=>[String(v),v+'%']),selectedOb,'ob') + makeChips('Waived months',FREE_LEVELS.map(v=>[String(v),v+' mo']),selectedFree,'free');
-  box.querySelectorAll('input').forEach(inp=>inp.addEventListener('change',()=>{
-    const kind=inp.dataset.kind;
-    const val=kind==='mrr'?inp.dataset.val:+inp.dataset.val;
-    const set=kind==='mrr'?selectedMrr:kind==='ob'?selectedOb:selectedFree;
-    if(inp.checked) set.add(val); else set.delete(val);
-    if(!set.size) set.add(val);
-    update();
-  }));
-  box.querySelectorAll('.mini-btn').forEach(btn=>btn.addEventListener('click',()=>{
-    const kind=btn.dataset.kind;
-    const action=btn.dataset.action;
-    const set=kind==='mrr'?selectedMrr:kind==='ob'?selectedOb:selectedFree;
-    set.clear();
-    if(action==='all'){
-      if(kind==='mrr'){ set.add('custom'); MRR_PRESETS.forEach(v=>set.add(String(v))); }
-      else if(kind==='ob') OB_LEVELS.forEach(v=>set.add(v));
-      else FREE_LEVELS.forEach(v=>set.add(v));
-    } else {
-      if(kind==='mrr') set.add('custom');
-      else if(kind==='ob') set.add(100);
-      else set.add(0);
-    }
-    update();
-  }));
-}
-
-function drawLineChart(canvasId, series, opts={}){
-  const canvas=byId(canvasId),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
-  if(rect.width === 0 || rect.height === 0) return; // hidden tab
-  canvas.width=Math.floor(rect.width*dpr);canvas.height=Math.floor(rect.height*dpr);
-  const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
-  const w=rect.width,h=rect.height;ctx.clearRect(0,0,w,h);
-  const pad={l:72,r:34,t:22,b:44}; const plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b;
-  const horizon=+byId('horizon').value,metric=opts.metric||byId('metric').value,cac=+byId('cacInput').value;
-  const data=series.map(s=>({s,curve:s.curve.map((ltv,t)=>{
-    if(metric==='ltv') return ltv;
-    if(metric==='ratio') return ltv/(cac||1);
-    if(metric==='net') return ltv-cac;
-    if(metric==='paybackProgress') return Math.min(1, ltv/(cac||1));
-    return t===0?0:churnN(s.mrr,s.ob,s.fm,t);
-  })}));
-  let ys=data.flatMap(d=>d.curve);
-  let minY=Math.min(0,...ys),maxY=Math.max(...ys, metric==='ratio'?1:0, metric==='paybackProgress'?1:0);
-  if(metric==='churn'||metric==='paybackProgress'){minY=0;maxY=Math.max(.05,maxY)}
-  if(minY===maxY){maxY+=1}
-  maxY*=1.08;
-  const xPx=t=>pad.l+(t/horizon)*plotW,yPx=v=>pad.t+(1-(v-minY)/(maxY-minY))*plotH;
-  ctx.font='11px Inter,system-ui,sans-serif';ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){
-    const yy=pad.t+plotH*i/4,val=maxY-(maxY-minY)*i/4;
-    ctx.strokeStyle=i===4?'rgba(255,255,255,.18)':'rgba(255,255,255,.09)';
-    ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();
-    ctx.fillStyle='#737d91';ctx.fillText(metricLabel(metric,val),8,yy+4);
-  }
-  for(let i=0;i<=4;i++){const xx=pad.l+plotW*i/4,val=Math.round(horizon*i/4);ctx.fillStyle='#737d91';ctx.fillText('M'+val,xx-10,h-13)}
-  if(opts.showCac && metric==='ltv'){
-    ctx.strokeStyle='rgba(253,176,34,.95)';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(pad.l,yPx(cac));ctx.lineTo(w-pad.r,yPx(cac));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fdb022';ctx.fillText('CAC '+fmtUSD(cac),pad.l+6,yPx(cac)-6);
-  }
-  if(opts.showCac && (metric==='ratio'||metric==='paybackProgress')){
-    ctx.strokeStyle='rgba(253,176,34,.95)';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(pad.l,yPx(1));ctx.lineTo(w-pad.r,yPx(1));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fdb022';ctx.fillText('CAC breakeven',pad.l+6,yPx(1)-6);
-  }
-  const highlight=byId('highlightBest')?.checked;
-  const best=highlight&&series.length?bestBy(metric==='paybackProgress'?'ratio':metric,series)[0]:null;
-  const crowded=data.length>18;
-  data.forEach((d,i)=>{
-    const isBest=best&&d.s.key===best.key;
-    ctx.strokeStyle=color(i);ctx.lineWidth=isBest?3.8:(crowded?1.25:2.1);ctx.globalAlpha=isBest?1:(crowded?.42:.78);
-    ctx.beginPath();d.curve.forEach((v,t)=>{const xx=xPx(t),yy=yPx(v);if(t===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)});ctx.stroke();ctx.globalAlpha=1;
-    const end=d.curve[horizon];ctx.fillStyle=color(i);ctx.beginPath();ctx.arc(xPx(horizon),yPx(end),isBest?4.5:3,0,Math.PI*2);ctx.fill();
-  });
-  if(byId('showLabels')?.checked){
-    const labelData=data.map((d,i)=>({d,i,end:d.curve[horizon]})).sort((a,b)=>b.end-a.end);
-    let lastY=-999;
-    labelData.forEach(item=>{
-      const d=item.d,i=item.i,end=item.end;
-      let yy=yPx(end); if(Math.abs(yy-lastY)<13) yy=lastY+13; if(yy>pad.t+plotH) yy=pad.t+plotH; lastY=yy;
-      ctx.strokeStyle=color(i);ctx.lineWidth=1;ctx.globalAlpha=.6;ctx.beginPath();ctx.moveTo(xPx(horizon),yPx(end));ctx.lineTo(w-pad.r+3,yy);ctx.stroke();ctx.globalAlpha=1;
-      ctx.fillStyle=color(i);ctx.font='10.5px Inter,system-ui,sans-serif';ctx.fillText(d.s.name,w-pad.r+5,yy+3);
+  } else {
+    const dim = seg === 'free' ? 'fm' : seg === 'ob' ? 'ob' : 'mrr';
+    const vals = [...new Set(scenarios.map(s=>s[dim]))].sort((a,b)=>a-b);
+    vals.forEach((v,idx)=>{
+      const items = scenarios.filter(s=>s[dim] === v);
+      const avg = items.reduce((a,s)=>a+valOf(s),0) / items.length;
+      const lbl = dim === 'mrr' ? '$'+v.toLocaleString() : dim === 'ob' ? v+'%' : v+' mo';
+      groups.push({label:lbl, value:avg, items, color:colorFor(idx)});
     });
   }
-}
-function renderLegend(id,series){ byId(id).innerHTML=series.map((s,i)=>`<span class="legend-item"><span class="sw" style="background:${color(i)}"></span>${s.name}</span>`).join(''); }
-function drawHeatmap(){
-  const canvas=byId('heatmapChart'),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
-  if(rect.width === 0 || rect.height === 0) return; // hidden tab
-  canvas.width=Math.floor(rect.width*dpr);canvas.height=Math.floor(rect.height*dpr);const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
-  const w=rect.width,h=rect.height;ctx.clearRect(0,0,w,h);
-  const rows=[...selectedFree].sort((a,b)=>a-b),cols=[...selectedOb].sort((a,b)=>a-b),goal=byId('goal').value;
-  const pad={l:72,r:12,t:34,b:16};const cw=(w-pad.l-pad.r)/Math.max(1,cols.length),rh=(h-pad.t-pad.b)/Math.max(1,rows.length);
-  ctx.font='11px Inter,system-ui,sans-serif';
-  cols.forEach((c,i)=>{ctx.fillStyle='#aeb7c8';ctx.fillText(c+'% OB',pad.l+i*cw+8,20)});
-  rows.forEach((r,i)=>{ctx.fillStyle='#aeb7c8';ctx.fillText(r+' free',8,pad.t+i*rh+rh/2+4)});
-  const cellBest=[]; rows.forEach(fm=>cols.forEach(ob=>{const choices=SCENARIOS.filter(s=>s.fm===fm&&s.ob===ob); if(choices.length) cellBest.push(bestBy(goal,choices)[0]);}));
-  const vals=cellBest.map(s=>metricValue(s,goal)); const min=Math.min(...vals),max=Math.max(...vals);
-  rows.forEach((fm,ri)=>cols.forEach((ob,ci)=>{
-    const choices=SCENARIOS.filter(s=>s.fm===fm&&s.ob===ob); if(!choices.length)return;
-    const s=bestBy(goal,choices)[0]; const v=metricValue(s,goal); let score;
-    if(goal==='ratio')score=(v-min)/(max-min||1);else score=1-(v-min)/(max-min||1);
-    score=Math.max(.12,Math.min(.92,score)); const x=pad.l+ci*cw,y=pad.t+ri*rh;
-    ctx.fillStyle=`rgba(50,213,131,${score})`;ctx.fillRect(x+2,y+2,cw-4,rh-4);ctx.strokeStyle='rgba(255,255,255,.08)';ctx.strokeRect(x+2,y+2,cw-4,rh-4);
-    ctx.textAlign='center';ctx.fillStyle='#f4f6fb';ctx.font='bold 13px Inter,system-ui,sans-serif';ctx.fillText(goal==='payback'?fmtPayback(s.payback):metricLabel(goal,v),x+cw/2,y+rh/2-8);
-    ctx.font='10px Inter,system-ui,sans-serif';ctx.fillStyle='#d1d5db';ctx.fillText(fmtUSD(s.mrr)+' MRR',x+cw/2,y+rh/2+7);ctx.fillText(fmtRatio(s.ratio)+' · '+fmtPct(s.churnHorizon),x+cw/2,y+rh/2+22);ctx.textAlign='left';
-  }));
-}
-function renderRanks(){ function rows(id,metric){ const top=bestBy(metric).slice(0,3); byId(id).innerHTML=top.map((s,i)=>`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-main">${s.name}<span class="rank-sub">${fmtUSD(s.mrr)} MRR · ${fmtRatio(s.ratio)} · horizon churn ${fmtPct(s.churnHorizon)}</span></div><div class="rank-val">${metric==='churn'?fmtPct(s.churnHorizon):metric==='payback'?fmtPayback(s.payback):fmtRatio(s.ratio)}</div></div>`).join(''); } rows('rankChurn','churn');rows('rankPayback','payback');rows('rankRatio','ratio'); }
-function renderSummary(){ const rows=[...SCENARIOS].sort((a,b)=>b.ratio-a.ratio); const horizon=+byId('horizon').value; byId('summaryTable').innerHTML=`<thead><tr><th>Scenario</th><th>MRR</th><th>LTV</th><th>LTV:CAC</th><th>Churn @ M${horizon}</th><th>Churn @ M12</th><th>Payback</th><th>Net</th></tr></thead><tbody>`+rows.map(s=>`<tr><td>${s.name}</td><td>${fmtUSD(s.mrr)}</td><td>${fmtUSD(s.ltv)}</td><td class="${s.ratio>=3?'pos':s.ratio<1?'neg':''}">${fmtRatio(s.ratio)}</td><td>${fmtPct(s.churnHorizon)}</td><td>${fmtPct(s.churn12)}</td><td>${fmtPayback(s.payback)}</td><td class="${s.net>=0?'pos':'neg'}">${fmtUSD(s.net)}</td></tr>`).join('')+`</tbody>`; }
-function updateMetrics(){ const bestRatio=bestBy('ratio')[0],bestChurn=bestBy('churn')[0],bestPayback=bestBy('payback')[0]; byId('mMrr').textContent=fmtUSD(+byId('mrrInput').value);byId('mCac').textContent=fmtUSD(+byId('cacInput').value);byId('mBestRatio').textContent=fmtRatio(bestRatio.ratio);byId('mBestRatio').className='metric-val '+(bestRatio.ratio>=3?'good':bestRatio.ratio>=1.5?'warn':'bad');byId('mBestRatioSub').textContent=bestRatio.name;byId('mBestChurn').textContent=fmtPct(bestChurn.churnHorizon);byId('mBestChurn').className='metric-val '+(bestChurn.churnHorizon<.35?'good':bestChurn.churnHorizon<.55?'warn':'bad');byId('mBestChurnSub').textContent=bestChurn.name;byId('mBestPayback').textContent=fmtPayback(bestPayback.payback);byId('mBestPayback').className='metric-val '+(bestPayback.payback!==null&&bestPayback.payback<=12?'good':bestPayback.payback!==null&&bestPayback.payback<=24?'warn':'bad');byId('mBestPaybackSub').textContent=bestPayback.name;byId('mScenarioCount').textContent=SCENARIOS.length.toLocaleString(); const alert=byId('scenarioAlert'); if(SCENARIOS.length>48){alert.style.display='block';alert.textContent='You are showing '+SCENARIOS.length+' scenarios. The rankings and heatmap are fine, but the line charts may be crowded. Turn off labels, use Focused, or clear a dimension for readability.';} else {alert.style.display='none';alert.textContent='';} }
-function update(){
-  buildScenarios(); renderPicker();
-  const shown=SCENARIOS.filter(s=>visibleKeys.has(s.key));
-  drawLineChart('matrixChart',shown,{metric:byId('metric').value,showCac:byId('showCac').checked});
-  renderLegend('matrixLegend',shown);
-  byId('aLines').textContent=shown.length.toLocaleString();
-  const visibleBest=shown.length?bestBy(byId('metric').value==='paybackProgress'?'ratio':byId('metric').value, shown)[0]:null;
-  byId('aBestVisible').textContent=visibleBest?visibleBest.name:'—';
-  byId('aMetric').textContent=byId('metric').selectedOptions[0].textContent;
 
-  const seg=byId('segment').value;
-  let segSeries=[];
-  if(seg==='free'){
-    segSeries=[...selectedFree].sort((a,b)=>a-b).map(fm=>{const vals=SCENARIOS.filter(s=>s.fm===fm); const base=vals[0]; return {...base,name:fm+' waived mo avg',curve:avgCurves(vals.map(v=>v.curve))};});
-  } else if(seg==='ob'){
-    segSeries=[...selectedOb].sort((a,b)=>a-b).map(ob=>{const vals=SCENARIOS.filter(s=>s.ob===ob); const base=vals[0]; return {...base,name:ob+'% OB avg',curve:avgCurves(vals.map(v=>v.curve))};});
-  } else if(seg==='mrr'){
-    segSeries=[...selectedMrr].map(mt=>{const vals=SCENARIOS.filter(s=>s.mrrToken===mt); const base=vals[0]; return {...base,name:mrrLabel(mt)+' MRR avg',curve:avgCurves(vals.map(v=>v.curve))};});
-  } else segSeries=shown;
-  drawLineChart('segmentChart',segSeries,{metric:byId('metric').value,showCac:byId('showCac').checked});
-  renderLegend('segmentLegend',segSeries);
-  drawHeatmap(); renderRanks(); renderSummary(); updateMetrics();
-}
-
-['mrrRange','cacRange'].forEach(id=>byId(id).addEventListener('input',()=>{ const target=id==='mrrRange'?'mrrInput':'cacInput'; byId(target).value=byId(id).value; update(); }));
-['mrrInput','cacInput'].forEach(id=>byId(id).addEventListener('input',()=>{ const target=id==='mrrInput'?'mrrRange':'cacRange'; byId(target).value=byId(id).value; update(); }));
-['horizon','metric','segment','goal','showLabels','showCac','highlightBest'].forEach(id=>byId(id).addEventListener('input',update));
-document.querySelectorAll('.preset-btn').forEach(btn=>btn.addEventListener('click',()=>{
-  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  selectedMrr.clear(); selectedOb.clear(); selectedFree.clear();
-  if(btn.dataset.preset==='focused'){
-    selectedMrr.add('custom'); selectedOb.add(100); selectedOb.add(150); selectedFree.add(0); selectedFree.add(1);
-  } else if(btn.dataset.preset==='standard'){
-    selectedMrr.add('custom'); selectedMrr.add('1000'); [50,100,150].forEach(v=>selectedOb.add(v)); [0,1,2].forEach(v=>selectedFree.add(v));
-  } else {
-    selectedMrr.add('custom'); MRR_PRESETS.forEach(v=>selectedMrr.add(String(v))); OB_LEVELS.forEach(v=>selectedOb.add(v)); FREE_LEVELS.forEach(v=>selectedFree.add(v));
+  if(groups.length === 0){
+    ctx.fillStyle = '#737d91'; ctx.fillText('No data.', pad.l, pad.t + plotH/2); return;
   }
-  update();
-}));
-window.addEventListener('resize',update);
-update();
-})();
+
+  // Y bounds
+  let mn = Math.min(0, ...groups.map(g=>g.value));
+  let mx = Math.max(...groups.map(g=>g.value));
+  if(metric === 'churn'){ mn = 0; mx = Math.max(mx, 0.5); }
+  if(metric === 'paybackProgress'){ mn = 0; mx = 100; }
+  if(mn === mx){ mn -= 1; mx += 1; }
+
+  // Grid
+  ctx.font = '11px Inter, sans-serif';
+  ctx.strokeStyle = 'rgba(255,255,255,.08)';
+  ctx.fillStyle = '#737d91';
+  for(let i=0;i<=4;i++){
+    const yy = pad.t + plotH * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(w-pad.r, yy); ctx.stroke();
+    const val = mx - (mx-mn) * i / 4;
+    ctx.fillText(fmtMetricVal(metric, val), 6, yy+4);
+  }
+
+  // Bars
+  const barTotalW = plotW / groups.length;
+  const barW = Math.min(48, barTotalW * 0.7);
+  groups.forEach((g, i)=>{
+    const cx = pad.l + barTotalW * (i + 0.5);
+    const v = g.value;
+    const y0 = pad.t + (1 - (Math.max(0, v) - mn) / (mx - mn)) * plotH;
+    const y1 = pad.t + (1 - (Math.min(0, v) - mn) / (mx - mn)) * plotH;
+    const yTop = v >= 0 ? y0 : pad.t + (1 - (0 - mn) / (mx - mn)) * plotH;
+    const yBot = v >= 0 ? pad.t + (1 - (0 - mn) / (mx - mn)) * plotH : y1;
+    ctx.fillStyle = g.color;
+    ctx.fillRect(cx - barW/2, Math.min(yTop, yBot), barW, Math.abs(yBot - yTop));
+    // Label below
+    ctx.fillStyle = '#aeb7c8'; ctx.font = '10.5px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    // truncate long labels
+    const lbl = g.label.length > 12 ? g.label.slice(0,11) + '…' : g.label;
+    ctx.fillText(lbl, cx, h - 22);
+    // Value above bar
+    ctx.fillStyle = '#f4f6fb'; ctx.font = 'bold 10px Inter, sans-serif';
+    ctx.fillText(fmtMetricVal(metric, v), cx, Math.max(pad.t + 10, Math.min(yTop, yBot) - 4));
+    ctx.textAlign = 'left';
+  });
+
+  // X axis title
+  ctx.fillStyle = '#737d91'; ctx.font = '10px Inter, sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(SEGMENT_LABELS[seg] + ' · ' + METRIC_LABELS[metric], pad.l + plotW/2, h - 6);
+  ctx.textAlign = 'left';
+
+  $('segmentLegend').innerHTML = groups.map(g=>
+    `<div class="legend-item"><span class="sw" style="background:${g.color}"></span>${g.label} · ${fmtMetricVal(metric, g.value)} avg (${g.items.length})</div>`
+  ).join('');
+}
+
+// ===== Heatmap (fm × ob, best across selected MRR for goal) =====
+function drawHeatmap(scenarios){
+  const c = $('heatmapChart'); if(!c) return;
+  const sz = setupCanvas(c); if(!sz) return;
+  const {ctx, w, h} = sz;
+  const goal = state.goal;
+
+  if(scenarios.length === 0){
+    ctx.fillStyle = '#737d91'; ctx.font = '12px Inter, sans-serif';
+    ctx.fillText('Select scenarios to populate the heatmap.', 16, h/2);
+    return;
+  }
+
+  const fms = [...state.selFm].sort((a,b)=>a-b);
+  const obs = [...state.selOb].sort((a,b)=>a-b);
+  if(fms.length === 0 || obs.length === 0){
+    ctx.fillStyle = '#737d91'; ctx.font = '12px Inter, sans-serif';
+    ctx.fillText('Need at least one onboarding % and one waived-month value.', 16, h/2);
+    return;
+  }
+
+  const pad = {l:54, r:14, t:24, b:34};
+  const cellW = (w - pad.l - pad.r) / obs.length;
+  const cellH = (h - pad.t - pad.b) / fms.length;
+
+  // For each cell, choose best scenario across selected MRR for the goal
+  const cells = [];
+  let allVals = [];
+  fms.forEach((f, fi)=>{
+    obs.forEach((o, oi)=>{
+      const subset = scenarios.filter(s=>s.fm === f && s.ob === o);
+      if(subset.length === 0){ cells.push({fi, oi, v:null}); return; }
+      let best;
+      if(goal === 'churn') best = subset.reduce((a,b)=>a.churn < b.churn ? a : b);
+      else if(goal === 'payback'){
+        best = subset.reduce((a,b)=>{
+          const pa = a.payback === null ? 999 : a.payback;
+          const pb = b.payback === null ? 999 : b.payback;
+          return pa < pb ? a : b;
+        });
+      }
+      else best = subset.reduce((a,b)=>a.ratio > b.ratio ? a : b);
+      const v = goal === 'churn' ? best.churn
+        : goal === 'payback' ? (best.payback === null ? 60 : best.payback)
+        : best.ratio;
+      cells.push({fi, oi, v, best});
+      allVals.push(v);
+    });
+  });
+
+  if(allVals.length === 0){
+    ctx.fillStyle = '#737d91'; ctx.fillText('No populated cells.', 16, h/2); return;
+  }
+  const mn = Math.min(...allVals), mx = Math.max(...allVals);
+
+  // Color scale: green = good, red = bad, depending on goal direction
+  function colorFromScore(score){
+    // score 0 = worst, 1 = best
+    const r = Math.round(247 + (50 - 247) * score);
+    const g = Math.round(112 + (213 - 112) * score);
+    const b = Math.round(102 + (131 - 102) * score);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  cells.forEach(cell=>{
+    const x = pad.l + cell.oi * cellW;
+    const y = pad.t + cell.fi * cellH;
+    if(cell.v === null){
+      ctx.fillStyle = 'rgba(255,255,255,.04)';
+      ctx.fillRect(x+2, y+2, cellW-4, cellH-4);
+      return;
+    }
+    let score;
+    if(mx === mn) score = 0.5;
+    else score = (cell.v - mn) / (mx - mn);
+    if(goal === 'churn' || goal === 'payback') score = 1 - score; // lower is better
+    ctx.fillStyle = colorFromScore(score);
+    ctx.fillRect(x+2, y+2, cellW-4, cellH-4);
+    // Cell value
+    ctx.fillStyle = score > 0.5 ? '#0b0e14' : '#0b0e14';
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    const lbl = goal === 'churn' ? fmtPct0(cell.v)
+      : goal === 'payback' ? (cell.v >= 60 ? '>60' : Math.round(cell.v) + 'mo')
+      : fmtRatio(cell.v);
+    ctx.fillText(lbl, x + cellW/2, y + cellH/2 + 3);
+  });
+
+  // Axis labels
+  ctx.fillStyle = '#aeb7c8'; ctx.font = '10px Inter, sans-serif'; ctx.textAlign = 'center';
+  obs.forEach((o, oi)=>{
+    ctx.fillText(o + '% OB', pad.l + cellW * (oi + 0.5), h - 16);
+  });
+  ctx.textAlign = 'right';
+  fms.forEach((f, fi)=>{
+    ctx.fillText(f + ' fm', pad.l - 6, pad.t + cellH * (fi + 0.5) + 3);
+  });
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#737d91'; ctx.font = '10px Inter, sans-serif';
+  ctx.fillText('Cell value = best across selected MRR · ' + GOAL_LABELS[goal], pad.l + (w - pad.l - pad.r)/2, 14);
+  ctx.textAlign = 'left';
+}
+
+// ===== Rankings =====
+function renderRankings(scenarios){
+  function fillRank(elId, sorted, fmtFn){
+    $(elId).innerHTML = sorted.slice(0,3).map((s,i)=>
+      `<div class="rank-row"><span class="rank-num">${i+1}</span><span class="rank-main">${s.label}<span class="rank-sub">${s.fm} mo waived · ${fmtPct(s.churn12)} churn @ 12mo</span></span><span class="rank-val">${fmtFn(s)}</span></div>`
+    ).join('') || '<span style="color:var(--text3);font-size:11px">No scenarios.</span>';
+  }
+  fillRank('rankChurn',
+    [...scenarios].sort((a,b)=>a.churn - b.churn),
+    s=>fmtPct(s.churn));
+  fillRank('rankPayback',
+    [...scenarios].sort((a,b)=>{
+      const pa = a.payback === null ? 999 : a.payback;
+      const pb = b.payback === null ? 999 : b.payback;
+      return pa - pb;
+    }),
+    s=>fmtPb(s.payback));
+  fillRank('rankRatio',
+    [...scenarios].sort((a,b)=>b.ratio - a.ratio),
+    s=>fmtRatio(s.ratio));
+}
+
+// ===== Summary table =====
+function renderSummaryTable(scenarios){
+  const head = `<thead><tr>
+    <th>Scenario</th><th>MRR</th><th>OB %</th><th>Free mo</th>
+    <th>Upfront</th><th>Calibrated LTV</th><th>${state.horizon}-mo churn</th><th>12-mo churn</th>
+    <th>CAC payback</th><th>LTV:CAC</th><th>Net</th>
+  </tr></thead>`;
+  const sorted = [...scenarios].sort((a,b)=>b.ratio - a.ratio);
+  const body = `<tbody>${sorted.map(s=>{
+    const ratioCls = s.ratio >= 3 ? 'pos' : s.ratio >= 1 ? '' : 'neg';
+    const netCls = s.net >= 0 ? 'pos' : 'neg';
+    const churnCls = s.churn < .35 ? 'pos' : s.churn < .55 ? '' : 'neg';
+    const pbCls = s.payback === null ? 'neg' : s.payback <= 12 ? 'pos' : s.payback <= 24 ? '' : 'neg';
+    return `<tr>
+      <td>${s.label}</td>
+      <td>$${s.mrr.toLocaleString()}</td>
+      <td>${s.ob}%</td>
+      <td>${s.fm}</td>
+      <td>${fmtUSD(s.upfront)}</td>
+      <td>${fmtUSD(s.ltv)}</td>
+      <td class="${churnCls}">${fmtPct(s.churn)}</td>
+      <td>${fmtPct(s.churn12)}</td>
+      <td class="${pbCls}">${fmtPb(s.payback)}</td>
+      <td class="${ratioCls}">${fmtRatio(s.ratio)}</td>
+      <td class="${netCls}">${(s.net>=0?'+':'−')+fmtUSD(Math.abs(s.net))}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+  $('summaryTable').innerHTML = head + body;
+}
+
+// ===== Sticky metrics =====
+function renderStickyMetrics(scenarios){
+  $('mMrr').textContent = '$' + state.customMrr.toLocaleString();
+  $('mCac').textContent = '$' + state.cac.toLocaleString();
+  $('mScenarioCount').textContent = scenarios.length;
+
+  if(scenarios.length === 0){
+    $('mBestRatio').textContent = '0.00×';
+    $('mBestRatioSub').textContent = 'no scenarios';
+    $('mBestChurn').textContent = '0%';
+    $('mBestChurnSub').textContent = 'no scenarios';
+    $('mBestPayback').textContent = '—';
+    $('mBestPaybackSub').textContent = 'no scenarios';
+    return;
+  }
+
+  const bestRatio = scenarios.reduce((a,b)=>a.ratio > b.ratio ? a : b);
+  const bestChurn = scenarios.reduce((a,b)=>a.churn < b.churn ? a : b);
+  const bestPb = scenarios.reduce((a,b)=>{
+    const pa = a.payback === null ? 999 : a.payback;
+    const pb = b.payback === null ? 999 : b.payback;
+    return pa < pb ? a : b;
+  });
+
+  const ratioEl = $('mBestRatio');
+  ratioEl.textContent = fmtRatio(bestRatio.ratio);
+  ratioEl.className = 'metric-val ' + (bestRatio.ratio >= 3 ? 'good' : bestRatio.ratio >= 1.5 ? 'warn' : 'bad');
+  $('mBestRatioSub').textContent = bestRatio.label;
+
+  const churnEl = $('mBestChurn');
+  churnEl.textContent = fmtPct(bestChurn.churn);
+  churnEl.className = 'metric-val ' + (bestChurn.churn < .35 ? 'good' : bestChurn.churn < .55 ? 'warn' : 'bad');
+  $('mBestChurnSub').textContent = bestChurn.label;
+
+  const pbEl = $('mBestPayback');
+  pbEl.textContent = fmtPb(bestPb.payback);
+  pbEl.className = 'metric-val ' + (bestPb.payback === null ? 'bad' : bestPb.payback <= 12 ? 'good' : bestPb.payback <= 24 ? 'warn' : 'bad');
+  $('mBestPaybackSub').textContent = bestPb.label;
+}
+
+// ===== Brief live values =====
+function renderBriefLive(scenarios){
+  $('bxCac').textContent = '$' + state.cac.toLocaleString();
+  $('bxHorizon').textContent = state.horizon + ' mo';
+  $('bxScenarios').textContent = scenarios.length;
+  $('bxCacInline').textContent = '$' + state.cac.toLocaleString();
+  $('bx3xLtv').textContent = '$' + (state.cac * 3).toLocaleString();
+
+  if(scenarios.length === 0){
+    $('bxBest').textContent = '—';
+    $('bxBestSub').textContent = 'no scenarios in grid';
+    return;
+  }
+  const best = scenarios.reduce((a,b)=>a.ratio > b.ratio ? a : b);
+  $('bxBest').textContent = fmtRatio(best.ratio);
+  $('bxBestSub').textContent = best.label;
+}
+
+// ===== Scenario alert =====
+function renderAlert(scenarios){
+  const a = $('scenarioAlert');
+  if(scenarios.length === 0){
+    a.style.display = 'block';
+    a.textContent = 'No scenarios — pick at least one chip from each of MRR, onboarding, and waived months.';
+  } else if(scenarios.length > 60){
+    a.style.display = 'block';
+    a.textContent = `${scenarios.length} scenarios in the grid. Charts may get crowded — try the Focused preset or deselect chips for clarity.`;
+  } else {
+    a.style.display = 'none';
+  }
+}
+
+// ===== Master update =====
+function updateAll(){
+  const scenarios = buildScenarios();
+  renderAlert(scenarios);
+  renderStickyMetrics(scenarios);
+  renderBriefLive(scenarios);
+  drawMatrixChart(scenarios);
+  renderMatrixLegend(scenarios);
+  drawSegmentChart(scenarios);
+  drawHeatmap(scenarios);
+  renderRankings(scenarios);
+  renderSummaryTable(scenarios);
+}
+
+// ===== Wire up controls =====
+function syncRangeInput(rangeId, inputId, key, isInt){
+  const r = $(rangeId), inp = $(inputId);
+  function set(v){
+    v = isInt ? Math.round(+v) : +v;
+    if(isNaN(v)) return;
+    r.value = v; inp.value = v;
+    state[key] = v;
+    if(key === 'customMrr'){ /* MRR anchor display only */ }
+    updateAll();
+  }
+  r.addEventListener('input', ()=>set(r.value));
+  inp.addEventListener('input', ()=>set(inp.value));
+}
+syncRangeInput('mrrRange','mrrInput','customMrr', true);
+syncRangeInput('cacRange','cacInput','cac', true);
+
+$('horizon').addEventListener('change', e=>{ state.horizon = +e.target.value; updateAll(); });
+$('metric').addEventListener('change', e=>{ state.metric = e.target.value; updateAll(); });
+$('segment').addEventListener('change', e=>{ state.segment = e.target.value; updateAll(); });
+$('goal').addEventListener('change', e=>{ state.goal = e.target.value; updateAll(); });
+$('showLabels').addEventListener('change', e=>{ state.showLabels = e.target.checked; updateAll(); });
+$('showCac').addEventListener('change', e=>{ state.showCac = e.target.checked; updateAll(); });
+$('highlightBest').addEventListener('change', e=>{ state.highlightBest = e.target.checked; updateAll(); });
+
+// Presets
+document.querySelectorAll('.preset-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const p = PRESETS[btn.dataset.preset]; if(!p) return;
+    state.selMrr = new Set(p.mrr);
+    state.selOb = new Set(p.ob);
+    state.selFm = new Set(p.fm);
+    document.querySelectorAll('.preset-btn').forEach(b=>b.classList.toggle('active', b === btn));
+    renderDimPicker();
+    updateAll();
+  });
+});
+
+// Initial render
+renderDimPicker();
+updateAll();
+
+// Redraw when window resizes or tab visibility changes (canvases need real dimensions)
+window.addEventListener('resize', ()=>{
+  const scenarios = buildScenarios();
+  drawMatrixChart(scenarios);
+  drawSegmentChart(scenarios);
+  drawHeatmap(scenarios);
+});
+
+})(); // end explorer IIFE
 </script>
+
 </body>
 </html>
