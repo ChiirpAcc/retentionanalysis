@@ -182,7 +182,7 @@ code{background:#0b0e14;border:1px solid var(--line);padding:2px 5px;border-radi
 .chart-controls select{background:#0b0e14;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:12px}
 .chart-note{color:var(--text3);font-size:11px;margin-top:8px;line-height:1.35}
 .chart-wrap-calc{position:relative;height:250px;background:#0b0e14;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:8px}
-#sensitivityCanvas{width:100%;height:100%;display:block}
+
 
 /* ============ EXECUTIVE BRIEF ============ */
 .brief{margin:0 0 18px;border:1px solid rgba(125,211,252,.22);background:linear-gradient(180deg,rgba(125,211,252,.05),rgba(192,132,252,.03));border-radius:24px;padding:22px;box-shadow:var(--shadow)}
@@ -272,6 +272,40 @@ details[open] .brief-chev{transform:rotate(90deg)}
   .audit-row{grid-template-columns:1fr .6fr .6fr .6fr}
   .metric-val{font-size:28px}
 }
+/* ============ EXECUTIVE BRIEF (HOME) ============ */
+.exec-hero{background:linear-gradient(135deg,rgba(125,211,252,.08),rgba(192,132,252,.05));border:1px solid rgba(125,211,252,.18);border-radius:28px;padding:32px 36px;margin-bottom:24px}
+.exec-hero h1{margin:0 0 6px;font-size:34px;letter-spacing:-.04em}
+.exec-hero .exec-sub{font-size:15px;color:var(--text2);line-height:1.55;max-width:780px;margin:0 0 24px}
+.exec-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.exec-kpi{background:rgba(11,14,20,.7);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.exec-kpi-v{font-size:26px;font-weight:900;letter-spacing:-.04em;margin-bottom:2px}
+.exec-kpi-l{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900}
+.exec-kpi-s{font-size:11px;color:var(--text3);margin-top:3px}
+.section-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:900;margin:0 0 14px}
+.exec-takeaways{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.takeaway{border:1px solid var(--line);background:rgba(18,23,34,.95);border-radius:18px;padding:16px}
+.takeaway-icon{font-size:22px;margin-bottom:8px}
+.takeaway h3{margin:0 0 6px;font-size:14px;letter-spacing:-.01em}
+.takeaway p{margin:0;font-size:12.5px;color:var(--text2);line-height:1.5}
+.takeaway.highlight{border-color:rgba(125,211,252,.35);background:linear-gradient(180deg,rgba(125,211,252,.07),rgba(125,211,252,.02))}
+.charts-section{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+.charts-section.wide{grid-template-columns:1fr}
+.exec-chart-card{background:rgba(18,23,34,.95);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+.exec-chart-card h3{margin:0 0 4px;font-size:15px;font-weight:900}
+.exec-chart-card .chart-caption{font-size:12px;color:var(--text3);margin:0 0 14px;line-height:1.4}
+.exec-chart-wrap{height:240px;background:linear-gradient(180deg,#0b0e14,#0d111a);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:8px}
+.exec-chart-wrap.tall{height:300px}
+.exec-chart-wrap canvas{width:100%;height:100%;display:block}
+.exec-limit{border:1px solid rgba(253,176,34,.25);background:rgba(253,176,34,.06);border-radius:18px;padding:18px 22px;margin-bottom:28px}
+.exec-limit h3{margin:0 0 10px;font-size:14px;font-weight:900;color:var(--amber)}
+.exec-limit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.exec-limit-item{font-size:12px;color:var(--text2);line-height:1.5}
+.exec-limit-item strong{display:block;color:var(--text);margin-bottom:3px;font-size:12.5px}
+.exec-tools{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:1050px){
+  .exec-kpis{grid-template-columns:repeat(3,1fr)}
+  .exec-takeaways,.charts-section,.exec-limit-grid,.exec-tools{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -281,7 +315,6 @@ details[open] .brief-chev{transform:rotate(90deg)}
   <div class="site-brand">Deal Structure <span>Suite</span></div>
   <div class="site-tabs">
     <a href="#home" class="site-tab" data-tab="home">Overview</a>
-    <a href="#calculator" class="site-tab" data-tab="calculator">Calculator</a>
     <a href="#explorer" class="site-tab" data-tab="explorer">Scenario Explorer</a>
     <a href="#forecast" class="site-tab" data-tab="forecast">Deal Forecast</a>
   </div>
@@ -290,701 +323,69 @@ details[open] .brief-chev{transform:rotate(90deg)}
 <!-- ============ HOME / OVERVIEW SECTION ============ -->
 <section class="section" id="sec-home">
   <div class="app">
-    <div class="hdr">
-      <div>
-        <h1>Deal Structure Suite</h1>
-        <div class="hint">Two complementary tools for modeling SaaS deal structure under churn, onboarding, and free-month assumptions.</div>
+
+    <!-- HERO -->
+    <div class="exec-hero">
+      <h1>Deal Structure Analysis</h1>
+      <p class="exec-sub">Machine learning models trained on 2025–Feb 2026 deal and customer data estimate how pricing decisions affect win rate, churn, and LTV:CAC simultaneously. Use this to compare structures and set pricing policy — not to predict individual deals.</p>
+      <div class="exec-kpis">
+        <div class="exec-kpi"><div class="exec-kpi-v good" id="hKpiWr">—</div><div class="exec-kpi-l">Baseline win rate</div><div class="exec-kpi-s">avg deal structure</div></div>
+        <div class="exec-kpi"><div class="exec-kpi-v warn" id="hKpiChurn">—</div><div class="exec-kpi-l">Baseline 12-mo churn</div><div class="exec-kpi-s">avg deal structure</div></div>
+        <div class="exec-kpi"><div class="exec-kpi-v" id="hKpiLtv">—</div><div class="exec-kpi-l">Baseline LTV:CAC</div><div class="exec-kpi-s">at $5k CAC</div></div>
+        <div class="exec-kpi"><div class="exec-kpi-v" style="color:var(--blue)">2,944</div><div class="exec-kpi-l">Accounts modeled</div><div class="exec-kpi-s">churn model</div></div>
+        <div class="exec-kpi"><div class="exec-kpi-v" style="color:var(--purple)">14</div><div class="exec-kpi-l">Months of data</div><div class="exec-kpi-s">Jan 2025–Feb 2026</div></div>
       </div>
-      <span class="tag">Calibrated analytical LTV · compact churn model</span>
     </div>
 
-    <div class="home-hero" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="home-card" data-go="calculator">
-        <h2>🧮 Deal Structure Calculator</h2>
-        <p>Single-deal calculator with optimizer buttons (minimize churn or maximize LTV), a variable audit panel showing every model coefficient, and a sensitivity chart for sweeping any input.</p>
-        <span class="cta">Open the calculator →</span>
+    <!-- LEVER EFFECTS: 3 bar charts side by side -->
+    <div class="section-title">How each lever moves the needle</div>
+    <div class="charts-section" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="exec-chart-card">
+        <h3>Contract MRR</h3>
+        <p class="chart-caption">Win rate stable · churn falls · LTV:CAC rises as contract value grows.</p>
+        <div class="exec-chart-wrap"><canvas id="hChartMrr"></canvas></div>
       </div>
+      <div class="exec-chart-card">
+        <h3>Onboarding % of MRR</h3>
+        <p class="chart-caption">Win rate drops · churn rises · payback improves. Classic cash trade-off.</p>
+        <div class="exec-chart-wrap"><canvas id="hChartOb"></canvas></div>
+      </div>
+      <div class="exec-chart-card">
+        <h3>Free months waived</h3>
+        <p class="chart-caption">Sharp churn jump at 2 months · no meaningful win rate gain.</p>
+        <div class="exec-chart-wrap"><canvas id="hChartFm"></canvas></div>
+      </div>
+    </div>
+
+    <!-- WIN RATE vs LTV:CAC RANGE CHART -->
+    <div class="charts-section wide">
+      <div class="exec-chart-card">
+        <h3>Win rate vs. LTV:CAC — by churn risk tier</h3>
+        <p class="chart-caption">Each band shows the modeled range of win rate and LTV:CAC across all deal structures in that churn tier. Low-churn structures occupy the top-right. High-churn structures cluster bottom-left — weaker on both economics and retention.</p>
+        <div class="exec-chart-wrap" style="height:220px"><canvas id="hChartRange"></canvas></div>
+      </div>
+    </div>
+
+    <!-- LIMITATIONS -->
+    <div class="exec-limit">
+      <p style="margin:0;font-size:13px;color:var(--text2);line-height:1.6"><strong style="color:var(--text)">How to use this analysis:</strong> These models estimate directional patterns from historical data — use them to compare deal structures and guide pricing policy, not to predict any individual deal or account outcome. We observe final reported deal terms only, not the full negotiation context, so treat all outputs as planning inputs rather than precise causal rules.</p>
+    </div>
+
+    <!-- TOOL CARDS -->
+    <div class="section-title">Explore the models</div>
+    <div class="exec-tools">
       <div class="home-card" data-go="explorer">
         <h2>📊 Scenario Explorer</h2>
-        <p>Scenario grid across every combination of MRR, onboarding %, and waived months. Includes ranking cards, an optimal heatmap, and a full summary table for executive review.</p>
+        <p>Grid every combination of MRR, onboarding %, and waived months. See rankings, heatmaps, and the full scenario table sorted by any metric.</p>
         <span class="cta">Open the explorer →</span>
       </div>
       <div class="home-card" data-go="forecast">
         <h2>🎯 Deal Forecast</h2>
-        <p>Pipeline simulator using the win-rate and churn models together. Set your deal structure, lock variables, and optimize for minimum churn, maximum LTV:CAC, or maximum net revenue.</p>
+        <p>Set a deal structure, lock variables, and optimize for retention, economics, or net revenue across your full pipeline. Uses both win-rate and churn models together.</p>
         <span class="cta">Open the forecast →</span>
       </div>
     </div>
 
-    <div class="home-feat">
-      <div class="callout"><div class="callout-k">When to use the calculator</div><div class="callout-v">You have a specific deal in front of you and want to see what changing one variable does. Lock the variables that are non-negotiable, then optimize the rest.</div></div>
-      <div class="callout"><div class="callout-k">When to use the explorer</div><div class="callout-v">You want to compare deal structures directionally across many configurations. Best for setting pricing policy or finding the best structure for a goal metric.</div></div>
-      <div class="callout"><div class="callout-k">When to use the forecast</div><div class="callout-v">You want to model total pipeline economics — how many deals close, how many survive year 1, and what net revenue looks like across the whole pipeline.</div></div>
-    </div>
-
-    <div class="note">
-      <strong>Important:</strong> All three tools project from the same two models: a 42-feature L2 logistic churn model (AUC 0.78, N=2,944) and an 8-feature ElasticNet win-rate model (LOO R²=0.45, N=14 months). Treat outputs as directional. Use rankings and relative differences, not absolute predictions.
-    </div>
-  </div>
-</section>
-
-<!-- ============ CALCULATOR SECTION ============ -->
-<section class="section" id="sec-calculator">
-  <div class="calc-app">
-    <div class="hdr">
-      <h1>Deal Structure Calculator</h1>
-      <span class="tag">2024+ compact interaction model · calibrated analytical LTV</span>
-    </div>
-
-    <div class="opt-row">
-      <button class="opt-btn min-churn" id="btnMinChurn">
-        <div class="opt-icon">↓</div>
-        <div><span style="font-weight:700">Minimize Churn</span><span class="opt-sub">Optimize unlocked inputs for lowest 12-mo churn</span></div>
-      </button>
-      <button class="opt-btn max-ltv" id="btnMaxLtv">
-        <div class="opt-icon">↑</div>
-        <div><span style="font-weight:700">Maximize LTV</span><span class="opt-sub">Optimize unlocked inputs for highest calibrated LTV</span></div>
-      </button>
-    </div>
-
-    <div class="calc-grid">
-      <div class="controls-pane">
-        <div class="field">
-          <div class="field-hdr"><span class="field-lbl">Contract MRR</span></div>
-          <div class="field-val-row"><span class="field-val" id="mrrVal">$650</span><button class="lock-btn" id="lockMrr">🔓</button></div>
-          <input type="range" id="sliderMrr" min="99" max="3000" step="1" value="650">
-          <div class="range-ends"><span>$99</span><span>$3,000</span></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field">
-          <div class="field-hdr"><span class="field-lbl">Onboarding fee (% of MRR)</span></div>
-          <div class="field-val-row"><span class="field-val" id="obVal">100%</span><button class="lock-btn" id="lockOb">🔓</button></div>
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:4px" id="obDollar">= $650 upfront</div>
-          <input type="range" id="sliderOb" min="0" max="200" step="5" value="100">
-          <div class="range-ends"><span>0%</span><span>200%</span></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field">
-          <div class="field-hdr"><span class="field-lbl">Free months waived</span><button class="lock-btn" id="lockFm">🔓</button></div>
-          <div class="fm-pills" id="fmPills">
-            <div class="fm-pill active" data-fm="0">0</div>
-            <div class="fm-pill" data-fm="1">1</div>
-            <div class="fm-pill" data-fm="2">2</div>
-            <div class="fm-pill" data-fm="3">3</div>
-          </div>
-          <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-top:4px" id="fmHint">MRR billing starts month 1</div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="cac-section">
-          <div class="field-hdr"><span class="field-lbl cac-lbl">CAC per won account</span></div>
-          <div class="field-val-row"><span class="field-val" id="cacVal" style="color:var(--purple)">$5,000</span></div>
-          <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-bottom:4px">not affected by optimizer buttons</div>
-          <input type="range" id="sliderCac" class="cac-slider" min="500" max="12000" step="100" value="5000">
-          <div class="range-ends"><span>$500</span><span>$12,000</span></div>
-        </div>
-
-        <div id="lockNote" style="display:none" class="lock-note"><span>🔒</span><span id="lockNoteText"></span></div>
-      </div>
-
-      <div class="outputs-pane">
-        <div class="metrics-grid">
-          <div class="metric-card primary"><div class="metric-lbl">Calibrated LTV</div><div class="metric-val" id="oLtv">$0</div><div class="metric-sub" id="oLtvSub">analytical × 0.3854</div></div>
-          <div class="metric-card"><div class="metric-lbl">12-month churn</div><div class="metric-val" id="oChurn">0%</div><div class="metric-sub" id="oChurnSub">risk</div></div>
-          <div class="metric-card" style="border-color:rgba(50,213,131,.35)"><div class="metric-lbl">Win rate</div><div class="metric-val" id="oWinRate">0%</div><div class="metric-sub" id="oWinRateSub">model · clamped 8–40%</div></div>
-          <div class="metric-card"><div class="metric-lbl">Monthly hazard</div><div class="metric-val" id="oHazard">0%</div><div class="metric-sub">derived from annual</div></div>
-          <div class="metric-card cac-card"><div class="metric-lbl">LTV : CAC</div><div class="metric-val" id="oLtvCac">0×</div><div class="metric-sub" id="oLtvCacSub">ratio</div></div>
-          <div class="metric-card cac-card"><div class="metric-lbl">CAC payback</div><div class="metric-val" id="oPayback">—</div><div class="metric-sub" id="oPaybackSub">calibrated cash curve</div></div>
-          <div class="metric-card cac-card" style="grid-column:span 2"><div class="metric-lbl">Net (LTV − CAC)</div><div class="metric-val" id="oNet">$0</div><div class="metric-sub">after acquisition cost</div></div>
-        </div>
-
-        <div class="churn-vis"><div class="bar-hdr"><span>CHURN RISK</span><span id="barLbl">0%</span></div><div class="bar-track"><div class="bar-fill" id="barFill"></div></div></div>
-
-        <div class="bk">
-          <div class="bk-row"><span class="bk-lbl">Upfront onboarding cash</span><span class="bk-val pos" id="bUpfront">$0</span></div>
-          <div class="bk-row"><span class="bk-lbl">Expected MRR collected, 24 mo</span><span class="bk-val pos" id="bMrrRev">$0</span></div>
-          <div class="bk-row"><span class="bk-lbl">Revenue lost to churn, 24 mo</span><span class="bk-val neg" id="bLost">−$0</span></div>
-          <div class="bk-row"><span class="bk-lbl">Uncalibrated analytical LTV</span><span class="bk-val pos" id="bAnalytical">$0</span></div>
-          <div class="bk-row"><span class="bk-lbl">Calibrated expected LTV</span><span class="bk-val pos" id="bModel">$0</span></div>
-          <div class="bk-row cac-row"><span class="bk-lbl">CAC per won account</span><span class="bk-val purple" id="bCac">$5,000</span></div>
-          <div class="bk-row cac-row"><span class="bk-lbl">LTV : CAC ratio</span><span class="bk-val purple" id="bRatio">0×</span></div>
-          <div class="bk-row cac-row"><span class="bk-lbl">Net value (LTV − CAC)</span><span class="bk-val neg" id="bNet">$0</span></div>
-        </div>
-
-        <div class="insight" id="insight"></div>
-
-        <div class="sensitivity">
-          <div class="chart-hdr">
-            <div>
-              <div class="chart-title">Sensitivity chart</div>
-              <div class="chart-note">Sweep one input while the other current/locked inputs stay fixed.</div>
-            </div>
-            <div class="chart-controls">
-              <select id="chartX">
-                <option value="mrr">X: MRR</option>
-                <option value="ob">X: Onboarding %</option>
-                <option value="fm">X: Free months</option>
-                <option value="cac">X: CAC</option>
-              </select>
-              <select id="chartY">
-                <option value="ltv">Y: Calibrated LTV</option>
-                <option value="churn">Y: 12-mo churn</option>
-                <option value="ratio">Y: LTV:CAC</option>
-                <option value="net">Y: Net value</option>
-                <option value="payback">Y: CAC payback</option>
-              </select>
-            </div>
-          </div>
-          <div class="chart-wrap-calc"><canvas id="sensitivityCanvas"></canvas></div>
-          <div class="chart-note" id="chartNote"></div>
-        </div>
-
-        <div class="audit-box">
-          <div class="audit-hdr"><span>Variable audit — churn model (L2 logistic, top features)</span><span style="color:var(--text3);font-weight:400">raw · coef · contribution</span></div>
-          <div class="audit-section">CHURN — L2 LOGISTIC · AUC 0.7807 · N = 2,944 · top 14 features by |coef|</div>
-          <div id="auditChurn"></div>
-          <div class="audit-section">WIN RATE — ELASTICNET · LOO R² 0.4474 · N = 14 months</div>
-          <div id="auditWinRate"></div>
-          <div class="audit-section">LTV COMPUTATION — analytical LTV × calibration factor 0.3854</div>
-          <div id="auditLtv"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ EXPLORER SECTION ============ -->
-<section class="section" id="sec-explorer">
-  <div class="app">
-    <div class="hdr">
-      <div>
-        <h1>Projected Deal Structure Explorer</h1>
-        <div class="hint">Model-based scenario dashboard for free months, onboarding, MRR, churn, payback, and LTV:CAC.</div>
-      </div>
-      <span class="tag">No CSV · projected from churn regression</span>
-    </div>
-
-    <div class="hero">
-      <div class="hero-card">
-        <div class="hero-title">How to use this page</div>
-        <div class="hero-copy">Pick an MRR set, onboarding levels, and waived-month options. The dashboard builds every combination, projects LTV from the churn model, and ranks the structures by the selected business goal.</div>
-      </div>
-      <div class="hero-card hero-steps">
-        <div class="step"><div class="step-num">1</div><div><strong>Choose dimensions.</strong> Use the chips under the main chart to control the scenario grid.</div></div>
-        <div class="step"><div class="step-num">2</div><div><strong>Choose the metric.</strong> Switch between LTV:CAC, projected churn, CAC recovery %, LTV, and net value.</div></div>
-        <div class="step"><div class="step-num">3</div><div><strong>Use the rankings.</strong> The Top 3 cards show the best deal structures for each goal.</div></div>
-      </div>
-    </div>
-
-    <div class="sticky-top">
-      <div class="nav">
-        <a href="#brief">Exec brief</a><a href="#overview">Overview</a><a href="#scenario">Scenario curves</a><a href="#segments">Dynamic segment</a><a href="#heatmap">Optimal heatmap</a><a href="#rankings">Top 3</a><a href="#summary">Summary</a>
-      </div>
-      <div class="panel">
-        <div class="controls">
-          <div class="field"><label>Custom MRR anchor</label><div class="range-wrap"><input type="range" id="mrrRange" min="99" max="3000" step="1" value="1500"><input type="number" id="mrrInput" min="1" step="1" value="1500"></div></div>
-          <div class="field"><label>CAC threshold</label><div class="range-wrap"><input type="range" id="cacRange" min="500" max="20000" step="100" value="5000"><input type="number" id="cacInput" min="0" step="100" value="5000"></div></div>
-          <div class="field"><label>Horizon</label><select id="horizon"><option value="12">12 months</option><option value="18">18 months</option><option value="24" selected>24 months</option><option value="36">36 months</option><option value="60">60 months</option></select></div>
-          <div class="field"><label>Chart metric</label><select id="metric"><option value="ltv">Calibrated LTV</option><option value="ratio" selected>LTV:CAC</option><option value="churn">Projected churn</option><option value="paybackProgress">CAC recovery %</option><option value="net">Net value</option></select></div>
-          <div class="field"><label>Dynamic segment</label><select id="segment"><option value="free">Waived months only</option><option value="ob">Onboarding % only</option><option value="mrr">MRR tiers only</option><option value="matrix" selected>Free × onboarding</option></select></div>
-          <div class="field"><label>Heatmap goal</label><select id="goal"><option value="churn">Minimize churn</option><option value="payback">Minimize CAC payback</option><option value="ratio" selected>Maximize LTV:CAC</option></select></div>
-        </div>
-        <div class="toolbar" style="margin-top:12px">
-          <button class="preset-btn" data-preset="focused">Focused</button>
-          <button class="preset-btn active" data-preset="standard">Standard</button>
-          <button class="preset-btn" data-preset="wide">Wide search</button>
-        </div>
-        <div class="hint">This page intentionally uses projections only. LTV is derived from the compact churn model, then calibrated by 0.3854. No historical cohort CSV or observed CAC-by-month is used.</div>
-        <div class="scenario-alert" id="scenarioAlert"></div>
-      </div>
-    </div>
-
-    <div id="overview" class="section-anchor"></div>
-    <div class="note"><strong>Design intent:</strong> this is not a historical cohort dashboard. It is a scenario explorer. Lines represent modeled average scenarios, not real cohorts. Use it to compare deal structures under the same CAC/MRR assumptions.</div>
-
-    <div class="callout-grid">
-      <div class="callout"><div class="callout-k">Best for</div><div class="callout-v">Comparing deal structures directionally: which combinations improve LTV:CAC, pay back faster, or reduce modeled churn.</div></div>
-      <div class="callout"><div class="callout-k">Not for</div><div class="callout-v">Exact account-level forecasting. The churn model is stable, but model fit is modest, so use rankings and relative differences.</div></div>
-      <div class="callout"><div class="callout-k">Revenue rule</div><div class="callout-v">Waived months delay MRR. Onboarding cash can appear immediately, but MRR only starts after waived months end.</div></div>
-    </div>
-
-    <!-- ============ EXECUTIVE DECISION BRIEF ============ -->
-    <div id="brief" class="section-anchor"></div>
-    <section class="brief" id="briefSection">
-      <div class="brief-hdr">
-        <div>
-          <h2>Executive Decision Brief</h2>
-          <div style="font-size:12px;color:var(--text3);margin-top:4px">Translates the model into decisions, rules, and a recommended default policy. Tied to the assumptions selected above.</div>
-        </div>
-        <span class="brief-tag">For MRR band <span id="briefMrrBand">$1,000–$2,250</span></span>
-      </div>
-
-      <div class="brief-frame">
-        <strong>What we are deciding:</strong> how much onboarding to charge — and whether to allow waived months — without meaningfully harming churn or payback. Our pricing range is <strong>$1,000–$2,250 MRR</strong>, so the policy needs to work across that band rather than for a single price point.
-      </div>
-
-      <div class="brief-live">
-        <div class="brief-live-card"><div class="brief-live-k">Selected CAC</div><div class="brief-live-v" id="bxCac">$5,000</div><div class="brief-live-sub">payback target</div></div>
-        <div class="brief-live-card"><div class="brief-live-k">Horizon</div><div class="brief-live-v" id="bxHorizon">24 mo</div><div class="brief-live-sub">LTV evaluation window</div></div>
-        <div class="brief-live-card"><div class="brief-live-k">Scenarios evaluated</div><div class="brief-live-v" id="bxScenarios">0</div><div class="brief-live-sub">grid of selections above</div></div>
-        <div class="brief-live-card"><div class="brief-live-k">Best LTV:CAC found</div><div class="brief-live-v" id="bxBest">—</div><div class="brief-live-sub" id="bxBestSub">—</div></div>
-      </div>
-
-      <!-- 1. KEY FINDINGS -->
-      <details class="brief-block" open>
-        <summary>
-          <div class="brief-sum-l">
-            <div class="brief-sum-num">1</div>
-            <div>
-              <div class="brief-sum-title">Key findings</div>
-              <div class="brief-sum-sub">The five things to know before approving a deal in this MRR band.</div>
-            </div>
-          </div>
-          <span class="brief-chev">›</span>
-        </summary>
-        <div class="brief-body">
-          <div class="finding-grid">
-
-            <div class="finding spotlight" style="grid-column:1/-1">
-              <span class="finding-tag">Headline finding · onboarding raises churn and kills win rate</span>
-              <h4>Higher onboarding increases churn monotonically — and collapses win rate above ~25%</h4>
-              <p>The L2 logistic churn model has <strong>both</strong> <code>ob_pct</code> (coef +0.116) and <code>ob_pct_sq</code> (coef +0.624) as positive — meaning more onboarding <em>always</em> raises predicted churn. There is no U-shape minimum at 100%. The churn minimum is near <strong>25% OB</strong>. At the same time, the win-rate model has a large negative coefficient on <code>avg_ob_pct</code> (−0.204), meaning higher onboarding also reduces the probability of winning the deal — hitting the 5% model floor around OB=75%.</p>
-              <p>At MRR $1,500, 0 free months, the churn model predicts:</p>
-              <ul>
-                <li>0% onboarding → <span class="key-num">~34%</span> 12-mo churn</li>
-                <li><strong>25% onboarding → <span class="key-num">~33%</span> (model minimum)</strong></li>
-                <li>50% onboarding → <span class="key-num">~34%</span></li>
-                <li>100% onboarding → <span class="key-num">~43%</span></li>
-                <li>150% onboarding → <span class="key-num">~62%</span></li>
-                <li>200% onboarding → <span class="key-num">~84%</span></li>
-              </ul>
-              <p style="margin-top:10px"><strong>Operational read:</strong> Onboarding is a cash and payback lever, not a churn lever. Lower onboarding improves both churn <em>and</em> win rate — the trade-off is upfront cash and payback speed. Use the Forecast tab to find the OB level that maximizes expected pipeline LTV for your actual CAC and pipeline size.</p>
-            </div>
-
-            <div class="finding">
-              <span class="finding-tag">A · MRR</span>
-              <h4>Higher MRR lowers churn and strengthens all economics</h4>
-              <p>The model's <code>high_mrr</code> (coef −0.293) and <code>log_mrr</code> (coef −0.153) both reduce churn for larger accounts. LTV scales directly with MRR, so higher MRR improves every metric simultaneously.</p>
-              <p>Practical: don't discount MRR to close — churn improves with higher MRR in this model, so discounting is doubly costly.</p>
-            </div>
-
-            <div class="finding">
-              <span class="finding-tag">B · Onboarding cash timing</span>
-              <h4>Onboarding accelerates payback, but at a churn and win-rate cost</h4>
-              <p>Onboarding cash hits on day 1 and counts toward CAC payback immediately. A $1,500 deal at 100% OB recovers $578 of calibrated CAC upfront. But the same deal at 100% OB has ~43% predicted churn and a win-rate model output at the 5% floor — meaning the expected number of won deals is very low. Model the full pipeline, not just one won deal.</p>
-            </div>
-
-            <div class="finding">
-              <span class="finding-tag">C · Waived months</span>
-              <h4>Waived months consistently raise churn — the jump at 2 months is sharp</h4>
-              <p>At MRR $1,500 with 0% OB, the churn model predicts:</p>
-              <ul>
-                <li>0 free months: <span class="key-num">~34%</span></li>
-                <li>1 free month: <span class="key-num">~39%</span></li>
-                <li>2 free months: <span class="key-num">~57%</span> — large jump</li>
-                <li>3+ free months: <span class="key-num">~75%</span></li>
-              </ul>
-              <p>The 1→2 free month step is the biggest single increase. Treat 2+ waived months as exception-only.</p>
-            </div>
-
-            <div class="finding">
-              <span class="finding-tag">D · Goal trade-offs</span>
-              <h4>Different goals favor different structures</h4>
-              <table class="goal-table">
-                <thead><tr><th>Goal</th><th>Favors</th><th>Trade-off</th></tr></thead>
-                <tbody>
-                  <tr><td>Min churn</td><td>Low OB (0–25%) · 0 free mo</td><td>Low upfront cash; win rate is preserved</td></tr>
-                  <tr><td>Max win rate</td><td>0% OB · 1 free mo</td><td>More churn; no upfront cash</td></tr>
-                  <tr><td>Min payback</td><td>Moderate OB (50%) · 0 free</td><td>Win rate stays viable; some churn increase</td></tr>
-                  <tr><td>Max pipeline LTV</td><td>Low OB · 0 free</td><td>Win rate × LTV product is highest here</td></tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="finding">
-              <span class="finding-tag">E · CAC sensitivity</span>
-              <h4>CAC threshold changes what's viable, not the curves</h4>
-              <p>The churn and LTV curves don't depend on CAC. CAC just sets the bar. When CAC is high, a low-OB structure (with its higher win rate) may generate more total won deals whose LTV collectively exceeds CAC spend — even though per-deal payback is slower.</p>
-              <p style="margin-top:8px">Selected CAC: <span id="bxCacInline" class="key-num">$5,000</span>. To clear 3× LTV:CAC at this CAC, a deal needs <span id="bx3xLtv" class="key-num">$15,000</span> calibrated LTV.</p>
-            </div>
-
-          </div>
-        </div>
-      </details>
-
-      <!-- 2. DECISION RULES -->
-      <details class="brief-block" open>
-        <summary>
-          <div class="brief-sum-l">
-            <div class="brief-sum-num">2</div>
-            <div>
-              <div class="brief-sum-title">Decision rules we should adopt</div>
-              <div class="brief-sum-sub">Operational guardrails reps and approvers can apply without re-running the model.</div>
-            </div>
-          </div>
-          <span class="brief-chev">›</span>
-        </summary>
-        <div class="brief-body">
-          <div class="rule-list">
-            <div class="rule">
-              <div class="rule-name">Rule 1 — Onboarding of 0–50% minimizes churn <span class="pill">Churn lens</span></div>
-              <div class="rule-body">The new model's churn minimum is near 25% OB — not 100%. If reducing churn is the primary goal, quoting 0–50% OB is better than quoting 100%+. Higher OB raises churn monotonically in this model.</div>
-            </div>
-            <div class="rule">
-              <div class="rule-name">Rule 2 — Onboarding above ~75% kills win rate <span class="pill">Win rate lens</span></div>
-              <div class="rule-body">The win-rate model hits its 5% floor around OB=75%. Deals quoted above that level are predicted to rarely close. If you need to charge high OB, expect very low win rate and plan pipeline size accordingly.</div>
-            </div>
-            <div class="rule">
-              <div class="rule-name">Rule 3 — Treat 2+ waived months as exception-only <span class="pill">Approval</span></div>
-              <div class="rule-body">The 1→2 free month step is the largest single churn jump in the model (~39% → ~57% at MRR $1,500). If a deal needs 2 free months, it should be offset by other negotiated terms and stay above the LTV:CAC and payback targets.</div>
-            </div>
-            <div class="rule">
-              <div class="rule-name">Rule 4 — Use LTV:CAC <em>and</em> win rate together</div>
-              <div class="rule-body">A deal structure with excellent per-deal LTV:CAC can still be a bad pipeline strategy if win rate is at 5%. Always evaluate expected pipeline LTV (LTV × win rate × pipeline size) alongside per-deal economics.</div>
-            </div>
-            <div class="rule">
-              <div class="rule-name">Rule 5 — Use the Forecast tab for OB decisions <span class="pill">Tool</span></div>
-              <div class="rule-body">The optimal OB level depends on your actual CAC, pipeline size, and whether you're optimizing per-deal payback or total pipeline value. The Forecast tab models all of this explicitly with both scoring models.</div>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      <!-- 3. RECOMMENDED DEFAULT POLICY -->
-      <details class="brief-block" open>
-        <summary>
-          <div class="brief-sum-l">
-            <div class="brief-sum-num">3</div>
-            <div>
-              <div class="brief-sum-title">Recommended default policy</div>
-              <div class="brief-sum-sub">The starting point reps should quote unless something pushes them off it.</div>
-            </div>
-          </div>
-          <span class="brief-chev">›</span>
-        </summary>
-        <div class="brief-body">
-          <div class="policy-card">
-            <div class="policy-hdr">Policy-safe default</div>
-            <div class="policy-default">Quote <strong>0–50% onboarding · 0 waived months</strong> as the starting point. Higher OB should be justified by payback requirements, not churn reduction — it does not reduce churn in the new model.</div>
-
-            <div class="policy-tier">
-              <div class="policy-tier-k">Default</div>
-              <div class="policy-tier-v">0–25% onboarding, 0 waived months. Lowest churn, best win rate. Slowest upfront payback. No approval needed.</div>
-            </div>
-            <div class="policy-tier">
-              <div class="policy-tier-k">Acceptable</div>
-              <div class="policy-tier-v">25–75% onboarding, 0 waived months. Win rate starts declining above 50% but is still viable. Use when faster payback is needed and pipeline can absorb lower win rate.</div>
-            </div>
-            <div class="policy-tier">
-              <div class="policy-tier-k">Acceptable</div>
-              <div class="policy-tier-v">0–25% onboarding, 1 waived month. Small churn increase (~6 pp). Useful for competitive deals where a free month helps close.</div>
-            </div>
-            <div class="policy-tier">
-              <div class="policy-tier-k">Exception</div>
-              <div class="policy-tier-v">OB above 75% or 2 waived months — requires explicit justification. Win rate will be at or near the 5% model floor. Pipeline economics must be modeled in Forecast tab.</div>
-            </div>
-            <div class="policy-tier">
-              <div class="policy-tier-k">Avoid</div>
-              <div class="policy-tier-v">3+ waived months, or any combination where Forecast tab shows net pipeline value negative.</div>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      <!-- 4. OPEN DECISIONS -->
-      <details class="brief-block">
-        <summary>
-          <div class="brief-sum-l">
-            <div class="brief-sum-num">4</div>
-            <div>
-              <div class="brief-sum-title">Open decisions for the leadership team</div>
-              <div class="brief-sum-sub">The thresholds the model can't pick for you.</div>
-            </div>
-          </div>
-          <span class="brief-chev">›</span>
-        </summary>
-        <div class="brief-body">
-          <ul class="checklist">
-            <li><span class="q">?</span><div><strong>What is our target CAC payback window?</strong>6, 12, or 18 months? This single number determines whether 1 waived month is acceptable on a $1,500 deal.</div></li>
-            <li><span class="q">?</span><div><strong>What LTV:CAC ratio do we require?</strong>1.5× minimum to approve, 2× standard, 3× target? The brief assumes 3× as the aspirational target.</div></li>
-            <li><span class="q">?</span><div><strong>When are waived months allowed?</strong>Never by default · only 1 month · 2 months only at $1,500+ MRR with onboarding offset?</div></li>
-            <li><span class="q">?</span><div><strong>Is 100% onboarding the floor, or can reps quote 75–90% to close?</strong>The model penalizes anything below 100% with rising churn — but in negotiations a small concession may be the difference between winning and losing.</div></li>
-            <li><span class="q">?</span><div><strong>Should CAC vary by channel?</strong>If sales-led CAC is higher than self-serve CAC, the same deal structure looks healthy in one channel and underwater in the other.</div></li>
-          </ul>
-        </div>
-      </details>
-
-      <!-- 5. MODEL CAVEATS -->
-      <details class="brief-block">
-        <summary>
-          <div class="brief-sum-l">
-            <div class="brief-sum-num">5</div>
-            <div>
-              <div class="brief-sum-title">Model confidence &amp; caveats</div>
-              <div class="brief-sum-sub">Read this before treating any single prediction as truth.</div>
-            </div>
-          </div>
-          <span class="brief-chev">›</span>
-        </summary>
-        <div class="brief-body">
-          <p>This is a <strong>directional decision-support model</strong>, not an account-level forecast. Decisions should rest on relative comparisons and guardrails, not point predictions.</p>
-          <div class="caveat-row">
-            <div class="caveat-card"><strong>Stable, modest fit</strong>The compact churn regression is stable (no NaN standard errors, N = 14,208) but pseudo-R² is only ~0.022. It captures direction well; magnitudes should be treated as approximate.</div>
-            <div class="caveat-card"><strong>Waiver-post-sign held at 0</strong>The model has a separate term for "onboarding contracted but waived after signing." The dashboard does not separately observe this, so we hold that variable at 0. If you start tracking post-sign waivers, churn predictions for those deals will worsen.</div>
-            <div class="caveat-card"><strong>LTV is calibrated, not raw</strong>Analytical LTV from churn survival is multiplied by the calibration factor 0.3854, the median actual/analytical ratio observed historically. This corrects for analytical LTV's tendency to overstate.</div>
-            <div class="caveat-card"><strong>Use rankings, not absolute LTV</strong>Two scenarios that differ by $500 of predicted LTV are essentially indistinguishable in this model. Two scenarios that differ by $5,000 are meaningfully different.</div>
-          </div>
-        </div>
-      </details>
-    </section>
-
-    <div class="metrics sticky-metrics">
-      <div class="metric"><div class="metric-lbl">Selected MRR</div><div class="metric-val" id="mMrr">$1,500</div><div class="metric-sub">custom anchor</div></div>
-      <div class="metric"><div class="metric-lbl">CAC threshold</div><div class="metric-val purple" id="mCac">$5,000</div><div class="metric-sub">payback target</div></div>
-      <div class="metric"><div class="metric-lbl">Best LTV:CAC</div><div class="metric-val" id="mBestRatio">0.00×</div><div class="metric-sub" id="mBestRatioSub">scenario</div></div>
-      <div class="metric"><div class="metric-lbl">Lowest horizon churn</div><div class="metric-val" id="mBestChurn">0%</div><div class="metric-sub" id="mBestChurnSub">scenario</div></div>
-      <div class="metric"><div class="metric-lbl">Fastest payback</div><div class="metric-val" id="mBestPayback">—</div><div class="metric-sub" id="mBestPaybackSub">scenario</div></div>
-      <div class="metric"><div class="metric-lbl">Scenarios</div><div class="metric-val" id="mScenarioCount">0</div><div class="metric-sub">grid searched</div></div>
-    </div>
-
-    <div class="grid">
-      <div id="scenario" class="section-anchor"></div>
-      <div class="card wide">
-        <div class="card-hdr">
-          <div><div class="card-title">Three-dimensional scenario curves</div><div class="card-sub">Use the chips below the chart to choose which MRR, onboarding, and waived-month combinations are generated. Fewer selected chips make the chart easier to read.</div></div>
-          <div class="toggles"><label><input type="checkbox" id="showLabels"> labels</label><label><input type="checkbox" id="showCac" checked> CAC line</label><label><input type="checkbox" id="highlightBest" checked> emphasize best</label></div>
-        </div>
-        <div class="chart-wrap tall"><canvas class="chart" id="matrixChart"></canvas></div>
-        <div class="dimension-picker" id="dimensionPicker"></div>
-        <div class="chart-audit">
-          <div class="audit-pill"><div class="audit-k">Lines shown</div><div class="audit-v" id="aLines">0</div></div>
-          <div class="audit-pill"><div class="audit-k">Best visible</div><div class="audit-v" id="aBestVisible">—</div></div>
-          <div class="audit-pill"><div class="audit-k">Metric</div><div class="audit-v" id="aMetric">—</div></div>
-          <div class="audit-pill"><div class="audit-k">Revenue rule</div><div class="audit-v">MRR starts after waived months</div></div>
-        </div>
-        <div class="legend" id="matrixLegend"></div>
-      </div>
-
-      <div id="segments" class="section-anchor"></div>
-      <div class="card wide">
-        <div class="card-hdr"><div><div class="card-title">Dynamic segment view</div><div class="card-sub">Aggregates the selected scenarios so you can isolate one dimension at a time without losing the selected assumptions.</div></div></div>
-        <div class="chart-wrap"><canvas class="chart" id="segmentChart"></canvas></div>
-        <div class="legend" id="segmentLegend"></div>
-      </div>
-
-      <div id="heatmap" class="section-anchor"></div>
-      <div class="card">
-        <div class="card-hdr"><div><div class="card-title">Optimal heatmap</div><div class="card-sub">Rows are waived months, columns are onboarding %. Each cell chooses the best selected MRR for the chosen goal.</div></div></div>
-        <div class="chart-wrap"><canvas class="chart" id="heatmapChart"></canvas></div>
-      </div>
-
-      <div id="rankings" class="section-anchor"></div>
-      <div class="card">
-        <div class="card-hdr"><div><div class="card-title">Top 3 by goal metric</div><div class="card-sub">Fast executive readout across the scenario grid.</div></div></div>
-        <div class="rank-grid">
-          <div class="rank-card"><h3>Min horizon churn</h3><div id="rankChurn"></div></div>
-          <div class="rank-card"><h3>Fastest payback</h3><div id="rankPayback"></div></div>
-          <div class="rank-card"><h3>Max LTV:CAC</h3><div id="rankRatio"></div></div>
-        </div>
-      </div>
-
-      <div id="summary" class="section-anchor"></div>
-      <div class="card wide">
-        <div class="card-hdr"><div><div class="card-title">Scenario summary table</div><div class="card-sub">All modeled combinations at the selected MRR, CAC, and horizon. Churn is shown at the selected horizon and at month 12.</div></div></div>
-        <div style="overflow:auto"><table id="summaryTable"></table></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FORECAST SECTION ============ -->
-<section class="section" id="sec-forecast">
-  <div class="calc-app">
-    <div class="hdr">
-      <h1>Deal Forecast</h1>
-      <span class="tag">Pipeline simulator · win-rate + churn models · lock &amp; optimize</span>
-    </div>
-
-    <div class="note" style="margin-bottom:14px">
-      <strong>How it works:</strong> Set your deal structure. The win-rate model predicts how many of your pipeline deals close. The churn model predicts how many won accounts survive year 1. Lock any variable to hold it fixed, then optimize for your goal.
-    </div>
-
-    <!-- Optimizer buttons -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-      <button class="opt-btn" id="fc_btnMinChurn" style="border-color:var(--line)">
-        <div class="opt-icon" style="background:rgba(125,211,252,.13);color:var(--blue)">↓</div>
-        <div><span style="font-weight:700">Best Retention</span><span class="opt-sub">Lowest churn weighted by win rate</span></div>
-      </button>
-      <button class="opt-btn" id="fc_btnMaxLtv" style="border-color:var(--line)">
-        <div class="opt-icon" style="background:rgba(192,132,252,.13);color:var(--purple)">↑</div>
-        <div><span style="font-weight:700">Best Economics</span><span class="opt-sub">Highest LTV:CAC × win rate</span></div>
-      </button>
-      <button class="opt-btn" id="fc_btnMaxRev" style="border-color:var(--line)">
-        <div class="opt-icon" style="background:rgba(50,213,131,.13);color:var(--green)">$</div>
-        <div><span style="font-weight:700">Max Net Revenue</span><span class="opt-sub">Best total pipeline value</span></div>
-      </button>
-    </div>
-
-    <div style="display:grid;grid-template-columns:300px 1fr;gap:16px">
-      <!-- LEFT: controls with lock buttons -->
-      <div class="controls-pane" style="min-height:unset">
-        <div style="font-size:11px;font-weight:900;margin-bottom:14px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Deal structure · 🔒 to lock from optimizer</div>
-
-        <div class="field" style="margin-bottom:14px">
-          <div class="field-hdr">
-            <span class="field-lbl">Contract MRR</span>
-            <button class="lock-btn" id="fc_lockMrr">🔓</button>
-          </div>
-          <div class="field-val-row" style="margin-bottom:4px"><span class="field-val" id="fc_mrrVal">$1,500</span></div>
-          <input type="range" id="fc_sliderMrr" min="99" max="3000" step="1" value="1500">
-          <div class="range-ends"><span>$99</span><span>$3,000</span></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field" style="margin-bottom:14px">
-          <div class="field-hdr">
-            <span class="field-lbl">Onboarding fee (% of MRR)</span>
-            <button class="lock-btn" id="fc_lockOb">🔓</button>
-          </div>
-          <div class="field-val-row" style="margin-bottom:4px"><span class="field-val" id="fc_obVal">100%</span></div>
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:4px" id="fc_obDollar">= $1,500 upfront</div>
-          <input type="range" id="fc_sliderOb" min="0" max="200" step="5" value="100">
-          <div class="range-ends"><span>0%</span><span>200%</span></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field" style="margin-bottom:14px">
-          <div class="field-hdr">
-            <span class="field-lbl">Free months waived</span>
-            <button class="lock-btn" id="fc_lockFm">🔓</button>
-          </div>
-          <div class="fm-pills" id="fc_fmPills" style="margin-top:8px">
-            <div class="fm-pill active" data-fm="0">0</div>
-            <div class="fm-pill" data-fm="1">1</div>
-            <div class="fm-pill" data-fm="2">2</div>
-            <div class="fm-pill" data-fm="3">3</div>
-          </div>
-          <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);margin-top:4px" id="fc_fmHint">MRR billing starts month 1</div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field" style="margin-bottom:14px">
-          <div class="field-hdr"><span class="field-lbl cac-lbl">CAC per won account</span></div>
-          <div class="field-val-row" style="margin-bottom:4px"><span class="field-val" id="fc_cacVal" style="color:var(--purple)">$5,000</span></div>
-          <input type="range" id="fc_sliderCac" class="cac-slider" min="500" max="12000" step="100" value="5000">
-          <div class="range-ends"><span>$500</span><span>$12,000</span></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field">
-          <div class="field-lbl" style="display:block;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);font-weight:800">Pipeline size</div>
-          <div class="range-wrap">
-            <input type="range" id="fc_sliderDeals" min="10" max="500" step="10" value="100">
-            <input type="number" id="fc_dealsInput" min="1" max="1000" step="10" value="100" style="background:#0b0e14;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:13px">
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">deals in pipeline</div>
-        </div>
-
-        <div id="fc_lockNote" style="display:none;margin-top:14px" class="lock-note"><span>🔒</span><span id="fc_lockNoteText"></span></div>
-      </div>
-
-      <!-- RIGHT: outputs -->
-      <div class="outputs-pane" style="min-height:unset">
-        <!-- headline metrics -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
-          <div class="metric-card" style="border-color:rgba(50,213,131,.35)">
-            <div class="metric-lbl">Win rate</div>
-            <div class="metric-val good" id="fc_winRate">—</div>
-            <div class="metric-sub" id="fc_winRateSub">model prediction</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-lbl">Expected wins</div>
-            <div class="metric-val" id="fc_expectedWins">—</div>
-            <div class="metric-sub" id="fc_expectedWinsSub">of pipeline</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-lbl">12-mo churn</div>
-            <div class="metric-val" id="fc_churnRate">—</div>
-            <div class="metric-sub">of won accounts</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-lbl">Surviving yr 1</div>
-            <div class="metric-val" id="fc_surviving">—</div>
-            <div class="metric-sub" id="fc_survivingSub">expected</div>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
-          <div class="metric-card primary">
-            <div class="metric-lbl">Calibrated LTV / won</div>
-            <div class="metric-val" id="fc_ltv">—</div>
-            <div class="metric-sub">per won account</div>
-          </div>
-          <div class="metric-card cac-card">
-            <div class="metric-lbl">LTV : CAC</div>
-            <div class="metric-val" id="fc_ltvCac">—</div>
-            <div class="metric-sub" id="fc_ltvCacSub">per won account</div>
-          </div>
-          <div class="metric-card cac-card">
-            <div class="metric-lbl">Total upfront cash</div>
-            <div class="metric-val" id="fc_upfrontTotal">—</div>
-            <div class="metric-sub" id="fc_upfrontSub">OB × wins</div>
-          </div>
-          <div class="metric-card cac-card">
-            <div class="metric-lbl">Net pipeline value</div>
-            <div class="metric-val" id="fc_netPipeline">—</div>
-            <div class="metric-sub">total LTV − total CAC</div>
-          </div>
-        </div>
-
-        <!-- funnel -->
-        <div class="bk" style="margin-top:0">
-          <div style="font-size:12px;font-weight:900;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Pipeline funnel — <span id="fc_pipelineSize">100</span> deals</div>
-          <div class="bk-row"><span class="bk-lbl">Deals in pipeline</span><span class="bk-val" id="fc_fDeals" style="color:var(--blue)">100</span></div>
-          <div style="height:1px;background:var(--line);margin:4px 0"></div>
-
-          <div style="margin:10px 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900">Win stage</div>
-          <div class="bar-track" style="margin-bottom:8px"><div class="bar-fill" id="fc_winBar" style="background:linear-gradient(90deg,#32d583,#7dd3fc)"></div></div>
-          <div class="bk-row"><span class="bk-lbl">Expected won accounts</span><span class="bk-val good" id="fc_fWon">—</span></div>
-          <div class="bk-row"><span class="bk-lbl">Expected lost</span><span class="bk-val neg" id="fc_fLost">—</span></div>
-          <div class="bk-row"><span class="bk-lbl">Upfront OB cash (won deals)</span><span class="bk-val pos" id="fc_fUpfront">—</span></div>
-          <div style="height:1px;background:var(--line);margin:4px 0"></div>
-
-          <div style="margin:10px 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900">Post-win churn (year 1)</div>
-          <div class="bar-track" style="margin-bottom:8px"><div class="bar-fill" id="fc_churnBar" style="background:linear-gradient(90deg,#f97066,#c084fc)"></div></div>
-          <div class="bk-row"><span class="bk-lbl">Expected to churn within 12 mo</span><span class="bk-val neg" id="fc_fChurned">—</span></div>
-          <div class="bk-row"><span class="bk-lbl">Expected to survive year 1</span><span class="bk-val good" id="fc_fRetained">—</span></div>
-          <div style="height:1px;background:var(--line);margin:4px 0"></div>
-
-          <div style="margin:10px 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:900">Revenue (calibrated, waived months excluded)</div>
-          <div class="bk-row"><span class="bk-lbl">Calibrated LTV / won account</span><span class="bk-val pos" id="fc_fLtv">—</span></div>
-          <div class="bk-row"><span class="bk-lbl">Total pipeline LTV (won × LTV)</span><span class="bk-val pos" id="fc_fTotalLtv">—</span></div>
-          <div class="bk-row"><span class="bk-lbl">Total CAC spend (wins × CAC/won)</span><span class="bk-val neg" id="fc_fTotalCac">—</span></div>
-          <div class="bk-row" style="border-bottom:none"><span class="bk-lbl" style="font-weight:800;color:var(--text)">Net pipeline value (LTV − CAC)</span><span class="bk-val" id="fc_fNetPipeline">—</span></div>
-        </div>
-
-        <div class="insight" id="fc_insight" style="margin-top:14px"></div>
-
-        <div class="sensitivity" style="margin-top:14px">
-          <div class="chart-hdr">
-            <div>
-              <div class="chart-title">Win rate vs. churn — sweep onboarding %</div>
-              <div class="chart-note">Other inputs held at current values. Win rate (green) and 12-mo churn (red).</div>
-            </div>
-          </div>
-          <div class="chart-wrap-calc" style="height:220px"><canvas id="fc_tradeoffCanvas"></canvas></div>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -994,7 +395,6 @@ details[open] .brief-chev{transform:rotate(90deg)}
   const tabs = document.querySelectorAll('.site-tab');
   const sections = {
     home: document.getElementById('sec-home'),
-    calculator: document.getElementById('sec-calculator'),
     explorer: document.getElementById('sec-explorer'),
     forecast: document.getElementById('sec-forecast'),
   };
@@ -1020,620 +420,242 @@ details[open] .brief-chev{transform:rotate(90deg)}
   }));
 
   const initialHash = (location.hash || '#home').replace('#','').split('-')[0];
-  const knownTabs = ['home','calculator','explorer','forecast'];
+  const knownTabs = ['home','explorer','forecast'];
   show(knownTabs.includes(initialHash) ? initialHash : 'home');
 })();
 </script>
 
-<!-- ============ SHARED MODEL ENGINE (used by Calculator, Explorer, and Forecast) ============ -->
-<script>
-// ============================================================
-// CHURN MODEL — Logistic L2, 42 features, z-score standardized
-// ============================================================
-const CHURN_MODEL = {
-  intercept: 0.7104,
-  features: [
-    {name:'log_mrr',          mean:5.762408, std:1.053360, coef:-0.153083},
-    {name:'log_mrr_sq',       mean:34.287349,std:11.893578,coef:0.0},
-    {name:'mrr_lt100',        mean:0.148438, std:0.355533, coef:0.322278},
-    {name:'mrr_100_499',      mean:0.360394, std:0.480115, coef:0.188912},
-    {name:'mrr_1000p',        mean:0.370890, std:0.483136, coef:0.0},
-    {name:'high_mrr',         mean:0.506793, std:0.499954, coef:-0.293300},
-    {name:'ob_pct',           mean:0.312634, std:0.538784, coef:0.115857},
-    {name:'ob_pct_sq',        mean:0.388028, std:0.799613, coef:0.624254},
-    {name:'free_mo',          mean:0.699680, std:0.402589, coef:0.0},
-    {name:'free_mo_sq',       mean:0.571543, std:0.738192, coef:0.0},
-    {name:'any_free',         mean:0.752717, std:0.431432, coef:-0.495784},
-    {name:'free_1mo',         mean:0.683084, std:0.465274, coef:-0.444678},
-    {name:'free_2mo',         mean:0.035666, std:0.185455, coef:-0.098855},
-    {name:'free_3plus',       mean:0.033423, std:0.179759, coef:0.0},
-    {name:'coupon_15pct',     mean:0.023507, std:0.151600, coef:0.0},
-    {name:'coupon_25pct',     mean:0.039402, std:0.194550, coef:0.154421},
-    {name:'coupon_100pct',    mean:0.000340, std:0.018439, coef:0.0},
-    {name:'coupon_25pct_x_3mo',mean:0.039402,std:0.194550, coef:0.154421},
-    {name:'coupon_15pct_x_12mo',mean:0.023507,std:0.151600,coef:0.0},
-    {name:'discount_length_mo',mean:0.248302,std:1.301845, coef:0.114867},
-    {name:'equiv_free_months', mean:0.699680,std:0.402589, coef:0.0},
-    {name:'coupon_value_pct_annual',mean:0.007936,std:0.066178,coef:0.0},
-    {name:'free_value_pct_annual',  mean:0.058307,std:0.033532,coef:0.0},
-    {name:'total_incentive_pct_annual',mean:0.066242,std:0.073618,coef:0.0},
-    {name:'total_incentive_pct_annual_sq',mean:0.009778,std:0.026195,coef:0.0},
-    {name:'mrr_x_ob',         mean:1.986763, std:3.432937, coef:-0.285426},
-    {name:'mrr_x_free',       mean:4.337892, std:2.641732, coef:0.0},
-    {name:'mrr_x_coupon',     mean:0.386990, std:1.554964, coef:0.191639},
-    {name:'ob_x_free',        mean:0.220813, std:0.477443, coef:0.0},
-    {name:'ob_x_coupon',      mean:0.063203, std:0.290634, coef:-0.778646},
-    {name:'free_x_coupon',    mean:0.020041, std:0.284219, coef:-0.135298},
-    {name:'highmrr_x_ob',     mean:0.200617, std:0.388420, coef:0.0},
-    {name:'highmrr_x_free',   mean:0.443274, std:0.760910, coef:0.226600},
-    {name:'highmrr_x_coupon', mean:0.058424, std:0.234543, coef:0.124195},
-    {name:'anyfree_x_log_mrr',mean:4.337892, std:2.641732, coef:0.409848},
-    {name:'anyfree_x_high_mrr',mean:0.368546,std:0.482411, coef:0.429278},
-    {name:'anyfree_x_ob_pct', mean:0.220813, std:0.477443, coef:0.395095},
-    {name:'anyfree_x_ob_pct_sq',mean:0.276710,std:0.696516,coef:-0.581027},
-    {name:'incentive_x_log_mrr',mean:0.378698,std:0.193060,coef:0.0},
-    {name:'incentive_x_ob',   mean:0.026937, std:0.059923, coef:-0.150639},
-    {name:'log_cohort_age',   mean:3.233468, std:0.866114, coef:0.747569},
-    {name:'log_cohort_age_sq',mean:11.205466,std:5.098534, coef:0.486184},
-  ]
-};
-
-// ============================================================
-// WIN-RATE MODEL — Direct ElasticNet with interactions, 8 features
-// LOO R² 0.4474 · RMSE 0.0343 · N=14 months
-// ============================================================
-const WINRATE_MODEL = {
-  intercept: 0.223357,
-  win_rate_min_clamp: 0.08,
-  win_rate_max_clamp: 0.40,
-  features: [
-    {name:'avg_coupon_15pct', mean:0.052683, std:0.129184, coef:0.005573},
-    {name:'avg_coupon_25pct', mean:0.026113, std:0.078158, coef:0.045761},
-    {name:'avg_free_mo',      mean:0.699680, std:0.402589, coef:-0.000000},
-    {name:'avg_log_mrr',      mean:6.494034, std:0.304220, coef:-0.067788},
-    {name:'avg_ob_pct',       mean:0.708795, std:0.456633, coef:-0.203934},
-    {name:'ix_mrr_free',      mean:4.451093, std:2.490561, coef:-0.073078},
-    {name:'ix_mrr_ob',        mean:4.502319, std:2.816991, coef:0.059188},
-    {name:'ix_ob_free',       mean:0.585069, std:0.524263, coef:0.149384},
-  ]
-};
-
-// ============================================================
-// SHARED SCORING FUNCTIONS
-// ============================================================
-function sigmoid(x){ return 1 / (1 + Math.exp(-x)); }
-
-/**
- * Build all 42 churn features from raw deal inputs.
- * discountPct: decimal (0.15 = 15%, 0.25 = 25%, 1.0 = 100%)
- * obPct: decimal ratio (1.0 = 100% of MRR)
- * freeMonths: integer 0-3
- * cohortAge: months old (default 14 = current cohort)
- */
-function buildChurnFeatures(mrr, obPct, freeMonths, discountPct, cohortAge) {
-  cohortAge = cohortAge || 14;
-  discountPct = discountPct || 0;
-  const logMrr = Math.log(Math.max(mrr, 1));
-  const logMrrSq = logMrr ** 2;
-  const mrr_lt100 = mrr < 100 ? 1 : 0;
-  const mrr_100_499 = (mrr >= 100 && mrr < 500) ? 1 : 0;
-  const mrr_1000p = mrr >= 1000 ? 1 : 0;
-  const high_mrr = mrr >= 500 ? 1 : 0;
-  const ob = obPct; // already a decimal ratio e.g. 1.0 = 100%
-  const obSq = ob ** 2;
-  const fm = Math.min(Math.max(freeMonths, 0), 3);
-  const fmSq = fm ** 2;
-  const anyFree = fm > 0 ? 1 : 0;
-  const free_1mo = fm === 1 ? 1 : 0;   // EXACTLY 1 free month (not anyFree)
-  const free_2mo = fm === 2 ? 1 : 0;
-  const free_3plus = fm >= 3 ? 1 : 0;
-  const c15 = Math.abs(discountPct - 0.15) <= 0.005 ? 1 : 0;
-  const c25 = Math.abs(discountPct - 0.25) <= 0.005 ? 1 : 0;
-  const c100 = Math.abs(discountPct - 1.00) <= 0.005 ? 1 : 0;
-  const c25x3mo = c25; // same variable in this model
-  const c15x12mo = c15;
-  const discLen = discountPct > 0 ? (c25 ? 3 : c15 ? 12 : 0) : 0;
-  const equivFm = fm;
-  const couponValPct = c25 ? 0.25/12*3 : c15 ? 0.15 : c100 ? 1.0 : 0;
-  const freeValPct = fm / 12;
-  const totalIncentive = couponValPct + freeValPct;
-  const totalIncentiveSq = totalIncentive ** 2;
-  const logCohort = Math.log(Math.max(cohortAge, 1));
-  const logCohortSq = logCohort ** 2;
-
-  return {
-    log_mrr: logMrr,
-    log_mrr_sq: logMrrSq,
-    mrr_lt100,
-    mrr_100_499,
-    mrr_1000p,
-    high_mrr,
-    ob_pct: ob,
-    ob_pct_sq: obSq,
-    free_mo: fm,
-    free_mo_sq: fmSq,
-    any_free: anyFree,
-    free_1mo,
-    free_2mo,
-    free_3plus,
-    coupon_15pct: c15,
-    coupon_25pct: c25,
-    coupon_100pct: c100,
-    coupon_25pct_x_3mo: c25x3mo,
-    coupon_15pct_x_12mo: c15x12mo,
-    discount_length_mo: discLen,
-    equiv_free_months: equivFm,
-    coupon_value_pct_annual: couponValPct,
-    free_value_pct_annual: freeValPct,
-    total_incentive_pct_annual: totalIncentive,
-    total_incentive_pct_annual_sq: totalIncentiveSq,
-    mrr_x_ob: logMrr * ob,
-    mrr_x_free: logMrr * fm,
-    mrr_x_coupon: logMrr * (c15 + c25 + c100),
-    ob_x_free: ob * fm,
-    ob_x_coupon: ob * (c15 + c25 + c100),
-    free_x_coupon: fm * (c15 + c25 + c100),
-    highmrr_x_ob: high_mrr * ob,
-    highmrr_x_free: high_mrr * fm,
-    highmrr_x_coupon: high_mrr * (c15 + c25 + c100),
-    anyfree_x_log_mrr: anyFree * logMrr,
-    anyfree_x_high_mrr: anyFree * high_mrr,
-    anyfree_x_ob_pct: anyFree * ob,
-    anyfree_x_ob_pct_sq: anyFree * obSq,
-    incentive_x_log_mrr: totalIncentive * logMrr,
-    incentive_x_ob: totalIncentive * ob,
-    log_cohort_age: logCohort,
-    log_cohort_age_sq: logCohortSq,
-  };
-}
-
-function scoreChurn(mrr, obPct, freeMonths, discountPct, cohortAge) {
-  const f = buildChurnFeatures(mrr, obPct, freeMonths, discountPct, cohortAge);
-  let score = CHURN_MODEL.intercept;
-  for (const feat of CHURN_MODEL.features) {
-    const raw = f[feat.name] !== undefined ? f[feat.name] : feat.mean;
-    const z = (raw - feat.mean) / (feat.std || 1);
-    score += feat.coef * z;
-  }
-  return sigmoid(score);
-}
-
-/**
- * Build win-rate features.
- * obPct: decimal ratio (1.0 = 100%)
- * discountPct: 0.15, 0.25, or 1.0 (decimal)
- */
-function buildWinRateFeatures(mrr, obPct, freeMonths, discountPct) {
-  discountPct = discountPct || 0;
-  const logMrr = Math.log(Math.max(mrr, 1));
-  const fm = Math.min(Math.max(Number(freeMonths || 0), 0), 3);
-  const ob = Math.max(Number(obPct || 0), 0);
-  const c15  = Math.abs(discountPct - 0.15) <= 0.005 ? 1 : 0;
-  const c25  = Math.abs(discountPct - 0.25) <= 0.005 ? 1 : 0;
-  const c100 = Math.abs(discountPct - 1.00) <= 0.005 ? 1 : 0;
-  return {
-    avg_log_mrr:          logMrr,
-    avg_ob_pct:           ob,
-    avg_free_mo:          fm,
-    ix_mrr_ob:            logMrr * ob,
-    ix_mrr_free:          logMrr * fm,
-    ix_ob_free:           ob * fm,
-    avg_coupon_15pct:     c15,
-    avg_coupon_25pct:     c25,
-    avg_coupon_100pct:    c100,
-    ix_coupon_15pct_mrr:  c15 * logMrr,
-    ix_coupon_15pct_ob:   c15 * ob,
-    ix_coupon_15pct_free: c15 * fm,
-    ix_coupon_25pct_mrr:  c25 * logMrr,
-    ix_coupon_25pct_ob:   c25 * ob,
-    ix_coupon_25pct_free: c25 * fm,
-  };
-}
-
-function scoreWinRate(mrr, obPct, freeMonths, discountPct) {
-  const f = buildWinRateFeatures(mrr, obPct, freeMonths, discountPct);
-  let score = WINRATE_MODEL.intercept;
-  for (const feat of WINRATE_MODEL.features) {
-    const raw = f[feat.name] !== undefined ? f[feat.name] : feat.mean;
-    const z = (raw - feat.mean) / (feat.std || 1);
-    score += feat.coef * z;
-  }
-  return Math.min(Math.max(score, WINRATE_MODEL.win_rate_min_clamp), WINRATE_MODEL.win_rate_max_clamp);
-}
-
-// LTV helpers — survival-curve approach using churn probability
-const CALIBRATION = 0.3854;
-const MAX_LTV_MONTHS = 120;
-
-/**
- * Convert a one-year churn probability into a monthly hazard (constant hazard assumption).
- * p_annual = 1 - (1 - h)^12  =>  h = 1 - (1-p)^(1/12)
- */
-function annualChurnToMonthlyHazard(annualChurn) {
-  return 1 - Math.pow(Math.max(1 - annualChurn, 0.001), 1/12);
-}
-
-function ltvBreakdown(mrr, obPct, freeMonths, discountPct) {
-  const annualChurn = scoreChurn(mrr, obPct, freeMonths, discountPct);
-  const h = annualChurnToMonthlyHazard(annualChurn);
-  const upfront = mrr * obPct;
-  let survival = 1, mrrRev24 = 0, noChurn24 = 0, analytical = upfront;
-  for (let t = 1; t <= MAX_LTV_MONTHS; t++) {
-    survival *= (1 - h);
-    // Waived months = $0. After waived period, full MRR (coupons removed from model).
-    const billedMrr = t > freeMonths ? mrr : 0;
-    const expectedMrr = billedMrr * survival;
-    analytical += expectedMrr;
-    if (t <= 24) {
-      mrrRev24 += expectedMrr;
-      noChurn24 += billedMrr; // no-churn revenue also respects waived months
-    }
-  }
-  return {upfront, mrrRev24, lost24: noChurn24 - mrrRev24, analytical, calibrated: analytical * CALIBRATION, annualChurn};
-}
-
-function paybackMonth(mrr, obPct, freeMonths, discountPct, cac) {
-  const annualChurn = scoreChurn(mrr, obPct, freeMonths, discountPct);
-  const h = annualChurnToMonthlyHazard(annualChurn);
-  let cum = mrr * obPct * CALIBRATION;
-  let survival = 1;
-  if (cum >= cac) return 0;
-  for (let t = 1; t <= 60; t++) {
-    survival *= (1 - h);
-    if (t > freeMonths) cum += (mrr * survival) * CALIBRATION;
-    if (cum >= cac) return t;
-  }
-  return null;
-}
-
-function churn12(mrr, obPct, fm, discountPct) {
-  return scoreChurn(mrr, obPct, fm, discountPct);
-}
-</script>
-
-<!-- ============ CALCULATOR LOGIC (IIFE) ============ -->
+<!-- ============ HOME CHARTS IIFE ============ -->
 <script>
 (function(){
+const CAC_BASELINE = 5000;
 
-const locks = {mrr:false, ob:false, fm:false};
-let fm = 0;
-
-function byId(id){ return document.getElementById(id); }
-function fmtUSD(v){ return '$' + Math.round(v).toLocaleString(); }
-function fmtPct(v){ return (v * 100).toFixed(1) + '%'; }
-function fmtN4(v){ return typeof v === 'number' ? v.toFixed(4) : v; }
-function fmtP(v){ return v == null ? '—' : v.toFixed(4); }
-function riskClassChurn(c){ return c < .40 ? 'good' : c < .65 ? 'warn' : 'bad'; }
-function ltvClass(v,mrr){ return v > mrr * 20 ? 'good' : v > mrr * 10 ? 'warn' : 'bad'; }
-
-function updateLockUI(){
-  ['mrr','ob','fm'].forEach(k=>{
-    const btn = byId('lock' + k[0].toUpperCase() + k.slice(1));
-    btn.textContent = locks[k] ? '🔒' : '🔓';
-    btn.classList.toggle('locked', locks[k]);
-  });
-  byId('sliderMrr').classList.toggle('locked-slider', locks.mrr);
-  byId('sliderOb').classList.toggle('locked-slider', locks.ob);
-  document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('locked-pill', locks.fm));
-  const locked = Object.entries(locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
-  const note = byId('lockNote');
-  if(locked.length){ note.style.display = 'flex'; byId('lockNoteText').textContent = locked.join(', ') + ' locked — optimizer skips these'; }
-  else { note.style.display = 'none'; }
-}
-
-byId('lockMrr').addEventListener('click',()=>{locks.mrr = !locks.mrr; updateLockUI();});
-byId('lockOb').addEventListener('click',()=>{locks.ob = !locks.ob; updateLockUI();});
-byId('lockFm').addEventListener('click',()=>{locks.fm = !locks.fm; updateLockUI();});
-
-byId('fmPills').querySelectorAll('.fm-pill').forEach(p=>{
-  p.addEventListener('click',()=>{
-    if(locks.fm) return;
-    fm = +p.dataset.fm; setFm(fm); clearOpt(); update();
-  });
-});
-
-function setFm(v){
-  fm = v;
-  document.querySelectorAll('.fm-pill').forEach(p=>p.classList.toggle('active', +p.dataset.fm === v));
-}
-
-byId('sliderMrr').addEventListener('input',()=>{clearOpt(); update();});
-byId('sliderOb').addEventListener('input',()=>{clearOpt(); update();});
-byId('sliderCac').addEventListener('input',()=>update());
-byId('chartX').addEventListener('change',()=>update());
-byId('chartY').addEventListener('change',()=>update());
-
-function clearOpt(){ document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('active-opt')); }
-
-function optimize(goal){
-  const MRR = []; for(let m=99; m<=3000; m+=25) MRR.push(m);
-  const OB = []; for(let o=0; o<=200; o+=5) OB.push(o);  // stored as %
-  const FM = [0,1,2,3];
-  const curMrr = +byId('sliderMrr').value;
-  const curOb = +byId('sliderOb').value;
-  const curFm = fm;
-  const cac = +byId('sliderCac').value;
-  const discPct = 0;
-  const mrrRange = locks.mrr ? [curMrr] : MRR;
-  const obRange = locks.ob ? [curOb] : OB;
-  const fmRange = locks.fm ? [curFm] : FM;
-
-  let bestMrr = curMrr, bestOb = curOb, bestFm = curFm;
-  let best = goal === 'ltv' ? -Infinity : Infinity;
-  for(const m of mrrRange) for(const o of obRange) for(const f of fmRange){
-    const obR = o / 100;
-    const ltv = ltvBreakdown(m, obR, f, discPct).calibrated;
-    const score = goal === 'ltv' ? ltv : churn12(m, obR, f, discPct);
-    if((goal === 'ltv' && score > best) || (goal === 'churn' && score < best)){
-      best = score; bestMrr = m; bestOb = o; bestFm = f;
-    }
-  }
-  if(!locks.mrr) byId('sliderMrr').value = bestMrr;
-  if(!locks.ob) byId('sliderOb').value = bestOb;
-  if(!locks.fm) setFm(bestFm);
-  update();
-
-  const locked = Object.entries(locks).filter(([,v])=>v).map(([k])=>k.toUpperCase());
-  if(locked.length){
-    const metric = goal === 'ltv' ? fmtUSD(best) + ' calibrated LTV' : fmtPct(best) + ' 12-mo churn';
-    byId('lockNote').style.display = 'flex';
-    byId('lockNoteText').textContent = locked.join(', ') + ' locked — best unlocked: ' + metric + ' at ' + fmtUSD(bestMrr) + ' MRR, ' + bestOb + '% OB, ' + bestFm + ' free mo';
-  }
-}
-
-byId('btnMinChurn').addEventListener('click',()=>{ clearOpt(); byId('btnMinChurn').classList.add('active-opt'); optimize('churn'); });
-byId('btnMaxLtv').addEventListener('click',()=>{ clearOpt(); byId('btnMaxLtv').classList.add('active-opt'); optimize('ltv'); });
-
-function renderAudit(id, rows){
-  byId(id).innerHTML = rows.map(([name,val,coef,p,note])=>{
-    const cls = Math.abs(coef) < 1e-6 ? 'dim' : coef > 0 ? 'pos' : 'neg';
-    return `<div class="audit-row"><span class="audit-var">${name}<span class="audit-note">${note || ''}</span></span><span class="audit-live">${fmtN4(val)}</span><span class="audit-coef ${cls}">${coef>0?'+':''}${coef.toFixed(4)}</span><span class="audit-p">${fmtP(p)}</span></div>`;
-  }).join('');
-}
-
-function chartSeries(currentMrr, currentObPct, currentFm, currentCac, currentDisc, xKey, yKey){
-  let xs = [];
-  if(xKey === 'mrr'){ for(let v=99; v<=3000; v+=50) xs.push(v); }
-  else if(xKey === 'ob'){ for(let v=0; v<=200; v+=5) xs.push(v); }
-  else if(xKey === 'fm'){ xs = [0,1,2,3]; }
-  else if(xKey === 'cac'){ for(let v=500; v<=12000; v+=250) xs.push(v); }
-  return xs.map(x=>{
-    const m = xKey === 'mrr' ? x : currentMrr;
-    const oPct = xKey === 'ob' ? x : currentObPct;
-    const oR = oPct / 100;
-    const f = xKey === 'fm' ? x : currentFm;
-    const c = xKey === 'cac' ? x : currentCac;
-    const disc = currentDisc;
-    const bk = ltvBreakdown(m, oR, f, disc);
-    const ltv = bk.calibrated;
-    const ch = churn12(m, oR, f, disc);
-    const ratio = ltv / c;
-    const net = ltv - c;
-    const pbRaw = paybackMonth(m, oR, f, disc, c);
-    const payback = pbRaw === null ? 61 : pbRaw;
-    let y;
-    if(yKey === 'ltv') y = ltv;
-    else if(yKey === 'churn') y = ch;
-    else if(yKey === 'ratio') y = ratio;
-    else if(yKey === 'net') y = net;
-    else y = payback;
-    return {x,y,m,o:oPct,f,c,ltv,churn:ch,ratio,net,payback:pbRaw};
-  });
-}
-
-function fmtChartVal(yKey, v){
-  if(yKey === 'ltv' || yKey === 'net') return fmtUSD(v);
-  if(yKey === 'churn') return fmtPct(v);
-  if(yKey === 'ratio') return v.toFixed(2) + '×';
-  if(v >= 61) return '>60 mo';
-  return Math.round(v) + ' mo';
-}
-function fmtXVal(xKey, v){
-  if(xKey === 'mrr') return fmtUSD(v);
-  if(xKey === 'ob') return Math.round(v) + '%';
-  if(xKey === 'fm') return Math.round(v) + ' mo';
-  return fmtUSD(v);
-}
-
-function drawSensitivityChart(mrr, obPct, fmVal, cac, disc){
-  const canvas = byId('sensitivityCanvas');
-  if(!canvas) return;
+function setupCanvas(id){
+  const canvas = document.getElementById(id);
+  if(!canvas) return null;
   const rect = canvas.getBoundingClientRect();
-  if(rect.width === 0 || rect.height === 0) return;
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  if(!rect.width || !rect.height) return null;
+  const dpr = window.devicePixelRatio||1;
+  canvas.width  = Math.floor(rect.width*dpr);
+  canvas.height = Math.floor(rect.height*dpr);
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  const w = rect.width, h = rect.height;
-  ctx.clearRect(0,0,w,h);
-  const xKey = byId('chartX').value;
-  const yKey = byId('chartY').value;
-  const data = chartSeries(mrr, obPct, fmVal, cac, disc, xKey, yKey);
-  if(!data.length) return;
-  const pad = {l:62,r:18,t:18,b:42};
-  const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
-  const xs = data.map(d=>d.x), ys = data.map(d=>d.y);
-  const minX = Math.min(...xs), maxX = Math.max(...xs);
-  let minY = Math.min(...ys), maxY = Math.max(...ys);
-  if(yKey === 'churn') { minY = 0; maxY = Math.max(maxY, .05); }
-  if(yKey === 'ratio') { minY = 0; maxY = Math.max(maxY, 1); }
-  if(yKey === 'payback') { minY = 0; maxY = 61; }
-  if(minY === maxY){ minY -= 1; maxY += 1; }
-  const yPad = (maxY - minY) * .08;
-  if(yKey !== 'churn' && yKey !== 'ratio' && yKey !== 'payback') { minY -= yPad; maxY += yPad; }
-
-  const xToPx = x => pad.l + ((x - minX) / (maxX - minX || 1)) * plotW;
-  const yToPx = y => pad.t + (1 - ((y - minY) / (maxY - minY || 1))) * plotH;
-
-  ctx.strokeStyle = 'rgba(255,255,255,.12)';
-  ctx.lineWidth = 1;
-  ctx.font = '11px Inter, system-ui, sans-serif';
-  ctx.fillStyle = '#737d91';
-  for(let i=0; i<=4; i++){
-    const yy = pad.t + (plotH * i / 4);
-    const val = maxY - (maxY-minY) * i / 4;
-    ctx.beginPath(); ctx.moveTo(pad.l, yy); ctx.lineTo(w-pad.r, yy); ctx.stroke();
-    ctx.fillText(fmtChartVal(yKey, val), 8, yy+4);
-  }
-  for(let i=0; i<=4; i++){
-    const xx = pad.l + (plotW * i / 4);
-    const val = minX + (maxX-minX) * i / 4;
-    ctx.fillText(fmtXVal(xKey, val), xx-18, h-14);
-  }
-  ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 2.5; ctx.beginPath();
-  data.forEach((d,i)=>{ const xx = xToPx(d.x), yy = yToPx(d.y); if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy); });
-  ctx.stroke();
-
-  const currentX = xKey === 'mrr' ? mrr : xKey === 'ob' ? obPct : xKey === 'fm' ? fmVal : cac;
-  const nearest = data.reduce((best,d)=>Math.abs(d.x-currentX)<Math.abs(best.x-currentX)?d:best, data[0]);
-  const nx = xToPx(nearest.x), ny = yToPx(nearest.y);
-  ctx.fillStyle = '#f4f6fb';
-  ctx.beginPath(); ctx.arc(nx, ny, 4.5, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = 'rgba(244,246,251,.55)';
-  ctx.beginPath(); ctx.moveTo(nx, pad.t); ctx.lineTo(nx, pad.t+plotH); ctx.stroke();
-
-  const label = fmtXVal(xKey, nearest.x) + ' → ' + fmtChartVal(yKey, nearest.y);
-  ctx.fillStyle = 'rgba(11,14,20,.92)';
-  const labelW = Math.min(210, Math.max(120, label.length * 6.5 + 18));
-  const lx = Math.min(w - labelW - 8, Math.max(8, nx - labelW / 2));
-  const ly = Math.max(8, ny - 34);
-  ctx.fillRect(lx, ly, labelW, 24);
-  ctx.strokeStyle = 'rgba(255,255,255,.16)';
-  ctx.strokeRect(lx, ly, labelW, 24);
-  ctx.fillStyle = '#f4f6fb';
-  ctx.fillText(label, lx + 9, ly + 16);
-
-  const fixedParts = [];
-  if(xKey !== 'mrr') fixedParts.push('MRR ' + fmtUSD(mrr));
-  if(xKey !== 'ob') fixedParts.push('OB ' + obPct + '%');
-  if(xKey !== 'fm') fixedParts.push(fmVal + ' free mo');
-  if(xKey !== 'cac') fixedParts.push('CAC ' + fmtUSD(cac));
-  byId('chartNote').textContent = 'Curve holds ' + fixedParts.join(' · ') + ' constant. Locked variables stay fixed and still affect the curve/score.';
+  ctx.clearRect(0,0,rect.width,rect.height);
+  return {ctx, w:rect.width, h:rect.height};
 }
 
-function update(){
-  const mrr = +byId('sliderMrr').value;
-  const obPctPct = +byId('sliderOb').value;  // 0–200 as displayed %
-  const obPctRatio = obPctPct / 100;          // convert to decimal ratio for model
-  const cac = +byId('sliderCac').value;
-  const discPct = 0; // coupons excluded — insufficient sample size
+// ===== KPI cards =====
+function renderKpis(){
+  const baseMrr = Math.exp(6.494);
+  const baseOb  = 0.5;
+  const baseFm  = 0;
+  const wr_  = scoreWinRate(baseMrr, baseOb, baseFm, 0);
+  const ch_  = scoreChurn(baseMrr, baseOb, baseFm, 0);
+  const ltv_ = ltvBreakdown(baseMrr, baseOb, baseFm, 0).calibrated;
+  const ratio= ltv_ / CAC_BASELINE;
+  const wrEl = document.getElementById('hKpiWr');
+  if(wrEl){ wrEl.textContent = (wr_*100).toFixed(0)+'%'; wrEl.className='exec-kpi-v '+(wr_>=0.15?'good':'warn'); }
+  const chEl = document.getElementById('hKpiChurn');
+  if(chEl){ chEl.textContent = (ch_*100).toFixed(0)+'%'; chEl.className='exec-kpi-v warn'; }
+  const ltvEl = document.getElementById('hKpiLtv');
+  if(ltvEl){ ltvEl.textContent = ratio.toFixed(2)+'×'; ltvEl.className='exec-kpi-v '+(ratio>=3?'good':ratio>=1.5?'warn':'bad'); }
+}
 
-  byId('mrrVal').textContent = '$' + mrr.toLocaleString();
-  byId('obVal').textContent = obPctPct + '%';
-  byId('obDollar').textContent = '= $' + Math.round(mrr * obPctRatio).toLocaleString() + ' upfront';
-  byId('cacVal').textContent = '$' + cac.toLocaleString();
-  byId('fmHint').textContent = fm === 0 ? 'MRR billing starts month 1' : `${fm} month${fm>1?'s':''} waived · billing starts month ${fm+1}`;
+// ===== Grouped bar chart: 3 lines (win rate, retention, ltv:cac scaled) =====
+function drawGroupedBar(id, groups, yMax){
+  const sz=setupCanvas(id); if(!sz) return;
+  const {ctx,w,h}=sz;
+  const pad={l:36,r:10,t:18,b:36};
+  const pw=w-pad.l-pad.r, ph=h-pad.t-pad.b;
+  const nG=groups.length, barSlot=pw/nG;
+  const barW=Math.min(22, barSlot*0.25), gap=3;
 
-  const c12 = churn12(mrr, obPctRatio, fm, discPct);
-  const wr = scoreWinRate(mrr, obPctRatio, fm, discPct);
-  const bk = ltvBreakdown(mrr, obPctRatio, fm, discPct);
-  const ltv = bk.calibrated;
-  const ltvCac = ltv / cac;
-  const net = ltv - cac;
-  const pb = paybackMonth(mrr, obPctRatio, fm, discPct, cac);
-  const h1 = annualChurnToMonthlyHazard(c12);
+  const yp=v=>pad.t+(1-v/yMax)*ph;
+  const zeroY=pad.t+ph;
 
-  const ltvEl = byId('oLtv'); ltvEl.textContent = fmtUSD(ltv); ltvEl.className = 'metric-val ' + ltvClass(ltv, mrr);
-  byId('oLtvSub').textContent = `${fmtUSD(bk.analytical)} analytical × ${CALIBRATION}`;
-
-  const chEl = byId('oChurn'); chEl.textContent = fmtPct(c12); chEl.className = 'metric-val ' + riskClassChurn(c12);
-  byId('oChurnSub').textContent = c12 < .40 ? 'low risk' : c12 < .65 ? 'moderate' : 'high risk';
-
-  const wrEl = byId('oWinRate'); wrEl.textContent = fmtPct(wr); wrEl.className = 'metric-val ' + (wr >= 0.28 ? 'good' : wr >= 0.18 ? 'warn' : 'bad');
-  byId('oWinRateSub').textContent = 'model · clamped 8–40%';
-
-  const hz = byId('oHazard'); hz.textContent = fmtPct(h1); hz.className = 'metric-val ' + (h1 < .03 ? 'good' : h1 < .05 ? 'warn' : 'bad');
-
-  const ratio = byId('oLtvCac'); ratio.textContent = ltvCac.toFixed(2) + '×';
-  ratio.className = 'metric-val ' + (ltvCac >= 3 ? 'good' : ltvCac >= 1.5 ? 'warn' : 'bad');
-  byId('oLtvCacSub').textContent = ltvCac >= 3 ? 'healthy' : ltvCac >= 1 ? 'pays back' : 'underwater';
-
-  const pbEl = byId('oPayback'); pbEl.textContent = pb === null ? '>60 mo' : pb === 0 ? '0 mo' : pb + ' mo';
-  pbEl.className = 'metric-val ' + (pb !== null && pb <= 12 ? 'good' : pb !== null && pb <= 24 ? 'warn' : 'bad');
-  byId('oPaybackSub').textContent = pb === null ? 'not recovered in 5yr' : pb === 0 ? 'upfront only' : `month ${pb}`;
-
-  const netEl = byId('oNet'); netEl.textContent = (net >= 0 ? '+' : '−') + fmtUSD(Math.abs(net));
-  netEl.className = 'metric-val ' + (net >= 0 ? 'good' : 'bad');
-
-  const fill = byId('barFill');
-  const pct = Math.min(c12 * 100, 100);
-  fill.style.width = pct + '%';
-  fill.style.background = c12 < .35
-    ? 'linear-gradient(90deg,#32d583,#7dd3fc)'
-    : c12 < .55
-      ? 'linear-gradient(90deg,#fdb022,#f0abfc)'
-      : 'linear-gradient(90deg,#f97066,#c084fc)';
-  byId('barLbl').textContent = fmtPct(c12);
-
-  byId('bUpfront').textContent = fmtUSD(bk.upfront);
-  byId('bMrrRev').textContent = fmtUSD(bk.mrrRev24);
-  byId('bLost').textContent = '−' + fmtUSD(bk.lost24);
-  byId('bAnalytical').textContent = fmtUSD(bk.analytical);
-  byId('bModel').textContent = fmtUSD(bk.calibrated);
-  byId('bCac').textContent = fmtUSD(cac);
-  const bRatio = byId('bRatio');
-  bRatio.textContent = ltvCac.toFixed(2) + '×';
-  bRatio.className = 'bk-val ' + (ltvCac >= 3 ? 'pos' : ltvCac >= 1 ? 'purple' : 'neg');
-  const bNet = byId('bNet');
-  bNet.textContent = (net >= 0 ? '+' : '−') + fmtUSD(Math.abs(net));
-  bNet.className = 'bk-val ' + (net >= 0 ? 'pos' : 'neg');
-
-  let insight;
-  if(ltvCac < 1){
-    insight = `<strong>Underwater.</strong> Calibrated LTV (${fmtUSD(ltv)}) is below CAC (${fmtUSD(cac)}). Lower onboarding toward <code>0–25%</code> to reduce churn. Win rate is currently <code>${fmtPct(wr)}</code> — discount or free months affect both metrics.`;
-  } else if(c12 > .70){
-    insight = `<strong>High churn risk (${fmtPct(c12)}).</strong> In the new model, <strong>lower</strong> onboarding reduces churn. Try reducing OB toward <code>0–25%</code> or removing waived months. Win rate is <code>${fmtPct(wr)}</code>.`;
-  } else if(pb === null){
-    insight = `<strong>CAC does not pay back within 5 years.</strong> Onboarding cash (day-1) is the fastest payback lever — but note that raising OB also raises churn and lowers win rate in this model. Try the Forecast tab to see total pipeline impact.`;
-  } else if(c12 < .40 && ltvCac >= 3){
-    insight = `<strong>Strong structure.</strong> <code>${obPctPct}%</code> onboarding with <code>${fm}</code> waived month${fm===1?'':'s'} → ${fmtPct(c12)} churn · ${ltvCac.toFixed(2)}× LTV:CAC · win rate <code>${fmtPct(wr)}</code>. Payback in ${pb===0?'upfront only':`month ${pb}`}.`;
-  } else {
-    insight = `<strong>Acceptable.</strong> ${fmtPct(c12)} churn · ${ltvCac.toFixed(2)}× LTV:CAC · ${fmtPct(wr)} win rate. Payback in ${pb===0?'upfront only':`month ${pb}`}. Use the Forecast tab to model full pipeline impact.`;
+  // Grid
+  ctx.font='9px Inter,system-ui,sans-serif';
+  ctx.fillStyle='#737d91'; ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=0.5;
+  for(let i=0;i<=4;i++){
+    const yy=pad.t+ph*i/4;
+    ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();
+    ctx.fillText(Math.round(yMax*(1-i/4)*100)+'%', 2, yy+3);
   }
-  byId('insight').innerHTML = insight;
 
-  // Audit: top churn model features
-  const cf = buildChurnFeatures(mrr, obPctRatio, fm, discPct);
-  const auditRows = CHURN_MODEL.features
-    .filter(feat => Math.abs(feat.coef) > 0.001)
-    .sort((a,b) => Math.abs(b.coef) - Math.abs(a.coef))
-    .slice(0, 14)
-    .map(feat => {
-      const raw = cf[feat.name] !== undefined ? cf[feat.name] : feat.mean;
-      const z = (raw - feat.mean) / (feat.std || 1);
-      return [feat.name, raw.toFixed(4), feat.coef, null, `z=${z.toFixed(3)} · coef×z=${(feat.coef*z).toFixed(4)}`];
+  const COLORS=['#32d583','#f97066','#c084fc'];
+  const LABELS=['Win rate','Retention','LTV:CAC÷5'];
+
+  groups.forEach((g,gi)=>{
+    const cx=pad.l+barSlot*(gi+0.5);
+    const totalW=(barW+gap)*3-gap;
+    g.vals.forEach((v,si)=>{
+      const x=cx-totalW/2+si*(barW+gap);
+      const bh=Math.max(2,Math.abs(yp(v)-zeroY));
+      const topY=Math.min(yp(v),zeroY);
+      ctx.fillStyle=COLORS[si];
+      ctx.beginPath();
+      if(ctx.roundRect) ctx.roundRect(x,topY,barW,bh,2); else ctx.rect(x,topY,barW,bh);
+      ctx.fill();
     });
-  renderAudit('auditChurn', auditRows);
-
-  // Audit: win rate model features
-  const wf = buildWinRateFeatures(mrr, obPctRatio, fm, discPct);
-  const wrAuditRows = WINRATE_MODEL.features.map(feat => {
-    const raw = wf[feat.name] !== undefined ? wf[feat.name] : feat.mean;
-    const z = (raw - feat.mean) / (feat.std || 1);
-    return [feat.name, raw.toFixed(4), feat.coef, null, `z=${z.toFixed(3)} · coef×z=${(feat.coef*z).toFixed(4)}`];
+    // X label — split on newline
+    ctx.fillStyle='#737d91'; ctx.textAlign='center'; ctx.font='9px Inter,system-ui,sans-serif';
+    const parts=g.label.split('\n');
+    parts.forEach((p,pi)=>ctx.fillText(p, cx, h-22+pi*10));
   });
-  renderAudit('auditWinRate', wrAuditRows);
+  ctx.textAlign='left';
 
-  renderAudit('auditLtv', [
-    ['Upfront onboarding cash', bk.upfront, 1, null, 'MRR × OB ratio'],
-    ['Expected MRR collected, 24 mo', bk.mrrRev24, 1, null, 'survival-weighted, constant-hazard'],
-    ['Revenue lost to churn, 24 mo', -bk.lost24, -1, null, 'no-churn minus expected'],
-    ['Analytical LTV (raw)', bk.analytical, 1, null, '120-month survival tail'],
-    ['Calibration factor', CALIBRATION, CALIBRATION, null, 'median actual ÷ analytical'],
-    ['Calibrated LTV (final)', bk.calibrated, 1, null, 'analytical × 0.3854'],
-  ]);
-
-  drawSensitivityChart(mrr, obPctPct, fm, cac, discPct);
+  // Legend top-right
+  LABELS.forEach((lbl,i)=>{
+    const lx=pad.l+4+i*68;
+    ctx.fillStyle=COLORS[i]; ctx.fillRect(lx,pad.t-10,10,4);
+    ctx.fillStyle='#737d91'; ctx.font='8.5px Inter,system-ui,sans-serif';
+    ctx.fillText(lbl, lx+13, pad.t-7);
+  });
 }
 
-updateLockUI();
-update();
+function drawMrrChart(){
+  const buckets=[
+    {label:'$250–500', mrrs:[250,350,450,500]},
+    {label:'$500–1k',  mrrs:[600,750,1000]},
+    {label:'$1k–2k',   mrrs:[1250,1500,1750,2000]},
+    {label:'$2k+',     mrrs:[2250,2500,3000]},
+  ];
+  const groups=buckets.map(b=>{
+    let wr=0,ch=0,ratio=0;
+    b.mrrs.forEach(m=>{ wr+=scoreWinRate(m,0.5,0,0); ch+=scoreChurn(m,0.5,0,0); ratio+=ltvBreakdown(m,0.5,0,0).calibrated/CAC_BASELINE; });
+    const n=b.mrrs.length;
+    return {label:b.label, vals:[wr/n, 1-(ch/n), Math.min((ratio/n)/5,1)]};
+  });
+  drawGroupedBar('hChartMrr', groups, 1.0);
+}
 
-window.addEventListener('resize', ()=>{
-  drawSensitivityChart(+byId('sliderMrr').value, +byId('sliderOb').value, fm, +byId('sliderCac').value, 0);
-});
+function drawObChart(){
+  const buckets=[
+    {label:'0–25%',  obs:[0,0.1,0.25]},
+    {label:'25–75%', obs:[0.35,0.5,0.65,0.75]},
+    {label:'75–125%',obs:[0.85,1.0,1.1,1.25]},
+    {label:'125%+',  obs:[1.4,1.5,1.75,2.0]},
+  ];
+  const groups=buckets.map(b=>{
+    let wr=0,ch=0,ratio=0;
+    b.obs.forEach(o=>{ wr+=scoreWinRate(1500,o,0,0); ch+=scoreChurn(1500,o,0,0); ratio+=ltvBreakdown(1500,o,0,0).calibrated/CAC_BASELINE; });
+    const n=b.obs.length;
+    return {label:b.label, vals:[wr/n, 1-(ch/n), Math.min((ratio/n)/5,1)]};
+  });
+  drawGroupedBar('hChartOb', groups, 1.0);
+}
 
+function drawFmChart(){
+  const groups=[0,1,2,3].map(f=>({
+    label:f+' mo',
+    vals:[scoreWinRate(1500,0.25,f,0), 1-scoreChurn(1500,0.25,f,0), Math.min(ltvBreakdown(1500,0.25,f,0).calibrated/CAC_BASELINE/5,1)]
+  }));
+  drawGroupedBar('hChartFm', groups, 1.0);
+}
+
+// ===== Win rate vs LTV:CAC range chart (by churn tier) =====
+function drawRangeChart(){
+  const sz=setupCanvas('hChartRange'); if(!sz) return;
+  const {ctx,w,h}=sz;
+  const pad={l:56,r:20,t:24,b:44};
+  const pw=w-pad.l-pad.r, ph=h-pad.t-pad.b;
+
+  // Build all scenarios
+  const low=[], mid=[], high=[];
+  for(const m of [500,750,1000,1250,1500,1750,2000,2500,3000])
+    for(const o of [0,0.25,0.5,0.75,1.0,1.25,1.5])
+      for(const f of [0,1,2,3]){
+        const wr_=scoreWinRate(m,o,f,0);
+        const ch=scoreChurn(m,o,f,0);
+        const r=ltvBreakdown(m,o,f,0).calibrated/CAC_BASELINE;
+        const pt={wr:wr_,r};
+        if(ch<0.40) low.push(pt);
+        else if(ch<0.65) mid.push(pt);
+        else high.push(pt);
+      }
+
+  function stats(arr){
+    if(!arr.length) return null;
+    const wrs=arr.map(p=>p.wr).sort((a,b)=>a-b);
+    const rs=arr.map(p=>p.r).sort((a,b)=>a-b);
+    return {
+      wrMin:wrs[0], wrMax:wrs[wrs.length-1], wrMid:(wrs[0]+wrs[wrs.length-1])/2,
+      rMin:rs[0],   rMax:rs[rs.length-1],    rMid:(rs[0]+rs[rs.length-1])/2,
+    };
+  }
+
+  const tiers=[
+    {label:'Low churn (<40%)', data:low,  color:'#32d583', textColor:'#059669'},
+    {label:'Mid churn (40–65%)',data:mid, color:'#fdb022', textColor:'#b45309'},
+    {label:'High churn (65%+)',data:high, color:'#f97066', textColor:'#dc2626'},
+  ];
+
+  const allWrs=[...low,...mid,...high].map(p=>p.wr);
+  const allRs=[...low,...mid,...high].map(p=>p.r);
+  const wrMin=Math.min(...allWrs)*0.95, wrMax=Math.max(...allWrs)*1.05;
+  const rMin=0, rMax=Math.max(...allRs)*1.1;
+
+  const xp=v=>pad.l+(v-wrMin)/(wrMax-wrMin)*pw;
+  const yp=v=>pad.t+(1-(v-rMin)/(rMax-rMin))*ph;
+
+  // Grid
+  ctx.font='10px Inter,system-ui,sans-serif';
+  ctx.fillStyle='#737d91'; ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=0.5;
+  for(let i=0;i<=4;i++){
+    const yy=pad.t+ph*i/4;
+    const val=rMax-(rMax-rMin)*i/4;
+    ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();
+    ctx.fillText(val.toFixed(1)+'×', 4, yy+3);
+  }
+  for(let i=0;i<=4;i++){
+    const xx=pad.l+pw*i/4;
+    const val=wrMin+(wrMax-wrMin)*i/4;
+    ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,pad.t+ph);ctx.stroke();
+    ctx.fillText(Math.round(val*100)+'%', xx-10, h-26);
+  }
+
+  // Axis labels
+  ctx.fillStyle='#737d91'; ctx.textAlign='center';
+  ctx.fillText('Win rate →', pad.l+pw/2, h-10);
+  ctx.save(); ctx.translate(13, pad.t+ph/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('LTV:CAC →', 0, 0); ctx.restore();
+  ctx.textAlign='left';
+
+  // Draw bands — filled rect for each tier's range, then label
+  tiers.forEach(tier=>{
+    const s=stats(tier.data);
+    if(!s) return;
+    const x1=xp(s.wrMin), x2=xp(s.wrMax);
+    const y1=yp(s.rMax), y2=yp(s.rMin);
+    // Filled band
+    ctx.fillStyle=tier.color+'2a'; // ~16% opacity band
+    ctx.strokeStyle=tier.color;
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x1,y1,x2-x1,y2-y1,4) : ctx.rect(x1,y1,x2-x1,y2-y1);
+    ctx.fill(); ctx.stroke();
+    // Center dot
+    const cx=xp(s.wrMid), cy=yp(s.rMid);
+    ctx.fillStyle=tier.color;
+    ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2); ctx.fill();
+    // Label
+    ctx.fillStyle=tier.textColor;
+    ctx.font='bold 10px Inter,system-ui,sans-serif';
+    const lblX=Math.min(w-pad.r-80, Math.max(pad.l+4, cx-30));
+    ctx.fillText(tier.label, lblX, Math.max(pad.t+12, y1-5));
+  });
+}
+
+function drawAll(){
+  renderKpis();
+  drawMrrChart();
+  drawObChart();
+  drawFmChart();
+  drawRangeChart();
+}
+
+drawAll();
+window.addEventListener('resize', drawAll);
 })();
 </script>
 
