@@ -330,6 +330,16 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
 .wr-range{font-size:11px;color:var(--text3);margin-top:1px}
 .ch-range{font-size:11px;color:var(--text3);margin-top:1px}
 .net-range{font-size:11px;color:var(--text3);margin-top:1px}
+/* ── CONFIDENCE TOGGLE ── */
+.conf-toggle-wrap{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.conf-toggle-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);font-weight:700;flex:1}
+.conf-toggle-hint{font-size:11px;color:var(--text3);margin-top:3px}
+.toggle-switch{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:#1e2430;border:1px solid var(--line);border-radius:999px;cursor:pointer;transition:background .2s,border-color .2s}
+.toggle-slider:before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:var(--text3);border-radius:50%;transition:transform .2s,background .2s}
+.toggle-switch input:checked+.toggle-slider{background:rgba(91,175,214,.2);border-color:rgba(91,175,214,.5)}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(16px);background:var(--blue)}
 /* ── RESPONSIVE ── */
 @media(max-width:1100px){
   .controls,.metrics,.rank-grid,.dimension-picker,.exec-kpis,.exec-takeaways,.charts-section,.exec-tools,.opt-row{grid-template-columns:1fr!important}
@@ -512,7 +522,14 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
       </div>
       <div class="outputs-pane">
         <div class="metrics-grid">
-          <div class="metric-card primary"><div class="metric-lbl">Win rate</div><div id="fc_winRate" class="metric-val">—</div><div id="fc_winRateSub" class="metric-sub wr-range">—</div></div>
+          <div class="metric-card primary">
+            <div class="metric-lbl" style="display:flex;justify-content:space-between;align-items:center">
+              <span>Win rate</span>
+              <span id="fc_tierBadgeCard" class="tier-badge tier-HIGH" style="font-size:9px;padding:1px 6px">HIGH</span>
+            </div>
+            <div id="fc_winRate" class="metric-val">—</div>
+            <div id="fc_winRateSub" class="metric-sub wr-range">—</div>
+          </div>
           <div class="metric-card"><div class="metric-lbl">Expected wins</div><div id="fc_expectedWins" class="metric-val">—</div><div id="fc_expectedWinsSub" class="metric-sub">of pipeline</div></div>
           <div class="metric-card"><div class="metric-lbl">12-mo churn</div><div id="fc_churnRate" class="metric-val">—</div><div id="fc_churnSub" class="metric-sub ch-range">—</div></div>
           <div class="metric-card"><div class="metric-lbl">LTV:CAC</div><div id="fc_ltvCac" class="metric-val">—</div><div id="fc_ltvCacSub" class="metric-sub">—</div></div>
@@ -549,6 +566,16 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
             <div class="band-mark" id="fc_bandMark"></div>
           </div>
           <div class="band-ends" id="fc_bandEnds"><span>—</span><span>—</span></div>
+          <div class="conf-toggle-wrap">
+            <div style="flex:1">
+              <div class="conf-toggle-lbl">Conservative estimate</div>
+              <div class="conf-toggle-hint" id="fc_confHint">Using point estimate</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="fc_conservativeToggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
         </div>
         <div class="chart-title">Win rate vs churn as onboarding changes</div>
         <div class="chart-wrap-calc"><canvas id="fc_tradeoffCanvas" role="img" aria-label="Line chart: win rate and churn as onboarding percentage changes"></canvas></div>
@@ -567,7 +594,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     Object.entries(sections).forEach(([k,el])=>{if(el)el.classList.toggle('active',k===name)});
     tabs.forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
     window.dispatchEvent(new Event('resize'));
-    if(name==='home')requestAnimationFrame(()=>requestAnimationFrame(()=>{if(typeof window._drawHomeCharts==='function')window._drawHomeCharts()}));
+    if(name==='home')setTimeout(()=>{if(typeof window._drawHomeCharts==='function')window._drawHomeCharts()},50);
     if(name==='forecast')requestAnimationFrame(()=>requestAnimationFrame(()=>{if(typeof window._drawForecastChart==='function')window._drawForecastChart()}));
   }
   tabs.forEach(t=>t.addEventListener('click',e=>{e.preventDefault();const name=t.dataset.tab||'home';history.replaceState(null,'','#'+name);show(name)}));
@@ -783,7 +810,12 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
   }
 
   function heat(){
-    const s=setup('hChartInteraction');if(!s)return;
+    const s=setup('hChartInteraction');
+    if(!s){
+      // Canvas had zero dimensions — section may not be laid out yet. Retry after paint.
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{if(typeof window._drawHomeCharts==='function')window._drawHomeCharts()}));
+      return;
+    }
     const{ctx,w,h}=s,metric=(document.getElementById('hInteractionMetric')||{}).value||'ratio',
       obs=[0,.25,.5,.75,1,1.25,1.5,2],fms=[0,1,2,3],mrrs=[750,1500,2250],
       p={l:68,r:18,t:36,b:44},cw=(w-p.l-p.r)/obs.length,chh=(h-p.t-p.b)/fms.length,cells=[],vals=[];
@@ -794,11 +826,10 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     }));
     let mn=Math.min(...vals),mx=Math.max(...vals);
     if(mn===mx){mn-=1;mx+=1}
-    // Use a single-hue sequential scale (teal → dark blue) — perceptually uniform
+    // Single-hue sequential scale: light teal → deep blue — perceptually uniform
     function color(v){
       let score=(v-mn)/(mx-mn);
       if(metric==='churn')score=1-score;
-      // from light teal (#c8eee8) to deep blue (#1a3a5c)
       const r=Math.round(200+(26-200)*score),g=Math.round(238+(58-238)*score),b=Math.round(232+(92-232)*score);
       return`rgb(${r},${g},${b})`;
     }
@@ -809,13 +840,15 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     fms.forEach((fm,i)=>ctx.fillText(fm+' mo',p.l-8,p.t+chh*(i+.5)+4));
     cells.forEach(c=>{
       const x=p.l+c.oi*cw,y=p.t+c.fi*chh;
-      const bg=color(c.v);
-      ctx.fillStyle=bg;
+      ctx.fillStyle=color(c.v);
+      // beginPath() required — without it path accumulates across cells
+      ctx.beginPath();
       if(ctx.roundRect)ctx.roundRect(x+2,y+2,cw-4,chh-4,5);else ctx.rect(x+2,y+2,cw-4,chh-4);
       ctx.fill();
-      // Use dark text for readability on light cells
-      const score=(cells.find(cc=>cc===c).v-mn)/(mx-mn);
-      ctx.fillStyle=score>0.5?'#0c1a26':'#0c1a26';
+      // Contrast-aware label: dark text on light cells, light text on dark cells
+      const score=(c.v-mn)/(mx-mn);
+      const adjusted=metric==='churn'?1-score:score;
+      ctx.fillStyle=adjusted>0.55?'#edf0f7':'#0c1a26';
       ctx.font='bold 11px DM Mono,monospace';ctx.textAlign='center';
       ctx.fillText(labelFn(c.v),x+cw/2,y+chh/2+4);
     });
@@ -843,7 +876,9 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
   window._drawHomeCharts=drawAll;
   const sel=document.getElementById('hInteractionMetric');
   if(sel)sel.addEventListener('change',heat);
+  // Two-frame rAF catches most layout passes; setTimeout(50) catches deferred/hidden-section cases
   requestAnimationFrame(()=>requestAnimationFrame(drawAll));
+  setTimeout(drawAll,100);
   window.addEventListener('resize',drawAll);
 })();
 </script>
@@ -1047,6 +1082,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
         riskCls=c=>c<.4?'good':c<.65?'warn':'bad',
         wrCls=w=>w>=.28?'good':w>=.18?'warn':'bad';
   const D=0; // no coupon
+  let conservative=false; // conservative toggle state
 
   // Tier colors
   const TIER_COLOR={HIGH:'var(--green)',MODERATE:'var(--amber)',LOW:'var(--red)',EXTRAPOLATED:'var(--purple)'};
@@ -1105,6 +1141,9 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
   $('fc_btnMaxLtv').addEventListener('click',()=>{clearOpt();$('fc_btnMaxLtv').classList.add('active-opt');optimize('ltvcac')});
   $('fc_btnMaxRev').addEventListener('click',()=>{clearOpt();$('fc_btnMaxRev').classList.add('active-opt');optimize('maxrev')});
 
+  // Conservative toggle — use lower CI bound as the win rate for all derived metrics
+  $('fc_conservativeToggle').addEventListener('change',e=>{conservative=e.target.checked;update()});
+
   function drawTradeoff(mrr,fm){
     const c=$('fc_tradeoffCanvas');if(!c)return;
     const r=c.getBoundingClientRect();if(!r.width||!r.height)return;
@@ -1151,6 +1190,8 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     // ── Win rate with band ──────────────────────────────────────────────────
     const wrBand=winRateWithBand(mrr,ob,fc_fm);
     const wr=wrBand.point,wrLo=wrBand.wrLo,wrHi=wrBand.wrHi,tier=wrBand.tier;
+    // Conservative mode: use lower CI bound for all derived metrics
+    const wrEff=conservative?wrLo:wr;
 
     // ── Churn with band ─────────────────────────────────────────────────────
     const chBand=churnWithBand(mrr,ob,fc_fm);
@@ -1163,26 +1204,31 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     const ltvHi=ltvAtChurn(mrr,ob,fc_fm,chLo); // low churn  → high LTV
 
     // ── Derived metrics ─────────────────────────────────────────────────────
-    const wins=n*wr,lost=n-wins,churned=wins*ch,surv=wins*(1-ch),
+    const wins=n*wrEff,lost=n-wins,churned=wins*ch,surv=wins*(1-ch),
           upfront=wins*bk.upfront,totalLtv=wins*ltv,totalCac=wins*cac,
           net=totalLtv-totalCac;
 
-    // Net pipeline range: pessimistic (low wr × low ltv) / optimistic (high wr × high ltv)
+    // Net pipeline range always uses point estimate bounds (not conservative)
     const netRangeLo=wrLo*n*ltvLo - wrHi*n*cac;
     const netRangeHi=wrHi*n*ltvHi - wrLo*n*cac;
 
     // ── Win rate card ────────────────────────────────────────────────────────
     const wrEl=$('fc_winRate');
-    wrEl.textContent=fmtPct(wr);
-    wrEl.className='metric-val '+(tier==='HIGH'?wrCls(wr):'warn');
-    $('fc_winRateSub').innerHTML=
-      `<span style="font-size:10px;opacity:.75">${fmtPct(wrLo)}–${fmtPct(wrHi)}&nbsp;80% CI</span>
-       &nbsp;<span class="tier-badge tier-${tier}">${tier}</span>`;
+    wrEl.textContent=fmtPct(wrEff);
+    wrEl.className='metric-val '+(tier==='HIGH'?wrCls(wrEff):'warn');
+    // Sub: always show the full CI range
+    $('fc_winRateSub').textContent=`${fmtPct(wrLo)} – ${fmtPct(wrHi)} 80% CI`;
+    // Tier badge on the card header
+    const tcCard=TIER_COLOR[tier],tbCard=TIER_BG[tier];
+    const tbEl=$('fc_tierBadgeCard');
+    tbEl.textContent=tier;
+    tbEl.className=`tier-badge tier-${tier}`;
+    tbEl.style.cssText=`font-size:9px;padding:1px 6px`;
 
     // ── Expected wins card ───────────────────────────────────────────────────
     $('fc_expectedWins').textContent=wins.toFixed(1);
-    $('fc_expectedWins').className='metric-val '+wrCls(wr);
-    $('fc_expectedWinsSub').textContent=`of ${n} deals`;
+    $('fc_expectedWins').className='metric-val '+wrCls(wrEff);
+    $('fc_expectedWinsSub').textContent=conservative?`conservative · of ${n} deals`:`of ${n} deals`;
 
     // ── Churn card ───────────────────────────────────────────────────────────
     $('fc_churnRate').textContent=fmtPct(ch);
@@ -1232,24 +1278,31 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
 
     // ── Insight text ─────────────────────────────────────────────────────────
     const bandNote=tier!=='HIGH'?` <em style="color:var(--text3);font-size:12px">(${tier.toLowerCase()} confidence — band ${fmtPct(wrLo)}–${fmtPct(wrHi)})</em>`:'';
+    const conservativeNote=conservative?` <em style="color:var(--amber);font-size:12px">Conservative mode on.</em>`:'';
     $('fc_insight').innerHTML=
       ltvCac<1
-        ?`<strong>Underwater per deal.</strong> LTV (${fmtUSD(ltv)}) &lt; CAC (${fmtUSD(cac)}).${bandNote}`
+        ?`<strong>Underwater per deal.</strong> LTV (${fmtUSD(ltv)}) &lt; CAC (${fmtUSD(cac)}).${bandNote}${conservativeNote}`
       :ch>.75
-        ?`<strong>High churn risk (${fmtPct(ch)}).</strong> Churn band ${fmtPct(chLo)}–${fmtPct(chHi)}. Reduce free months or lower onboarding.${bandNote}`
-        :`<strong>Forecast:</strong> ${wins.toFixed(1)} wins (${fmtPct(wr)}) from ${n} deals. ${surv.toFixed(1)} survive yr 1. LTV:CAC ${ltvCac.toFixed(2)}×. Net pipeline range <strong>${rLoStr} – ${rHiStr}</strong>.${bandNote}`;
+        ?`<strong>High churn risk (${fmtPct(ch)}).</strong> Churn band ${fmtPct(chLo)}–${fmtPct(chHi)}. Reduce free months or lower onboarding.${bandNote}${conservativeNote}`
+        :`<strong>Forecast:</strong> ${wins.toFixed(1)} wins (${fmtPct(wrEff)}) from ${n} deals. ${surv.toFixed(1)} survive yr 1. LTV:CAC ${ltvCac.toFixed(2)}×. Net pipeline range <strong>${rLoStr} – ${rHiStr}</strong>.${bandNote}${conservativeNote}`;
 
     // ── Band bar ─────────────────────────────────────────────────────────────
-    // Scale display to [0, WR_HI=40%] — clips wrHi > 40% but keeps bar readable
-    const DISPLAY_MAX=0.50; // show a bit past clamp ceiling so HIGH bands don't crowd the edge
+    const DISPLAY_MAX=0.50;
     const pct=v=>Math.min(100,Math.max(0,v/DISPLAY_MAX*100));
     $('fc_bandFill').style.left=pct(wrLo)+'%';
     $('fc_bandFill').style.width=(pct(wrHi)-pct(wrLo))+'%';
-    $('fc_bandMark').style.left=pct(wr)+'%';
+    // Mark shows the effective value (conservative or point)
+    $('fc_bandMark').style.left=pct(wrEff)+'%';
+    $('fc_bandMark').style.background=conservative?'var(--amber)':'var(--blue)';
     const endsEl=$('fc_bandEnds');
-    endsEl.innerHTML=`<span>${fmtPct(wrLo)}</span><span style="color:var(--text2)">${fmtPct(wr)} point est.</span><span>${fmtPct(wrHi)}</span>`;
+    endsEl.innerHTML=`<span>${fmtPct(wrLo)}</span><span style="color:var(--text2)">${fmtPct(wrEff)} ${conservative?'conservative':'point est.'}</span><span>${fmtPct(wrHi)}</span>`;
+    // Tier badge on the band bar header
     const tc=TIER_COLOR[tier],tb=TIER_BG[tier];
     $('fc_tierBadge').innerHTML=`<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${tb};color:${tc};letter-spacing:.05em">${tier}</span>`;
+    // Conservative toggle hint
+    $('fc_confHint').textContent=conservative
+      ?`Using lower 80% bound · ${fmtPct(wrLo)} vs point ${fmtPct(wr)}`
+      :`Using point estimate · toggle to model ${fmtPct(wrLo)} lower bound`;
 
     drawTradeoff(mrr,fc_fm);
   }
