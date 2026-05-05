@@ -396,7 +396,7 @@ details[open] .brief-chev{transform:rotate(90deg)}
         <div class="metrics-grid">
           <div class="metric-card primary"><div class="metric-lbl">Calibrated LTV</div><div class="metric-val" id="oLtv">$0</div><div class="metric-sub" id="oLtvSub">analytical × 0.3854</div></div>
           <div class="metric-card"><div class="metric-lbl">12-month churn</div><div class="metric-val" id="oChurn">0%</div><div class="metric-sub" id="oChurnSub">risk</div></div>
-          <div class="metric-card" style="border-color:rgba(50,213,131,.35)"><div class="metric-lbl">Win rate</div><div class="metric-val" id="oWinRate">0%</div><div class="metric-sub" id="oWinRateSub">model · max 40%</div></div>
+          <div class="metric-card" style="border-color:rgba(50,213,131,.35)"><div class="metric-lbl">Win rate</div><div class="metric-val" id="oWinRate">0%</div><div class="metric-sub" id="oWinRateSub">model · clamped 8–40%</div></div>
           <div class="metric-card"><div class="metric-lbl">Monthly hazard</div><div class="metric-val" id="oHazard">0%</div><div class="metric-sub">derived from annual</div></div>
           <div class="metric-card cac-card"><div class="metric-lbl">LTV : CAC</div><div class="metric-val" id="oLtvCac">0×</div><div class="metric-sub" id="oLtvCacSub">ratio</div></div>
           <div class="metric-card cac-card"><div class="metric-lbl">CAC payback</div><div class="metric-val" id="oPayback">—</div><div class="metric-sub" id="oPaybackSub">calibrated cash curve</div></div>
@@ -818,11 +818,11 @@ details[open] .brief-chev{transform:rotate(90deg)}
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
       <button class="opt-btn" id="fc_btnMinChurn" style="border-color:var(--line)">
         <div class="opt-icon" style="background:rgba(125,211,252,.13);color:var(--blue)">↓</div>
-        <div><span style="font-weight:700">Minimize Churn</span><span class="opt-sub">Best structure for retention</span></div>
+        <div><span style="font-weight:700">Best Retention</span><span class="opt-sub">Lowest churn weighted by win rate</span></div>
       </button>
       <button class="opt-btn" id="fc_btnMaxLtv" style="border-color:var(--line)">
         <div class="opt-icon" style="background:rgba(192,132,252,.13);color:var(--purple)">↑</div>
-        <div><span style="font-weight:700">Max LTV:CAC</span><span class="opt-sub">Best per-deal economics</span></div>
+        <div><span style="font-weight:700">Best Economics</span><span class="opt-sub">Highest LTV:CAC × win rate</span></div>
       </button>
       <button class="opt-btn" id="fc_btnMaxRev" style="border-color:var(--line)">
         <div class="opt-icon" style="background:rgba(50,213,131,.13);color:var(--green)">$</div>
@@ -1079,21 +1079,22 @@ const CHURN_MODEL = {
 };
 
 // ============================================================
-// WIN-RATE MODEL — ElasticNet, 8 features, z-score standardized
+// WIN-RATE MODEL — Direct ElasticNet with interactions, 8 features
+// LOO R² 0.4474 · RMSE 0.0343 · N=14 months
 // ============================================================
 const WINRATE_MODEL = {
-  intercept: 0.2324,
-  win_rate_min_clamp: 0.0,
+  intercept: 0.223357,
+  win_rate_min_clamp: 0.08,
   win_rate_max_clamp: 0.40,
   features: [
-    {name:'avg_log_mrr',      mean:6.494034, std:0.304220, coef:-0.067788},
-    {name:'avg_ob_pct',       mean:0.708795, std:0.456633, coef:-0.203934},
-    {name:'avg_free_mo',      mean:0.699680, std:0.402589, coef:-0.000000},
-    {name:'ix_mrr_ob',        mean:4.502319, std:2.816991, coef:0.059188},
-    {name:'ix_mrr_free',      mean:4.451093, std:2.490561, coef:-0.073078},
-    {name:'ix_ob_free',       mean:0.585069, std:0.524263, coef:0.149384},
     {name:'avg_coupon_15pct', mean:0.052683, std:0.129184, coef:0.005573},
     {name:'avg_coupon_25pct', mean:0.026113, std:0.078158, coef:0.045761},
+    {name:'avg_free_mo',      mean:0.699680, std:0.402589, coef:-0.000000},
+    {name:'avg_log_mrr',      mean:6.494034, std:0.304220, coef:-0.067788},
+    {name:'avg_ob_pct',       mean:0.708795, std:0.456633, coef:-0.203934},
+    {name:'ix_mrr_free',      mean:4.451093, std:2.490561, coef:-0.073078},
+    {name:'ix_mrr_ob',        mean:4.502319, std:2.816991, coef:0.059188},
+    {name:'ix_ob_free',       mean:0.585069, std:0.524263, coef:0.149384},
   ]
 };
 
@@ -1205,17 +1206,27 @@ function scoreChurn(mrr, obPct, freeMonths, discountPct, cohortAge) {
 function buildWinRateFeatures(mrr, obPct, freeMonths, discountPct) {
   discountPct = discountPct || 0;
   const logMrr = Math.log(Math.max(mrr, 1));
-  const c15 = Math.abs(discountPct - 0.15) <= 0.005 ? 1 : 0;
-  const c25 = Math.abs(discountPct - 0.25) <= 0.005 ? 1 : 0;
+  const fm = Math.min(Math.max(Number(freeMonths || 0), 0), 3);
+  const ob = Math.max(Number(obPct || 0), 0);
+  const c15  = Math.abs(discountPct - 0.15) <= 0.005 ? 1 : 0;
+  const c25  = Math.abs(discountPct - 0.25) <= 0.005 ? 1 : 0;
+  const c100 = Math.abs(discountPct - 1.00) <= 0.005 ? 1 : 0;
   return {
-    avg_log_mrr: logMrr,
-    avg_ob_pct: obPct,
-    avg_free_mo: freeMonths,
-    ix_mrr_ob: logMrr * obPct,
-    ix_mrr_free: logMrr * freeMonths,
-    ix_ob_free: obPct * freeMonths,
-    avg_coupon_15pct: c15,
-    avg_coupon_25pct: c25,
+    avg_log_mrr:          logMrr,
+    avg_ob_pct:           ob,
+    avg_free_mo:          fm,
+    ix_mrr_ob:            logMrr * ob,
+    ix_mrr_free:          logMrr * fm,
+    ix_ob_free:           ob * fm,
+    avg_coupon_15pct:     c15,
+    avg_coupon_25pct:     c25,
+    avg_coupon_100pct:    c100,
+    ix_coupon_15pct_mrr:  c15 * logMrr,
+    ix_coupon_15pct_ob:   c15 * ob,
+    ix_coupon_15pct_free: c15 * fm,
+    ix_coupon_25pct_mrr:  c25 * logMrr,
+    ix_coupon_25pct_ob:   c25 * ob,
+    ix_coupon_25pct_free: c25 * fm,
   };
 }
 
@@ -1530,7 +1541,7 @@ function update(){
   byId('oChurnSub').textContent = c12 < .40 ? 'low risk' : c12 < .65 ? 'moderate' : 'high risk';
 
   const wrEl = byId('oWinRate'); wrEl.textContent = fmtPct(wr); wrEl.className = 'metric-val ' + (wr >= 0.28 ? 'good' : wr >= 0.18 ? 'warn' : 'bad');
-  byId('oWinRateSub').textContent = 'model · max 40%';
+  byId('oWinRateSub').textContent = 'model · clamped 8–40%';
 
   const hz = byId('oHazard'); hz.textContent = fmtPct(h1); hz.className = 'metric-val ' + (h1 < .03 ? 'good' : h1 < .05 ? 'warn' : 'bad');
 
@@ -2323,7 +2334,7 @@ window.addEventListener('resize', ()=>{
     const fmRange  = fc_locks.fm  ? [curFm]  : FM;
 
     let bestMrr=curMrr, bestOb=curOb, bestFm=curFm;
-    let best = (goal==='churn') ? Infinity : -Infinity;
+    let best = -Infinity;
 
     for(const m of mrrRange) for(const o of obRange) for(const f of fmRange){
       const oR=o/100;
@@ -2334,13 +2345,17 @@ window.addEventListener('resize', ()=>{
       const wins  = nP * wr;
       const netPipeline = wins * ltv - wins * cac;
 
+      // All three goals are win-rate-weighted so zero-win structures never win.
+      // churn:  minimize expected churn among winnable deals → maximize -(churn × wr)
+      //         i.e. weight churn improvement by how often we actually win those deals
+      // ltvcac: maximize LTV:CAC but only where deals close → ltvCac × wr
+      // maxrev: maximize net pipeline value (already inherits wr naturally)
       let score;
-      if(goal==='churn')  score = churn;
-      else if(goal==='ltvcac') score = ltvCac;
-      else score = netPipeline;  // maxrev
+      if(goal==='churn')       score = -(churn * wr);   // less churn AND more wins = better
+      else if(goal==='ltvcac') score = ltvCac * wr;     // better economics AND closeable
+      else                     score = netPipeline;      // maxrev: wins × ltv − wins × cac
 
-      const better = goal==='churn' ? score < best : score > best;
-      if(better){ best=score; bestMrr=m; bestOb=o; bestFm=f; }
+      if(score > best){ best=score; bestMrr=m; bestOb=o; bestFm=f; }
     }
 
     if(!fc_locks.mrr) $('fc_sliderMrr').value = bestMrr;
@@ -2428,8 +2443,8 @@ window.addEventListener('resize', ()=>{
     const netPipeline     = totalLtv - totalCac;
 
     // Win-rate clamp warning
-    const atClamp = wr >= 0.399;
-    const wrSub = atClamp ? '⚠ at model clamp boundary (40%)' : 'model · max 40%';
+    const atClamp = wr <= 0.081 || wr >= 0.399;
+    const wrSub = atClamp ? '⚠ at model clamp boundary' : 'model · clamped 8–40%';
     const wrEl = $('fc_winRate'); wrEl.textContent=fmtPct(wr); wrEl.className='metric-val '+(atClamp?'warn':wrCls(wr));
     $('fc_winRateSub').textContent = wrSub;
 
