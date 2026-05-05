@@ -1125,8 +1125,14 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
           ms=locks.mrr?[curM]:MRR,os=locks.ob?[curO]:OB,fs=locks.fm?[curF]:FM;
     let bm=curM,bo=curO,bf=curF,best=-Infinity;
     for(const m of ms)for(const o of os)for(const f of fs){
-      const or=o/100,ch=scoreChurn(m,or,f,D),wr=scoreWinRate(m,or,f,D),
-            ltv=ltvBreakdown(m,or,f,D).calibrated,ltvCac=ltv/cac,
+      const or=o/100,ch=scoreChurn(m,or,f,D),wr=scoreWinRate(m,or,f,D);
+      const wrBand=winRateWithBand(m,or,f);
+      // Skip scenarios that are extrapolated past the model's trained range.
+      // These have the widest uncertainty bands — optimizing on them means
+      // optimizing against noise, not signal. The model's raw score is only
+      // trustworthy within [8%, 40%]; past that we have no training data.
+      if(wrBand.extrapolation>0) continue;
+      const ltv=ltvBreakdown(m,or,f,D).calibrated,ltvCac=ltv/cac,
             wins=n*wr,net=wins*ltv-wins*cac;
       let score=goal==='churn'?-(ch*wr):goal==='ltvcac'?ltvCac*wr:net;
       if(score>best){best=score;bm=m;bo=o;bf=f}
@@ -1216,10 +1222,14 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     const wrEl=$('fc_winRate');
     wrEl.textContent=fmtPct(wrEff);
     wrEl.className='metric-val '+(tier==='HIGH'?wrCls(wrEff):'warn');
-    // Sub: always show the full CI range
-    $('fc_winRateSub').textContent=`${fmtPct(wrLo)} – ${fmtPct(wrHi)} 80% CI`;
+    // Sub: always show BOTH the point estimate and the full CI range.
+    // When conservative mode is ON, wrEff != wr, so we must surface wr explicitly
+    // — otherwise the user sees 34.3% as both the value and the CI lower bound,
+    // with no way to know the actual point estimate (40.0%) was ever there.
+    $('fc_winRateSub').textContent=conservative
+      ?`Point est. ${fmtPct(wr)} · CI ${fmtPct(wrLo)}–${fmtPct(wrHi)}`
+      :`CI ${fmtPct(wrLo)}–${fmtPct(wrHi)}`;
     // Tier badge on the card header
-    const tcCard=TIER_COLOR[tier],tbCard=TIER_BG[tier];
     const tbEl=$('fc_tierBadgeCard');
     tbEl.textContent=tier;
     tbEl.className=`tier-badge tier-${tier}`;
@@ -1278,13 +1288,14 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
 
     // ── Insight text ─────────────────────────────────────────────────────────
     const bandNote=tier!=='HIGH'?` <em style="color:var(--text3);font-size:12px">(${tier.toLowerCase()} confidence — band ${fmtPct(wrLo)}–${fmtPct(wrHi)})</em>`:'';
-    const conservativeNote=conservative?` <em style="color:var(--amber);font-size:12px">Conservative mode on.</em>`:'';
+    const conservativeNote=conservative?` <em style="color:var(--amber);font-size:12px">Conservative mode on · using ${fmtPct(wrLo)} vs point ${fmtPct(wr)}.</em>`:'';
+    const obHeavyNote=ob>1.0?` <em style="color:var(--amber);font-size:12px">Note: onboarding fee (${Math.round(ob*100)}% of MRR) is driving ${(bk.upfront/ltv*100).toFixed(0)}% of LTV — optimizer may be maximizing upfront rather than recurring value.</em>`:'';
     $('fc_insight').innerHTML=
       ltvCac<1
         ?`<strong>Underwater per deal.</strong> LTV (${fmtUSD(ltv)}) &lt; CAC (${fmtUSD(cac)}).${bandNote}${conservativeNote}`
       :ch>.75
         ?`<strong>High churn risk (${fmtPct(ch)}).</strong> Churn band ${fmtPct(chLo)}–${fmtPct(chHi)}. Reduce free months or lower onboarding.${bandNote}${conservativeNote}`
-        :`<strong>Forecast:</strong> ${wins.toFixed(1)} wins (${fmtPct(wrEff)}) from ${n} deals. ${surv.toFixed(1)} survive yr 1. LTV:CAC ${ltvCac.toFixed(2)}×. Net pipeline range <strong>${rLoStr} – ${rHiStr}</strong>.${bandNote}${conservativeNote}`;
+        :`<strong>Forecast:</strong> ${wins.toFixed(1)} wins (${fmtPct(wrEff)}) from ${n} deals. ${surv.toFixed(1)} survive yr 1. LTV:CAC ${ltvCac.toFixed(2)}×. Net pipeline range <strong>${rLoStr} – ${rHiStr}</strong>.${obHeavyNote}${bandNote}${conservativeNote}`;
 
     // ── Band bar ─────────────────────────────────────────────────────────────
     const DISPLAY_MAX=0.50;
@@ -1295,7 +1306,14 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     $('fc_bandMark').style.left=pct(wrEff)+'%';
     $('fc_bandMark').style.background=conservative?'var(--amber)':'var(--blue)';
     const endsEl=$('fc_bandEnds');
-    endsEl.innerHTML=`<span>${fmtPct(wrLo)}</span><span style="color:var(--text2)">${fmtPct(wrEff)} ${conservative?'conservative':'point est.'}</span><span>${fmtPct(wrHi)}</span>`;
+    // Always show the full band anchors (lo, hi) plus the point estimate in the middle.
+    // When conservative mode is on the mark moves to wrLo, but we still label the
+    // point estimate so the user can see where 40.0% actually sits on the track.
+    if(conservative){
+      endsEl.innerHTML=`<span>${fmtPct(wrLo)} ◀ using this</span><span style="color:var(--text2)">${fmtPct(wr)} point est.</span><span>${fmtPct(wrHi)}</span>`;
+    } else {
+      endsEl.innerHTML=`<span>${fmtPct(wrLo)}</span><span style="color:var(--text2)">${fmtPct(wr)} point est.</span><span>${fmtPct(wrHi)}</span>`;
+    }
     // Tier badge on the band bar header
     const tc=TIER_COLOR[tier],tb=TIER_BG[tier];
     $('fc_tierBadge').innerHTML=`<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${tb};color:${tc};letter-spacing:.05em">${tier}</span>`;
