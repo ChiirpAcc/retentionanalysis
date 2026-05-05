@@ -324,18 +324,6 @@ details[open] .brief-chev{transform:rotate(90deg)}
 <section class="section" id="sec-home">
   <div class="app">
 
-    <!-- HERO -->
-    <div class="exec-hero">
-      <h1>Deal Structure Analysis</h1>
-      <p class="exec-sub">Machine learning models trained on 2025–Feb 2026 deal and customer data estimate how pricing decisions affect win rate, churn, and LTV:CAC simultaneously. Use this to compare structures and set pricing policy — not to predict individual deals.</p>
-      <div class="exec-kpis">
-        <div class="exec-kpi"><div class="exec-kpi-v good" id="hKpiWr">—</div><div class="exec-kpi-l">Baseline win rate</div><div class="exec-kpi-s">avg deal structure</div></div>
-        <div class="exec-kpi"><div class="exec-kpi-v warn" id="hKpiChurn">—</div><div class="exec-kpi-l">Baseline 12-mo churn</div><div class="exec-kpi-s">avg deal structure</div></div>
-        <div class="exec-kpi"><div class="exec-kpi-v" id="hKpiLtv">—</div><div class="exec-kpi-l">Baseline LTV:CAC</div><div class="exec-kpi-s">at $5k CAC</div></div>
-        <div class="exec-kpi"><div class="exec-kpi-v" style="color:var(--blue)">2,944</div><div class="exec-kpi-l">Accounts modeled</div><div class="exec-kpi-s">churn model</div></div>
-        <div class="exec-kpi"><div class="exec-kpi-v" style="color:var(--purple)">14</div><div class="exec-kpi-l">Months of data</div><div class="exec-kpi-s">Jan 2025–Feb 2026</div></div>
-      </div>
-    </div>
 
     <!-- LEVER EFFECTS: 3 bar charts side by side -->
     <div class="section-title">How each lever moves the needle</div>
@@ -404,6 +392,8 @@ details[open] .brief-chev{transform:rotate(90deg)}
     Object.entries(sections).forEach(([k,el])=>el.classList.toggle('active', k===name));
     tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
     window.dispatchEvent(new Event('resize'));
+    // Home charts need real dimensions — draw after the tab is visible
+    if(name === 'home') requestAnimationFrame(()=>{ if(window._drawHomeCharts) window._drawHomeCharts(); });
   }
 
   tabs.forEach(t=>t.addEventListener('click', e=>{
@@ -444,22 +434,6 @@ function setupCanvas(id){
   return {ctx, w:rect.width, h:rect.height};
 }
 
-// ===== KPI cards =====
-function renderKpis(){
-  const baseMrr = Math.exp(6.494);
-  const baseOb  = 0.5;
-  const baseFm  = 0;
-  const wr_  = scoreWinRate(baseMrr, baseOb, baseFm, 0);
-  const ch_  = scoreChurn(baseMrr, baseOb, baseFm, 0);
-  const ltv_ = ltvBreakdown(baseMrr, baseOb, baseFm, 0).calibrated;
-  const ratio= ltv_ / CAC_BASELINE;
-  const wrEl = document.getElementById('hKpiWr');
-  if(wrEl){ wrEl.textContent = (wr_*100).toFixed(0)+'%'; wrEl.className='exec-kpi-v '+(wr_>=0.15?'good':'warn'); }
-  const chEl = document.getElementById('hKpiChurn');
-  if(chEl){ chEl.textContent = (ch_*100).toFixed(0)+'%'; chEl.className='exec-kpi-v warn'; }
-  const ltvEl = document.getElementById('hKpiLtv');
-  if(ltvEl){ ltvEl.textContent = ratio.toFixed(2)+'×'; ltvEl.className='exec-kpi-v '+(ratio>=3?'good':ratio>=1.5?'warn':'bad'); }
-}
 
 // ===== Grouped bar chart: 3 lines (win rate, retention, ltv:cac scaled) =====
 function drawGroupedBar(id, groups, yMax){
@@ -647,14 +621,17 @@ function drawRangeChart(){
 }
 
 function drawAll(){
-  renderKpis();
   drawMrrChart();
   drawObChart();
   drawFmChart();
   drawRangeChart();
 }
 
-drawAll();
+// Expose so the router can trigger redraws when home tab becomes active
+window._drawHomeCharts = drawAll;
+
+// Draw once the tab is visible (rAF ensures layout has settled)
+requestAnimationFrame(drawAll);
 window.addEventListener('resize', drawAll);
 })();
 </script>
