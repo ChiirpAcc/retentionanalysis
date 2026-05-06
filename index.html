@@ -509,7 +509,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
         <div class="divider"></div>
         <div class="field-lbl" style="color:var(--purple)">CAC per won account</div>
         <div id="fc_cacVal" class="field-val">$5,000</div>
-        <input id="fc_sliderCac" type="range" min="500" max="20000" step="250" value="5000" style="accent-color:var(--purple)">
+        <input id="fc_sliderCac" type="range" min="0" max="10000" step="250" value="5000" style="accent-color:var(--purple)">
         <div class="divider"></div>
         <div class="field-lbl">Pipeline size</div>
         <div class="range-wrap">
@@ -1134,19 +1134,34 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     const FM=[0,1],curM=+$('fc_sliderMrr').value,curO=+$('fc_sliderOb').value,curF=fc_fm,
           cac=+$('fc_sliderCac').value,n=+$('fc_dealsInput').value||100,
           ms=locks.mrr?[curM]:MRR,os=locks.ob?[curO]:OB,fs=locks.fm?[curF]:FM;
-    let bm=curM,bo=curO,bf=curF,best=-Infinity;
+    // Guard: prevent division by zero when CAC=0 in the LTV:CAC objective.
+    // At CAC=0 every scenario scores Infinity so the first evaluated wins arbitrarily.
+    // Clamp to 1 so the ratio is finite and ranks correctly (maximizes LTV×WR).
+    const cacForScore=Math.max(cac,1);
+    let bm=curM,bo=curO,bf=curF,best=-Infinity,eligibleFound=false;
     for(const m of ms)for(const o of os)for(const f of fs){
       const or=o/100,ch=scoreChurn(m,or,f,D),wr=scoreWinRate(m,or,f,D);
       const wrBand=winRateWithBand(m,or,f);
-      // Skip scenarios that are extrapolated past the model's trained range.
-      // These have the widest uncertainty bands — optimizing on them means
-      // optimizing against noise, not signal. The model's raw score is only
-      // trustworthy within [8%, 40%]; past that we have no training data.
+      // Skip extrapolated scenarios — the model has no training data there.
       if(wrBand.extrapolation>0) continue;
-      const ltv=ltvBreakdown(m,or,f,D).calibrated,ltvCac=ltv/cac,
+      eligibleFound=true;
+      const ltv=ltvBreakdown(m,or,f,D).calibrated,
+            ltvCac=ltv/cacForScore,
             wins=n*wr,net=wins*ltv-wins*cac;
+      // Score functions:
+      //   churn:  -(ch × wr) = expected churned deals per pipeline deal (lower = better)
+      //   ltvcac: (ltv/cac) × wr = LTV:CAC weighted by conversion probability
+      //   maxrev: wins × (ltv − cac) = net pipeline value
       let score=goal==='churn'?-(ch*wr):goal==='ltvcac'?ltvCac*wr:net;
       if(score>best){best=score;bm=m;bo=o;bf=f}
+    }
+    // Surface a warning if the optimizer found no in-range scenarios.
+    // This happens when all unlocked dimensions are locked to extrapolated values.
+    const noteEl=$('fc_lockNote');
+    if(!eligibleFound){
+      noteEl.style.display='flex';
+      $('fc_lockNoteText').textContent='No in-range scenarios found — current inputs are outside the model\'s trained range. Unlock a dimension or adjust inputs.';
+      return; // don't move sliders — leave current state
     }
     if(!locks.mrr)$('fc_sliderMrr').value=bm;
     if(!locks.ob)$('fc_sliderOb').value=bo;
@@ -1216,7 +1231,9 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
 
     // ── LTV at point + churn bounds ─────────────────────────────────────────
     const bk=ltvBreakdown(mrr,ob,fc_fm,D);
-    const ltv=bk.calibrated,ltvCac=ltv/cac;
+    const ltv=bk.calibrated;
+    // Guard CAC=0: ratio is meaningless at zero cost, show as ∞ explicitly
+    const ltvCac=cac>0?ltv/cac:null;
     const ltvLo=ltvAtChurn(mrr,ob,fc_fm,chHi); // high churn → low LTV
     const ltvHi=ltvAtChurn(mrr,ob,fc_fm,chLo); // low churn  → high LTV
 
@@ -1225,7 +1242,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
           upfront=wins*bk.upfront,totalLtv=wins*ltv,totalCac=wins*cac,
           net=totalLtv-totalCac;
 
-    // Net pipeline range always uses point estimate bounds (not conservative)
+    // Net pipeline range: pessimistic / optimistic across wr and churn uncertainty
     const netRangeLo=wrLo*n*ltvLo - wrHi*n*cac;
     const netRangeHi=wrHi*n*ltvHi - wrLo*n*cac;
 
@@ -1257,9 +1274,15 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     $('fc_churnSub').textContent=`${fmtPct(chLo)}–${fmtPct(chHi)} 80% CI`;
 
     // ── LTV:CAC card ─────────────────────────────────────────────────────────
-    $('fc_ltvCac').textContent=ltvCac.toFixed(2)+'×';
-    $('fc_ltvCac').className='metric-val '+(ltvCac>=3?'good':ltvCac>=1.5?'warn':'bad');
-    $('fc_ltvCacSub').textContent=ltvCac>=3?'healthy':ltvCac>=1?'pays back':'underwater';
+    if(ltvCac===null){
+      $('fc_ltvCac').textContent='∞';
+      $('fc_ltvCac').className='metric-val good';
+      $('fc_ltvCacSub').textContent='CAC = $0';
+    } else {
+      $('fc_ltvCac').textContent=ltvCac.toFixed(2)+'×';
+      $('fc_ltvCac').className='metric-val '+(ltvCac>=3?'good':ltvCac>=1.5?'warn':'bad');
+      $('fc_ltvCacSub').textContent=ltvCac>=3?'healthy':ltvCac>=1?'pays back':'underwater';
+    }
 
     // ── Surviving wins card ──────────────────────────────────────────────────
     $('fc_surviving').textContent=surv.toFixed(1);
@@ -1268,7 +1291,8 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
 
     // ── LTV per won card ─────────────────────────────────────────────────────
     $('fc_ltv').textContent=fmtUSD(ltv);
-    $('fc_ltv').className='metric-val '+(ltvCac>=3?'good':ltvCac>=1?'warn':'bad');
+    const ltvCacSafe=ltvCac??Infinity;
+    $('fc_ltv').className='metric-val '+(ltvCacSafe>=3?'good':ltvCacSafe>=1?'warn':'bad');
 
     // ── Upfront card ─────────────────────────────────────────────────────────
     $('fc_upfrontTotal').textContent=fmtK(upfront);
@@ -1311,15 +1335,16 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     $('fc_fNetPipeline').className='bk-val '+(net>=0?'pos':'neg');
 
     // ── Insight text ─────────────────────────────────────────────────────────
+    const ltvCacSafeForInsight=ltvCac??Infinity;
     const bandNote=tier!=='HIGH'?` <em style="color:var(--text3);font-size:12px">(${tier.toLowerCase()} confidence — band ${fmtPct(wrLo)}–${fmtPct(wrHi)})</em>`:'';
     const conservativeNote=conservative?` <em style="color:var(--amber);font-size:12px">Conservative mode on · using ${fmtPct(wrLo)} vs point ${fmtPct(wr)}.</em>`:'';
     const obHeavyNote=ob>1.0?` <em style="color:var(--amber);font-size:12px">Note: onboarding fee (${Math.round(ob*100)}% of MRR) is driving ${(bk.upfront/ltv*100).toFixed(0)}% of LTV — optimizer may be maximizing upfront rather than recurring value.</em>`:'';
     $('fc_insight').innerHTML=
-      ltvCac<1
+      ltvCacSafeForInsight<1
         ?`<strong>Underwater per deal.</strong> LTV (${fmtUSD(ltv)}) &lt; CAC (${fmtUSD(cac)}).${bandNote}${conservativeNote}`
       :ch>.75
         ?`<strong>High churn risk (${fmtPct(ch)}).</strong> Churn band ${fmtPct(chLo)}–${fmtPct(chHi)}. Reduce free months or lower onboarding.${bandNote}${conservativeNote}`
-        :`<strong>Forecast:</strong> ${wins.toFixed(1)} wins (${fmtPct(wrEff)}) from ${n} deals. ${surv.toFixed(1)} survive yr 1. LTV:CAC ${ltvCac.toFixed(2)}×. Net pipeline range <strong>${rLoStr} – ${rHiStr}</strong>.${obHeavyNote}${bandNote}${conservativeNote}`;
+        :`<strong>Forecast:</strong> ${wins.toFixed(1)} wins (${fmtPct(wrEff)}) from ${n} deals. ${surv.toFixed(1)} survive yr 1. LTV:CAC ${ltvCac===null?'∞':ltvCacSafeForInsight.toFixed(2)+'×'}. Net pipeline range <strong>${rLoStr} – ${rHiStr}</strong>.${obHeavyNote}${bandNote}${conservativeNote}`;
 
     // ── Band bar ─────────────────────────────────────────────────────────────
     const DISPLAY_MAX=0.50;
