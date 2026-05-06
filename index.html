@@ -501,11 +501,9 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
         <div class="range-ends"><span>0%</span><span>200%</span></div>
         <div class="divider"></div>
         <div class="field-hdr"><div class="field-lbl">Waived months</div><button id="fc_lockFm" class="lock-btn">🔓</button></div>
-        <div id="fc_fmPills" class="fm-pills">
+        <div id="fc_fmPills" class="fm-pills" style="grid-template-columns:1fr 1fr">
           <button class="fm-pill active" data-fm="0">0</button>
           <button class="fm-pill" data-fm="1">1</button>
-          <button class="fm-pill" data-fm="2">2</button>
-          <button class="fm-pill" data-fm="3">3</button>
         </div>
         <div id="fc_fmHint" class="hint" style="margin-top:7px">MRR billing starts month 1</div>
         <div class="divider"></div>
@@ -521,6 +519,27 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
         <div id="fc_lockNote" class="lock-note"><span>🔒</span><span id="fc_lockNoteText"></span></div>
       </div>
       <div class="outputs-pane">
+        <div class="band-vis" style="margin-top:0;margin-bottom:14px">
+          <div class="bar-hdr">
+            <span>Win rate confidence</span>
+            <span id="fc_tierBadge"></span>
+          </div>
+          <div class="band-track" id="fc_bandTrack">
+            <div class="band-fill" id="fc_bandFill"></div>
+            <div class="band-mark" id="fc_bandMark"></div>
+          </div>
+          <div class="band-ends" id="fc_bandEnds"><span>—</span><span>—</span></div>
+          <div class="conf-toggle-wrap">
+            <div style="flex:1">
+              <div class="conf-toggle-lbl">Conservative estimate</div>
+              <div class="conf-toggle-hint" id="fc_confHint">Using point estimate</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="fc_conservativeToggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
         <div class="metrics-grid">
           <div class="metric-card primary">
             <div class="metric-lbl" style="display:flex;justify-content:space-between;align-items:center">
@@ -540,8 +559,21 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
         </div>
         <div class="churn-vis">
           <div class="bar-hdr"><span>Win funnel</span><span><span id="fc_pipelineSize">100</span> deals</span></div>
-          <div class="bar-track"><div id="fc_winBar" class="bar-fill" style="background:var(--green);width:0%"></div></div>
-          <div class="bar-track" style="margin-top:5px"><div id="fc_churnBar" class="bar-fill" style="background:var(--red);width:0%"></div></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
+            <span style="font-size:11px;color:var(--text3);width:58px;text-align:right;flex-shrink:0">Won</span>
+            <div class="bar-track" style="flex:1;margin-top:0"><div id="fc_winBar" class="bar-fill" style="background:var(--green);width:0%"></div></div>
+            <span id="fc_winBarLabel" style="font-size:11px;color:var(--text2);width:32px;flex-shrink:0">—</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+            <span style="font-size:11px;color:var(--text3);width:58px;text-align:right;flex-shrink:0">Churned</span>
+            <div class="bar-track" style="flex:1;margin-top:0"><div id="fc_churnBar" class="bar-fill" style="background:var(--red);width:0%"></div></div>
+            <span id="fc_churnBarLabel" style="font-size:11px;color:var(--text2);width:32px;flex-shrink:0">—</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+            <span style="font-size:11px;color:var(--text3);width:58px;text-align:right;flex-shrink:0">Retained</span>
+            <div class="bar-track" style="flex:1;margin-top:0"><div id="fc_retainBar" class="bar-fill" style="background:var(--teal);width:0%"></div></div>
+            <span id="fc_retainBarLabel" style="font-size:11px;color:var(--text2);width:32px;flex-shrink:0">—</span>
+          </div>
         </div>
         <div class="bk">
           <div class="bk-row"><span class="bk-lbl">Pipeline deals</span><span id="fc_fDeals" class="bk-val">100</span></div>
@@ -556,27 +588,6 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
           <div class="bk-row"><span class="bk-lbl">Net pipeline</span><span id="fc_fNetPipeline" class="bk-val">—</span></div>
         </div>
         <div id="fc_insight" class="insight"></div>
-        <div class="band-vis">
-          <div class="bar-hdr">
-            <span>Win rate confidence band</span>
-            <span id="fc_tierBadge"></span>
-          </div>
-          <div class="band-track" id="fc_bandTrack">
-            <div class="band-fill" id="fc_bandFill"></div>
-            <div class="band-mark" id="fc_bandMark"></div>
-          </div>
-          <div class="band-ends" id="fc_bandEnds"><span>—</span><span>—</span></div>
-          <div class="conf-toggle-wrap">
-            <div style="flex:1">
-              <div class="conf-toggle-lbl">Conservative estimate</div>
-              <div class="conf-toggle-hint" id="fc_confHint">Using point estimate</div>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="fc_conservativeToggle">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
         <div class="chart-title">Win rate vs churn as onboarding changes</div>
         <div class="chart-wrap-calc"><canvas id="fc_tradeoffCanvas" role="img" aria-label="Line chart: win rate and churn as onboarding percentage changes"></canvas></div>
       </div>
@@ -1120,7 +1131,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     const MRR=[],OB=[];
     for(let m=99;m<=3000;m+=50)MRR.push(m);
     for(let o=0;o<=200;o+=5)OB.push(o);
-    const FM=[0,1,2,3],curM=+$('fc_sliderMrr').value,curO=+$('fc_sliderOb').value,curF=fc_fm,
+    const FM=[0,1],curM=+$('fc_sliderMrr').value,curO=+$('fc_sliderOb').value,curF=fc_fm,
           cac=+$('fc_sliderCac').value,n=+$('fc_dealsInput').value||100,
           ms=locks.mrr?[curM]:MRR,os=locks.ob?[curO]:OB,fs=locks.fm?[curF]:FM;
     let bm=curM,bo=curO,bf=curF,best=-Infinity;
@@ -1271,8 +1282,21 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     $('fc_netPipelineSub').textContent=`${rLoStr} to ${rHiStr} 80% range`;
 
     // ── Win funnel bars ──────────────────────────────────────────────────────
-    $('fc_winBar').style.width=Math.min(wr*100,100)+'%';
-    $('fc_churnBar').style.width=Math.min(ch*100,100)+'%';
+    // All bars are expressed as a fraction of the TOTAL PIPELINE (N deals).
+    // Won = wrEff*N/N = wrEff
+    // Churned = wrEff*ch*N/N = wrEff*ch  (of the total pipeline, this fraction won then churned)
+    // Retained = wrEff*(1-ch)*N/N = wrEff*(1-ch)
+    // Previously the churn bar used ch directly (41.8%), implying 41 of 100 pipeline deals
+    // churned — wrong. The correct value is wrEff*ch (5.7% of pipeline).
+    const wonFrac=wrEff;
+    const churnedFrac=wrEff*ch;
+    const retainFrac=wrEff*(1-ch);
+    $('fc_winBar').style.width=Math.min(wonFrac*100,100)+'%';
+    $('fc_churnBar').style.width=Math.min(churnedFrac*100,100)+'%';
+    $('fc_retainBar').style.width=Math.min(retainFrac*100,100)+'%';
+    $('fc_winBarLabel').textContent=wins.toFixed(1);
+    $('fc_churnBarLabel').textContent=churned.toFixed(1);
+    $('fc_retainBarLabel').textContent=surv.toFixed(1);
 
     // ── Breakdown table ──────────────────────────────────────────────────────
     $('fc_fWon').textContent=wins.toFixed(1);
