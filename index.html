@@ -468,7 +468,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
         <div class="field"><label>Custom MRR marker</label><div class="range-wrap"><input id="mrrRange" type="range" min="99" max="3000" step="50" value="1500"><input id="mrrInput" type="number" value="1500"></div></div>
         <div class="field"><label>CAC per won account</label><div class="range-wrap"><input id="cacRange" type="range" min="500" max="20000" step="250" value="5000"><input id="cacInput" type="number" value="5000"></div></div>
         <div class="field"><label>Horizon</label><select id="horizon"><option value="12">12 months</option><option value="24" selected>24 months</option><option value="36">36 months</option></select></div>
-        <div class="field"><label>Chart metric</label><select id="metric"><option value="ratio" selected>LTV:CAC</option><option value="ltv">Calibrated LTV</option><option value="churn">Projected churn</option><option value="net">Net value</option><option value="paybackProgress">CAC recovery</option></select></div>
+        <div class="field"><label>Chart metric</label><select id="metric"><option value="ratio" selected>LTV:CAC</option><option value="ltv">Calibrated LTV</option><option value="churn">Cumulative churn (chart)</option><option value="net">Net per won deal</option><option value="paybackProgress">CAC recovery</option></select></div>
         <div class="field"><label>Segment view</label><select id="segment"><option value="matrix" selected>Free × onboarding</option><option value="free">Waived months</option><option value="ob">Onboarding %</option><option value="mrr">MRR tier</option></select></div>
         <div class="field"><label>Heatmap goal</label><select id="goal"><option value="ratio" selected>Max LTV:CAC</option><option value="churn">Min churn</option><option value="payback">Min payback</option></select></div>
       </div>
@@ -1067,14 +1067,14 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
   const MRR=[500,750,1000,1500,2000,2250,2500,3000],OB=[0,25,50,75,100,125,150,200],FM=[0,1,2,3];
   const PRE={
     focused:{mrr:[1500],ob:[100,125],fm:[0,1]},
-    standard:{mrr:[1000,1500,2000],ob:[50,100,125,150],fm:[0,1,2]},
+    standard:{mrr:[1000,1500,2000],ob:[50,100,125,150],fm:[0,1]},
     wide:{mrr:[500,1000,1500,2000,2500],ob:[0,50,100,125,150,200],fm:[0,1,2,3]}
   };
   // Chart palette for explorer — distinct from status colors
   const PALETTE=['#5bafd6','#9b72d0','#38b8a0','#e8a03a','#d06472','#7db87a','#5e8cba','#c47eb0'];
   const state={selMrr:new Set(PRE.standard.mrr),selOb:new Set(PRE.standard.ob),selFm:new Set(PRE.standard.fm),customMrr:1500,cac:5000,horizon:24,metric:'ratio',segment:'matrix',goal:'ratio',showLabels:false,highlightBest:true};
   const color=i=>PALETTE[i%PALETTE.length];
-  const ML={ltv:'Calibrated LTV',ratio:'LTV:CAC',churn:'Projected churn',paybackProgress:'CAC recovery %',net:'Net value'};
+  const ML={ltv:'Calibrated LTV',ratio:'LTV:CAC',churn:'Cumulative churn (% won deals lost)',paybackProgress:'CAC recovery %',net:'Net per won deal'};
 
   function valFmt(m,v){return m==='ltv'||m==='net'?fmtK(v):m==='ratio'?fmtRatio(v):m==='churn'?Math.round(v*100)+'%':Math.round(v)+'%'}
   function setup(c){
@@ -1084,8 +1084,17 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     return{ctx,w:r.width,h:r.height};
   }
   function sc(m,o,f){
-    const or=o/100,b=ltvBreakdown(m,or,f,0),ltv=b.calibrated,ch=scoreChurn(m,or,f,0),pb=paybackMonth(m,or,f,0,state.cac);
-    return{mrr:m,ob:o,fm:f,label:`$${m.toLocaleString()} · ${o}% OB · ${f} mo`,short:`$${m>=1000?(m/1000)+'k':m}/${o}%/${f}fm`,ltv,upfront:b.upfront,churn:ch,churn12:ch,ratio:ltv/state.cac,net:ltv-state.cac,payback:pb};
+    const or=o/100,b=ltvBreakdown(m,or,f,0,state.horizon),ltv=b.calibrated,
+          ch=scoreChurn(m,or,f,0),wr=scoreWinRate(m,or,f,0),
+          pb=paybackMonth(m,or,f,0,state.cac);
+    return{mrr:m,ob:o,fm:f,
+      label:`$${m.toLocaleString()} · ${o}% OB · ${f} mo`,
+      short:`$${m>=1000?(m/1000)+'k':m}/${o}%/${f}fm`,
+      ltv,upfront:b.upfront,churn:ch,churn12:ch,
+      winRate:wr,                      // conversion rate per opportunity
+      ratio:ltv/state.cac,             // LTV:CAC at state.horizon months
+      net:ltv-state.cac,               // net per won deal (not pipeline total)
+      payback:pb};
   }
   function build(){const out=[];[...state.selMrr].sort((a,b)=>a-b).forEach(m=>[...state.selOb].sort((a,b)=>a-b).forEach(o=>[...state.selFm].sort((a,b)=>a-b).forEach(f=>out.push(sc(m,o,f)))));return out}
   function curve(s){
@@ -1200,9 +1209,16 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
   }
 
   function table(arr){
-    $('summaryTable').innerHTML='<thead><tr><th>Scenario</th><th>MRR</th><th>OB %</th><th>Free mo</th><th>Upfront</th><th>Calibrated LTV</th><th>Churn</th><th>CAC payback</th><th>LTV:CAC</th><th>Net</th></tr></thead><tbody>'+
-      [...arr].sort((a,b)=>b.ratio-a.ratio).map(s=>`<tr><td>${s.label}</td><td>$${s.mrr.toLocaleString()}</td><td>${s.ob}%</td><td>${s.fm}</td><td>${fmtUSD(s.upfront)}</td><td>${fmtUSD(s.ltv)}</td><td class="${s.churn<.35?'pos':s.churn<.55?'':'neg'}">${fmtPct(s.churn)}</td><td>${fmtPb(s.payback)}</td><td class="${s.ratio>=3?'pos':s.ratio>=1?'':'neg'}">${fmtRatio(s.ratio)}</td><td class="${s.net>=0?'pos':'neg'}">${(s.net>=0?'+':'−')+fmtUSD(Math.abs(s.net))}</td></tr>`).join('')+
-      '</tbody>';
+    $('summaryTable').innerHTML='<thead><tr><th>Scenario</th><th>MRR</th><th>OB %</th><th>Waived mo</th><th>Win rate</th><th>Upfront</th><th>LTV ('+state.horizon+'mo)</th><th>12-mo churn</th><th>CAC payback</th><th>LTV:CAC</th><th>Net / won deal</th></tr></thead><tbody>'+
+      [...arr].sort((a,b)=>b.ratio-a.ratio).map(s=>`<tr>
+        <td>${s.label}</td><td>$${s.mrr.toLocaleString()}</td><td>${s.ob}%</td><td>${s.fm}</td>
+        <td class="${s.winRate>=0.20?'pos':s.winRate>=0.12?'':'neg'}">${(s.winRate*100).toFixed(1)}%</td>
+        <td>${fmtUSD(s.upfront)}</td><td>${fmtUSD(s.ltv)}</td>
+        <td class="${s.churn<.35?'pos':s.churn<.55?'':'neg'}">${fmtPct(s.churn)}</td>
+        <td>${fmtPb(s.payback)}</td>
+        <td class="${s.ratio>=3?'pos':s.ratio>=1?'':'neg'}">${fmtRatio(s.ratio)}</td>
+        <td class="${s.net>=0?'pos':'neg'}">${(s.net>=0?'+':'−')+fmtUSD(Math.abs(s.net))}</td>
+      </tr>`).join('')+'</tbody>';
   }
 
   function metrics(arr){
