@@ -133,6 +133,16 @@ body{
 .exec-chart-card,.panel,.card,.controls-pane,.outputs-pane{padding:18px}
 .exec-chart-card h3{margin:0 0 3px;font-size:14px;font-weight:700}
 .chart-caption{font-size:12px;color:var(--text3);margin:0 0 12px;line-height:1.45}
+.chart-callout{
+  margin-top:10px;
+  padding:10px 12px;
+  border-left:2px solid var(--blue);
+  background:rgba(91,175,214,.06);
+  border-radius:0 8px 8px 0;
+  font-size:12px;
+  color:var(--text2);
+  line-height:1.55;
+}
 .exec-chart-wrap,.chart-wrap,.chart-wrap-calc{
   background:rgba(8,11,18,.7);
   border:1px solid rgba(255,255,255,.05);
@@ -401,16 +411,28 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     <p class="exec-sub" style="margin-top:-6px;margin-bottom:16px;max-width:960px">The charts below show average modeled outcomes across the scenario space. They prepare users for the forecasting page by showing how each major pricing lever tends to move win rate, churn, and LTV:CAC.</p>
 
     <div class="charts-section" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="exec-chart-card"><h3>Contract MRR</h3><p class="chart-caption">Average modeled win rate, churn, and LTV:CAC across contract-size buckets.</p><div class="exec-chart-wrap"><canvas id="hChartMrr" role="img" aria-label="Bar chart: win rate, churn, and LTV:CAC by MRR bucket"></canvas></div></div>
-      <div class="exec-chart-card"><h3>Onboarding % of MRR</h3><p class="chart-caption">Average modeled tradeoff between onboarding level, expected conversion, churn risk, and economics.</p><div class="exec-chart-wrap"><canvas id="hChartOb" role="img" aria-label="Bar chart: outcomes by onboarding percentage"></canvas></div></div>
-      <div class="exec-chart-card"><h3>Waived months</h3><p class="chart-caption">Average modeled effect of delaying billing through 0–3 waived months.</p><div class="exec-chart-wrap"><canvas id="hChartFm" role="img" aria-label="Bar chart: outcomes by number of waived months"></canvas></div></div>
+      <div class="exec-chart-card">
+        <h3>Contract MRR</h3>
+        <div class="exec-chart-wrap"><canvas id="hChartMrr" role="img" aria-label="Bar chart: win rate, churn, and LTV:CAC by MRR bucket"></canvas></div>
+        <div class="chart-callout">Higher MRR closes less often but the unit economics improve sharply. Deals under $500/mo average <strong>0.93× LTV:CAC</strong> — frequently underwater on acquisition cost. The $1k–2k range balances conversion (~10%) and value (~4.4×). <em style="color:var(--text3)">LTV:CAC uses a 24-month window at $5k CAC.</em></div>
+      </div>
+      <div class="exec-chart-card">
+        <h3>Onboarding % of MRR</h3>
+        <div class="exec-chart-wrap"><canvas id="hChartOb" role="img" aria-label="Bar chart: outcomes by onboarding percentage"></canvas></div>
+        <div class="chart-callout">Higher onboarding fees cut win rate from <strong>15% → 9%</strong> while 24-mo LTV:CAC barely moves (4.1× → 3.7×). The upfront cash is offset by harder conversion and higher 12-mo churn. Lower OB wins more deals with nearly the same economics.</div>
+      </div>
+      <div class="exec-chart-card">
+        <h3>Waived months</h3>
+        <div class="exec-chart-wrap"><canvas id="hChartFm" role="img" aria-label="Bar chart: outcomes by number of waived months"></canvas></div>
+        <div class="chart-callout">One waived month costs <strong>~0.6× in 24-mo LTV:CAC</strong> (4.3× → 3.7×) and raises estimated 12-mo churn by ~5pp, with minimal conversion benefit. Delayed billing reduces recovered revenue. Zero waived months is preferred on unit economics.</div>
+      </div>
     </div>
 
     <div class="charts-section wide">
       <div class="exec-chart-card">
         <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
-          <div><h3>Interaction effect: onboarding × waived months</h3><p class="chart-caption">Cell values show the selected modeled outcome at each onboarding and waived-month combination, averaged across MRR scenarios.</p></div>
-          <div class="field" style="min-width:180px"><label>Heatmap metric</label><select id="hInteractionMetric"><option value="ratio" selected>LTV:CAC</option><option value="winRate">Win rate</option><option value="churn">Churn</option><option value="net">Net value</option></select></div>
+          <div><h3>Interaction effect: onboarding × waived months</h3><p class="chart-caption">Averaged across $750, $1,500, and $2,250 MRR. Only 0–1 waived months — data for 2+ is too sparse. <strong>Metric definitions:</strong> Win rate = conversion rate per opportunity (no time horizon). 12-mo churn = probability of churning within 12 months of signing. LTV:CAC and Net value use a 24-month LTV window at $5,000 CAC and a 100-deal pipeline.</p></div>
+          <div class="field" style="min-width:180px"><label>Heatmap metric</label><select id="hInteractionMetric"><option value="ratio" selected>LTV:CAC (24-mo)</option><option value="winRate">Win rate (per opp.)</option><option value="churn">12-mo churn rate</option><option value="net">Net value (24-mo, 100 deals)</option></select></div>
         </div>
         <div class="exec-chart-wrap tall"><canvas id="hChartInteraction" role="img" aria-label="Heatmap: interaction between onboarding % and waived months"></canvas></div>
       </div>
@@ -419,7 +441,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     <div class="charts-section wide">
       <div class="exec-chart-card">
         <h3>Top modeled pricing structures</h3>
-        <p class="chart-caption">Ranked by expected net value using a standard 100-deal pipeline and $5,000 CAC per won account.</p>
+        <p class="chart-caption">Ranked by expected net value. LTV uses a 24-month window; CAC = $5,000; pipeline = 100 deals. Restricted to in-range model predictions (no extrapolation) and 0–1 waived months.</p>
         <div style="overflow:auto"><table id="hTopScenarios"></table></div>
       </div>
     </div>
@@ -783,6 +805,12 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
   function ratio(v){return v.toFixed(2)+'×'}
   function usdK(v){const sign=v<0?'-':'';const x=Math.abs(v);return x>=1000?sign+'$'+(x/1000).toFixed(x>=10000?0:1)+'k':sign+'$'+Math.round(x)}
   function avg(a,k){return a.length?a.reduce((s,x)=>s+x[k],0)/a.length:0}
+  // Local scoreRaw for extrapolation filtering in top() — mirrors the models script
+  function scoreRaw(mrr,ob,fm){
+    const M={intercept:.223357,features:[{name:'avg_coupon_15pct',mean:.052683,std:.129184,coef:.005573},{name:'avg_coupon_25pct',mean:.026113,std:.078158,coef:.045761},{name:'avg_free_mo',mean:.699680,std:.402589,coef:0},{name:'avg_log_mrr',mean:6.494034,std:.304220,coef:-.067788},{name:'avg_ob_pct',mean:.708795,std:.456633,coef:-.203934},{name:'ix_mrr_free',mean:4.451093,std:2.490561,coef:-.073078},{name:'ix_mrr_ob',mean:4.502319,std:2.816991,coef:.059188},{name:'ix_ob_free',mean:.585069,std:.524263,coef:.149384}]};
+    const l=Math.log(Math.max(mrr,1));const f={avg_log_mrr:l,avg_ob_pct:ob,avg_free_mo:fm,ix_mrr_ob:l*ob,ix_mrr_free:l*fm,ix_ob_free:ob*fm,avg_coupon_15pct:0,avg_coupon_25pct:0};
+    let s=M.intercept;for(const feat of M.features){const raw=f[feat.name]!==undefined?f[feat.name]:feat.mean;s+=feat.coef*((raw-feat.mean)/(feat.std||1))}return s;
+  }
   function scen(m,o,f,d=0){
     const wr=scoreWinRate(m,o,f,d),ch=scoreChurn(m,o,f,d),ltv=ltvBreakdown(m,o,f,d).calibrated,rat=ltv/CAC,wins=PIPE*wr,net=wins*ltv-wins*CAC;
     return{mrr:m,obPct:o,freeMonths:f,discountPct:d,winRate:wr,churn:ch,ltv,ratio:rat,wins,net};
@@ -790,66 +818,150 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
 
   function barChart(id,groups){
     const s=setup(id);if(!s)return;
-    const{ctx,w,h}=s,p={l:46,r:14,t:28,b:42},pw=w-p.l-p.r,ph=h-p.t-p.b;
+    const{ctx,w,h}=s;
+    // Generous left/right padding for dual axis labels
+    const p={l:52,r:48,t:36,b:44},pw=w-p.l-p.r,ph=h-p.t-p.b;
     if(pw<=0||ph<=0)return;
-    const labels=[
-      ['winRate','Win rate',CHART_COLORS.winRate],
-      ['churn','Churn',CHART_COLORS.churn],
-      ['ratioScaled','LTV:CAC ÷5',CHART_COLORS.ratio]
+
+    // Left axis: 0-100% for win rate and churn
+    // Right axis: 0-10× for LTV:CAC (no ÷5 hack)
+    const PCT_MAX=1.0;     // 100%
+    const RAT_MAX=10.0;    // 10×
+
+    const series=[
+      {key:'winRate',  label:'Win rate', color:CHART_COLORS.winRate,  axis:'left',  fmt:v=>Math.round(v*100)+'%'},
+      {key:'churn',    label:'Churn',    color:CHART_COLORS.churn,    axis:'left',  fmt:v=>Math.round(v*100)+'%'},
+      {key:'ratio',    label:'LTV:CAC',  color:CHART_COLORS.ratio,    axis:'right', fmt:v=>v.toFixed(1)+'×'},
     ];
-    const yp=v=>p.t+(1-v)*ph,zero=p.t+ph;
-    ctx.font='11px DM Sans,system-ui,sans-serif';
-    ctx.fillStyle='#556070';
-    ctx.strokeStyle='rgba(255,255,255,.07)';
-    for(let i=0;i<=4;i++){
-      const y=p.t+ph*i/4;
-      ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(w-p.r,y);ctx.stroke();
-      ctx.fillText(Math.round((1-i/4)*100)+'%',4,y+4);
+
+    // Gridlines (based on left %)
+    ctx.font='10px DM Sans,system-ui,sans-serif';
+    ctx.strokeStyle='rgba(255,255,255,.06)';
+    const TICKS=5;
+    for(let i=0;i<=TICKS;i++){
+      const frac=i/TICKS;
+      const y=p.t+(1-frac)*ph;
+      ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(w-p.r,y);
+      ctx.strokeStyle='rgba(255,255,255,.06)';ctx.stroke();
+      // Left axis labels (%)
+      ctx.fillStyle='#8d97aa';ctx.textAlign='right';
+      ctx.fillText(Math.round(frac*100)+'%',p.l-5,y+3);
+      // Right axis labels (LTV:CAC ×)
+      ctx.textAlign='left';
+      ctx.fillText((frac*RAT_MAX).toFixed(1)+'×',w-p.r+5,y+3);
     }
-    const gw=pw/groups.length,bw=Math.min(20,gw*.20),gap=3;
-    groups.forEach((g,gi)=>{
-      const cx=p.l+gw*(gi+.5),tw=labels.length*bw+(labels.length-1)*gap;
-      labels.forEach((ser,si)=>{
-        const v=Math.max(0,Math.min(1,g[ser[0]]||0)),x=cx-tw/2+si*(bw+gap),y=yp(v),bh=Math.max(2,zero-y);
-        ctx.fillStyle=ser[2];
-        ctx.beginPath();
-        if(ctx.roundRect)ctx.roundRect(x,y,bw,bh,2);else ctx.rect(x,y,bw,bh);
-        ctx.fill();
-      });
-      ctx.fillStyle='#8d97aa';ctx.textAlign='center';ctx.font='11px DM Sans,system-ui,sans-serif';
-      String(g.label).split('\n').forEach((txt,i)=>ctx.fillText(txt,cx,h-26+i*11));
-    });
+
+    // Left axis label (rotated)
+    ctx.save();ctx.translate(11,p.t+ph/2);ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='#556070';ctx.font='10px DM Sans,system-ui,sans-serif';ctx.textAlign='center';
+    ctx.fillText('Win rate / Churn',0,0);ctx.restore();
+
+    // Right axis label (rotated)
+    ctx.save();ctx.translate(w-10,p.t+ph/2);ctx.rotate(Math.PI/2);
+    ctx.fillStyle='#556070';ctx.font='10px DM Sans,system-ui,sans-serif';ctx.textAlign='center';
+    ctx.fillText('LTV:CAC',0,0);ctx.restore();
+
+    // Legend
     ctx.textAlign='left';
-    labels.forEach((ser,i)=>{
-      const x=p.l+i*82;
-      ctx.fillStyle=ser[2];ctx.fillRect(x,p.t-16,12,5);
-      ctx.fillStyle='#8d97aa';ctx.font='11px DM Sans,system-ui,sans-serif';
-      ctx.fillText(ser[1],x+16,p.t-12);
+    series.forEach((ser,i)=>{
+      const x=p.l+i*(pw/3);
+      ctx.fillStyle=ser.color;ctx.fillRect(x,p.t-24,11,5);
+      ctx.fillStyle='#8d97aa';ctx.font='10px DM Sans,system-ui,sans-serif';
+      ctx.fillText(ser.label,x+15,p.t-20);
+    });
+
+    // Bars
+    const gw=pw/groups.length;
+    const bw=Math.min(18,gw*0.21);
+    const gap=3;
+    groups.forEach((g,gi)=>{
+      const cx=p.l+gw*(gi+0.5);
+      const tw=series.length*bw+(series.length-1)*gap;
+      const x0=cx-tw/2;
+
+      series.forEach((ser,si)=>{
+        const rawVal=g[ser.key]||0;
+        const frac=ser.axis==='left'
+          ? Math.min(rawVal/PCT_MAX,1)
+          : Math.min(rawVal/RAT_MAX,1);
+        const barH=Math.max(2,ph*frac);
+        const x=x0+si*(bw+gap);
+        const y=p.t+ph-barH;
+
+        ctx.fillStyle=ser.color;
+        ctx.beginPath();
+        if(ctx.roundRect)ctx.roundRect(x,y,bw,barH,2);else ctx.rect(x,y,bw,barH);
+        ctx.fill();
+
+        // Value label above bar (if bar tall enough)
+        if(barH>14){
+          ctx.fillStyle='rgba(255,255,255,.85)';
+          ctx.font='bold 9px DM Mono,monospace';
+          ctx.textAlign='center';
+          ctx.fillText(ser.fmt(rawVal),x+bw/2,y-3);
+          ctx.textAlign='left';
+        } else {
+          // Short bar: place label above bar top
+          ctx.fillStyle=ser.color;
+          ctx.font='bold 9px DM Mono,monospace';
+          ctx.textAlign='center';
+          ctx.fillText(ser.fmt(rawVal),x+bw/2,y-3);
+          ctx.textAlign='left';
+        }
+      });
+
+      // Group label
+      ctx.fillStyle='#8d97aa';ctx.textAlign='center';ctx.font='11px DM Sans,system-ui,sans-serif';
+      String(g.label).split('\n').forEach((txt,i)=>ctx.fillText(txt,cx,h-28+i*12));
     });
   }
 
   function drawMrr(){
-    const buckets=[['$250–500',[250,350,450,500]],['$500–1k',[600,750,1000]],['$1k–2k',[1250,1500,1750,2000]],['$2k+',[2250,2500,3000]]];
-    barChart('hChartMrr',buckets.map(b=>{const arr=[];b[1].forEach(m=>[0,.25,.5,1].forEach(o=>[0,1].forEach(f=>arr.push(scen(m,o,f)))));return{label:b[0],winRate:avg(arr,'winRate'),churn:avg(arr,'churn'),ratioScaled:Math.min(avg(arr,'ratio')/5,1)}}));
+    const buckets=[
+      ['$250–500',[250,350,450,500]],
+      ['$500–1k',[600,750,1000]],
+      ['$1k–2k',[1250,1500,1750,2000]],
+      ['$2k+',[2250,2500,3000]]
+    ];
+    barChart('hChartMrr',buckets.map(b=>{
+      const arr=[];
+      b[1].forEach(m=>[0,.25,.5,1].forEach(o=>[0,1].forEach(f=>arr.push(scen(m,o,f)))));
+      return{label:b[0],winRate:avg(arr,'winRate'),churn:avg(arr,'churn'),ratio:avg(arr,'ratio')};
+    }));
   }
+
   function drawOb(){
-    const buckets=[['0–25%',[0,.1,.25]],['25–75%',[.35,.5,.65,.75]],['75–125%',[.85,1,1.1,1.25]],['125%+',[1.4,1.5,1.75,2]]];
-    barChart('hChartOb',buckets.map(b=>{const arr=[];b[1].forEach(o=>[750,1500,2250].forEach(m=>[0,1].forEach(f=>arr.push(scen(m,o,f)))));return{label:b[0],winRate:avg(arr,'winRate'),churn:avg(arr,'churn'),ratioScaled:Math.min(avg(arr,'ratio')/5,1)}}));
+    const buckets=[
+      ['0–25%',[0,.1,.25]],
+      ['25–75%',[.35,.5,.65,.75]],
+      ['75–125%',[.85,1,1.1,1.25]],
+      ['125%+',[1.4,1.5,1.75,2]]
+    ];
+    barChart('hChartOb',buckets.map(b=>{
+      const arr=[];
+      b[1].forEach(o=>[750,1500,2250].forEach(m=>[0,1].forEach(f=>arr.push(scen(m,o,f)))));
+      return{label:b[0],winRate:avg(arr,'winRate'),churn:avg(arr,'churn'),ratio:avg(arr,'ratio')};
+    }));
   }
+
   function drawFm(){
-    barChart('hChartFm',[0,1,2,3].map(f=>{const arr=[];[750,1500,2250].forEach(m=>[.25,.5,1].forEach(o=>arr.push(scen(m,o,f))));return{label:f+' mo',winRate:avg(arr,'winRate'),churn:avg(arr,'churn'),ratioScaled:Math.min(avg(arr,'ratio')/5,1)}}));
+    barChart('hChartFm',[0,1].map(f=>{
+      const arr=[];[750,1500,2250].forEach(m=>[.25,.5,1].forEach(o=>arr.push(scen(m,o,f))));
+      return{label:f===0?'0 mo\n(no waiver)':'1 mo\nwaived',winRate:avg(arr,'winRate'),churn:avg(arr,'churn'),ratio:avg(arr,'ratio')};
+    }));
   }
 
   function heat(){
     const s=setup('hChartInteraction');
     if(!s){
-      // Canvas had zero dimensions — section may not be laid out yet. Retry after paint.
       requestAnimationFrame(()=>requestAnimationFrame(()=>{if(typeof window._drawHomeCharts==='function')window._drawHomeCharts()}));
       return;
     }
     const{ctx,w,h}=s,metric=(document.getElementById('hInteractionMetric')||{}).value||'ratio',
-      obs=[0,.25,.5,.75,1,1.25,1.5,2],fms=[0,1,2,3],mrrs=[750,1500,2250],
-      p={l:68,r:18,t:36,b:44},cw=(w-p.l-p.r)/obs.length,chh=(h-p.t-p.b)/fms.length,cells=[],vals=[];
+      obs=[0,.25,.5,.75,1,1.25,1.5,2],
+      fms=[0,1],  // FM=2,3 removed — small sample size in training data
+      mrrs=[750,1500,2250],
+      p={l:72,r:18,t:44,b:48},cw=(w-p.l-p.r)/obs.length,chh=(h-p.t-p.b)/fms.length,cells=[],vals=[];
     fms.forEach((fm,fi)=>obs.forEach((o,oi)=>{
       const arr=mrrs.map(m=>scen(m,o,fm));
       let v=metric==='winRate'?avg(arr,'winRate'):metric==='churn'?avg(arr,'churn'):metric==='net'?avg(arr,'net'):avg(arr,'ratio');
@@ -857,7 +969,6 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     }));
     let mn=Math.min(...vals),mx=Math.max(...vals);
     if(mn===mx){mn-=1;mx+=1}
-    // Single-hue sequential scale: light teal → deep blue — perceptually uniform
     function color(v){
       let score=(v-mn)/(mx-mn);
       if(metric==='churn')score=1-score;
@@ -865,32 +976,61 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
       return`rgb(${r},${g},${b})`;
     }
     function labelFn(v){return metric==='winRate'||metric==='churn'?pct(v):metric==='net'?usdK(v):ratio(v)}
+
+    // Title
+    ctx.fillStyle='#556070';ctx.font='11px DM Sans,system-ui,sans-serif';ctx.textAlign='center';
+    const metricLabel={
+      ratio:'24-mo LTV:CAC (avg $750/$1,500/$2,250 MRR)',
+      winRate:'Win rate per opportunity (avg $750/$1,500/$2,250 MRR)',
+      churn:'12-mo churn rate (avg $750/$1,500/$2,250 MRR)',
+      net:'24-mo net value / 100 deals (avg $750/$1,500/$2,250 MRR)'
+    }[metric]||metric;
+    ctx.fillText(metricLabel,p.l+(w-p.l-p.r)/2,16);
+
+    // X-axis label
+    ctx.fillStyle='#556070';ctx.font='11px DM Sans,system-ui,sans-serif';ctx.textAlign='center';
+    ctx.fillText('Onboarding % of MRR',p.l+(w-p.l-p.r)/2,h-6);
+
+    // Y-axis label (rotated)
+    ctx.save();ctx.translate(12,p.t+chh*fms.length/2);ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='#556070';ctx.font='11px DM Sans,system-ui,sans-serif';ctx.textAlign='center';
+    ctx.fillText('Waived months',0,0);ctx.restore();
+
+    // X-axis tick labels
     ctx.fillStyle='#8d97aa';ctx.font='11px DM Sans,system-ui,sans-serif';ctx.textAlign='center';
-    obs.forEach((o,i)=>ctx.fillText(Math.round(o*100)+'% OB',p.l+cw*(i+.5),h-20));
+    obs.forEach((o,i)=>ctx.fillText(Math.round(o*100)+'%',p.l+cw*(i+.5),h-26));
+
+    // Y-axis tick labels
     ctx.textAlign='right';
     fms.forEach((fm,i)=>ctx.fillText(fm+' mo',p.l-8,p.t+chh*(i+.5)+4));
+
+    // Cells
     cells.forEach(c=>{
       const x=p.l+c.oi*cw,y=p.t+c.fi*chh;
       ctx.fillStyle=color(c.v);
-      // beginPath() required — without it path accumulates across cells
       ctx.beginPath();
       if(ctx.roundRect)ctx.roundRect(x+2,y+2,cw-4,chh-4,5);else ctx.rect(x+2,y+2,cw-4,chh-4);
       ctx.fill();
-      // Contrast-aware label: dark text on light cells, light text on dark cells
       const score=(c.v-mn)/(mx-mn);
       const adjusted=metric==='churn'?1-score:score;
       ctx.fillStyle=adjusted>0.55?'#edf0f7':'#0c1a26';
       ctx.font='bold 11px DM Mono,monospace';ctx.textAlign='center';
       ctx.fillText(labelFn(c.v),x+cw/2,y+chh/2+4);
     });
-    ctx.fillStyle='#556070';ctx.font='11px DM Sans,system-ui,sans-serif';ctx.textAlign='center';
-    ctx.fillText(({ratio:'LTV:CAC',winRate:'Win rate',churn:'Churn',net:'Net value'}[metric]||'Metric')+' — averaged across $750, $1,500, and $2,250 MRR',p.l+(w-p.l-p.r)/2,18);
   }
 
   function top(){
     const table=document.getElementById('hTopScenarios');if(!table)return;
-    const rows=[],mrrs=[500,750,1000,1500,2000,2250,2500,3000],obs=[0,.25,.5,.75,1,1.25,1.5,2],fms=[0,1,2,3];
-    mrrs.forEach(m=>obs.forEach(o=>fms.forEach(f=>rows.push(scen(m,o,f,0)))));
+    const rows=[];
+    // FM=0,1 only; filter out extrapolated scenarios (raw score outside [8%,40%])
+    const mrrs=[500,750,1000,1500,2000,2250,2500,3000];
+    const obs=[0,.25,.5,.75,1,1.25,1.5,2];
+    mrrs.forEach(m=>obs.forEach(o=>[0,1].forEach(f=>{
+      const raw=scoreRaw(m,o,f);
+      const extrap=Math.max(0,0.08-raw)+Math.max(0,raw-0.40);
+      if(extrap>0)return; // skip extrapolated scenarios
+      rows.push(scen(m,o,f,0));
+    })));
     rows.sort((a,b)=>b.net-a.net);
     table.innerHTML='<thead><tr><th>Rank</th><th>MRR</th><th>Onboarding</th><th>Waived mo.</th><th>Win rate</th><th>Churn</th><th>LTV:CAC</th><th>Net / 100 deals</th></tr></thead><tbody>'+
       rows.slice(0,8).map((r,i)=>`<tr><td>${i+1}</td><td>$${r.mrr.toLocaleString()}</td><td>${Math.round(r.obPct*100)}%</td><td>${r.freeMonths}</td><td>${pct1(r.winRate)}</td><td>${pct1(r.churn)}</td><td>${ratio(r.ratio)}</td><td class="${r.net>=0?'pos':'neg'}">${r.net>=0?'+':'−'}${usdK(Math.abs(r.net))}</td></tr>`).join('')+
