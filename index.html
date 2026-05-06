@@ -493,8 +493,8 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
       <span class="tag">Win rate + churn + cash engine</span>
     </div>
     <div class="opt-row">
-      <button id="fc_btnMinChurn" class="opt-btn"><span class="opt-icon">🛡️</span><span><strong>Minimize churn</strong><span class="opt-sub">weighted by win probability</span></span></button>
-      <button id="fc_btnMaxLtv" class="opt-btn"><span class="opt-icon">📈</span><span><strong>Maximize LTV:CAC</strong><span class="opt-sub">weighted by win probability</span></span></button>
+      <button id="fc_btnMinChurn" class="opt-btn"><span class="opt-icon">🛡️</span><span><strong>Minimize churn</strong><span class="opt-sub">lowest retention risk</span></span></button>
+      <button id="fc_btnMaxLtv" class="opt-btn"><span class="opt-icon">📈</span><span><strong>Best deal economics</strong><span class="opt-sub">highest LTV:CAC, WR ≥ 15%</span></span></button>
       <button id="fc_btnMaxRev" class="opt-btn"><span class="opt-icon">💰</span><span><strong>Maximize net pipeline</strong><span class="opt-sub">wins × LTV − CAC</span></span></button>
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:#0f131c;border:1px solid var(--line);border-radius:var(--r-card)">
@@ -1170,10 +1170,19 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
             ltvCac=ltv/cacForScore,
             wins=n*wr,net=wins*ltv-wins*cac;
       // Score functions:
-      //   churn:  -(ch × wr) = expected churned deals per pipeline deal (lower = better)
-      //   ltvcac: (ltv/cac) × wr = LTV:CAC weighted by conversion probability
-      //   maxrev: wins × (ltv − cac) = net pipeline value
-      let score=goal==='churn'?-(ch*wr):goal==='ltvcac'?ltvCac*wr:net;
+      //   churn:  -ch = churn rate of won deals (lower = better retention)
+      //           No WR weighting — we want the deal structure with the best retention
+      //           regardless of how often it converts. WR weighting caused low-WR deals
+      //           to win because they churn fewer absolute deals, which is the wrong metric.
+      //   ltvcac: ltv/cac = pure LTV:CAC ratio, restricted to WR >= 15% floor.
+      //           No WR weighting — maximizes the displayed ratio directly so the result
+      //           always shows the highest LTV:CAC of any optimizer output.
+      //           WR floor prevents picking operationally useless sub-15% win rate deals.
+      //   maxrev: wins × (ltv − cac) = total net pipeline value
+      const WR_FLOOR=0.15;
+      let score=goal==='churn'?-ch:
+                goal==='ltvcac'?(wr>=WR_FLOOR?ltvCac:-Infinity):
+                net;
       if(score>best){best=score;bm=m;bo=o;bf=f}
     }
     // Surface a warning if the optimizer found no in-range scenarios.
