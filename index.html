@@ -294,6 +294,15 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
 }
 .fm-pill.active{background:rgba(91,175,214,.14);border-color:rgba(91,175,214,.6);color:var(--text)}
 .locked-pill{opacity:.45;cursor:not-allowed}
+/* Horizon pills */
+.fc-horizon-pill{
+  border:1px solid var(--line);border-radius:8px;
+  padding:5px 0;flex:1;cursor:pointer;text-align:center;
+  color:var(--text2);background:#0d111a;font-weight:700;
+  font-family:inherit;font-size:11px;
+  transition:background .12s,border-color .12s,color .12s;
+}
+.fc-horizon-pill.active{background:rgba(155,114,208,.15);border-color:rgba(155,114,208,.55);color:var(--text)}
 .lock-note{
   display:none;margin-top:12px;padding:9px 12px;
   border-radius:var(--r-card);
@@ -487,6 +496,17 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
       <button id="fc_btnMinChurn" class="opt-btn"><span class="opt-icon">🛡️</span><span><strong>Minimize churn</strong><span class="opt-sub">weighted by win probability</span></span></button>
       <button id="fc_btnMaxLtv" class="opt-btn"><span class="opt-icon">📈</span><span><strong>Maximize LTV:CAC</strong><span class="opt-sub">weighted by win probability</span></span></button>
       <button id="fc_btnMaxRev" class="opt-btn"><span class="opt-icon">💰</span><span><strong>Maximize net pipeline</strong><span class="opt-sub">wins × LTV − CAC</span></span></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:#0f131c;border:1px solid var(--line);border-radius:var(--r-card)">
+      <span style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);font-weight:700;white-space:nowrap">LTV horizon</span>
+      <div style="display:flex;gap:5px;flex:1">
+        <button class="fc-horizon-pill active" data-h="12">12 mo</button>
+        <button class="fc-horizon-pill" data-h="24">24 mo</button>
+        <button class="fc-horizon-pill" data-h="36">36 mo</button>
+        <button class="fc-horizon-pill" data-h="48">48 mo</button>
+        <button class="fc-horizon-pill" data-h="60">60 mo</button>
+      </div>
+      <span id="fc_horizonHint" style="font-size:11px;color:var(--text3);white-space:nowrap">affects LTV, optimizer &amp; net pipeline</span>
     </div>
     <div class="calc-grid">
       <div class="controls-pane">
@@ -1094,6 +1114,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
         wrCls=w=>w>=.28?'good':w>=.18?'warn':'bad';
   const D=0; // no coupon
   let conservative=false; // conservative toggle state
+  let fc_horizon=24;      // LTV horizon in months (12/24/36/48/60)
 
   // Tier colors
   const TIER_COLOR={HIGH:'var(--green)',MODERATE:'var(--amber)',LOW:'var(--red)',EXTRAPOLATED:'var(--purple)'};
@@ -1145,7 +1166,7 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
       // Skip extrapolated scenarios — the model has no training data there.
       if(wrBand.extrapolation>0) continue;
       eligibleFound=true;
-      const ltv=ltvBreakdown(m,or,f,D).calibrated,
+      const ltv=ltvBreakdown(m,or,f,D,fc_horizon).calibrated,
             ltvCac=ltv/cacForScore,
             wins=n*wr,net=wins*ltv-wins*cac;
       // Score functions:
@@ -1175,6 +1196,14 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
 
   // Conservative toggle — use lower CI bound as the win rate for all derived metrics
   $('fc_conservativeToggle').addEventListener('change',e=>{conservative=e.target.checked;update()});
+
+  // Horizon pills — change the LTV calculation window, re-run optimizers + update display
+  document.querySelectorAll('.fc-horizon-pill').forEach(p=>p.addEventListener('click',()=>{
+    fc_horizon=+p.dataset.h;
+    document.querySelectorAll('.fc-horizon-pill').forEach(x=>x.classList.toggle('active',+x.dataset.h===fc_horizon));
+    clearOpt();
+    update();
+  }));
 
   function drawTradeoff(mrr,fm){
     const c=$('fc_tradeoffCanvas');if(!c)return;
@@ -1230,12 +1259,12 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-top:7px;cursor:poin
     const ch=chBand.point,chLo=chBand.chLo,chHi=chBand.chHi;
 
     // ── LTV at point + churn bounds ─────────────────────────────────────────
-    const bk=ltvBreakdown(mrr,ob,fc_fm,D);
+    const bk=ltvBreakdown(mrr,ob,fc_fm,D,fc_horizon);
     const ltv=bk.calibrated;
     // Guard CAC=0: ratio is meaningless at zero cost, show as ∞ explicitly
     const ltvCac=cac>0?ltv/cac:null;
-    const ltvLo=ltvAtChurn(mrr,ob,fc_fm,chHi); // high churn → low LTV
-    const ltvHi=ltvAtChurn(mrr,ob,fc_fm,chLo); // low churn  → high LTV
+    const ltvLo=ltvAtChurn(mrr,ob,fc_fm,chHi,fc_horizon); // high churn → low LTV
+    const ltvHi=ltvAtChurn(mrr,ob,fc_fm,chLo,fc_horizon); // low churn  → high LTV
 
     // ── Derived metrics ─────────────────────────────────────────────────────
     const wins=n*wrEff,lost=n-wins,churned=wins*ch,surv=wins*(1-ch),
